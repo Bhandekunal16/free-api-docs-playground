@@ -7,7 +7,6 @@ import {
   CloudSun,
   ShieldAlert,
   AlertTriangle,
-  Search,
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
@@ -22,8 +21,6 @@ export const Sidebar: React.FC = () => {
     isMobileMenuOpen,
     setIsMobileMenuOpen
   } = useApi();
-
-  const [filterQuery, setFilterQuery] = useState<string>('');
   
   // Collapsible section states
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
@@ -49,12 +46,6 @@ export const Sidebar: React.FC = () => {
   const geographyEndpoints = API_ENDPOINTS.filter(e => e.category === 'geography');
   const weatherEndpoints = API_ENDPOINTS.filter(e => e.category === 'weather');
 
-  const filterItem = (title: string, path?: string) => {
-    if (!filterQuery.trim()) return true;
-    const q = filterQuery.toLowerCase();
-    return title.toLowerCase().includes(q) || (path && path.toLowerCase().includes(q));
-  };
-
   return (
     <>
       {/* Mobile Backdrop */}
@@ -72,25 +63,11 @@ export const Sidebar: React.FC = () => {
         }`}
       >
         {/* Top Menubar Header with Version & Mode Badge */}
-        <div className="px-3 pt-3 pb-2 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
+        <div className="px-3.5 py-3 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/30">
           <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">Explorer</span>
           <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded shadow-2xs">
             v1.0 Docs & Playground
           </span>
-        </div>
-
-        {/* Search filter in sidebar */}
-        <div className="p-3 border-b border-slate-200 dark:border-slate-800/80">
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" />
-            <input
-              type="text"
-              value={filterQuery}
-              onChange={e => setFilterQuery(e.target.value)}
-              placeholder="Filter endpoints & docs..."
-              className="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-md text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-medium transition-colors"
-            />
-          </div>
         </div>
 
         {/* Navigation list */}
@@ -110,47 +87,41 @@ export const Sidebar: React.FC = () => {
 
             {!collapsedSections.docs && (
               <div className="space-y-0.5 pt-0.5">
-                {filterItem(DOC_ARTICLES.overview.title) && (
-                  <button
-                    onClick={() => handleSelect('doc', 'overview')}
-                    className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      activeSelection.type === 'doc' && activeSelection.id === 'overview'
-                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <BookOpen size={14} className="shrink-0 text-slate-700 dark:text-slate-300" />
-                    <span className="truncate">Overview</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => handleSelect('doc', 'overview')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'overview'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <BookOpen size={14} className="shrink-0 text-slate-700 dark:text-slate-300" />
+                  <span className="truncate">Overview</span>
+                </button>
 
-                {filterItem(DOC_ARTICLES['http-status-codes'].title) && (
-                  <button
-                    onClick={() => handleSelect('doc', 'http-status-codes')}
-                    className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      activeSelection.type === 'doc' && activeSelection.id === 'http-status-codes'
-                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <ShieldAlert size={14} className="shrink-0 text-amber-600 dark:text-amber-400" />
-                    <span className="truncate">HTTP Status Codes</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => handleSelect('doc', 'http-status-codes')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'http-status-codes'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <ShieldAlert size={14} className="shrink-0 text-amber-600 dark:text-amber-400" />
+                  <span className="truncate">HTTP Status Codes</span>
+                </button>
 
-                {filterItem(DOC_ARTICLES['error-handling'].title) && (
-                  <button
-                    onClick={() => handleSelect('doc', 'error-handling')}
-                    className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      activeSelection.type === 'doc' && activeSelection.id === 'error-handling'
-                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <AlertTriangle size={14} className="shrink-0 text-rose-600 dark:text-rose-400" />
-                    <span className="truncate">Error Handling</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => handleSelect('doc', 'error-handling')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'error-handling'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <AlertTriangle size={14} className="shrink-0 text-rose-600 dark:text-rose-400" />
+                  <span className="truncate">Error Handling</span>
+                </button>
               </div>
             )}
           </div>
@@ -170,7 +141,7 @@ export const Sidebar: React.FC = () => {
 
             {!collapsedSections.health && (
               <div className="space-y-0.5 pt-0.5">
-                {healthEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                {healthEndpoints.map(ep => {
                   const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
                   return (
                     <button
@@ -213,7 +184,7 @@ export const Sidebar: React.FC = () => {
 
             {!collapsedSections.fake && (
               <div className="space-y-0.5 pt-0.5">
-                {fakeEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                {fakeEndpoints.map(ep => {
                   const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
                   return (
                     <button
@@ -259,7 +230,7 @@ export const Sidebar: React.FC = () => {
 
             {!collapsedSections.geography && (
               <div className="space-y-0.5 pt-0.5">
-                {geographyEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                {geographyEndpoints.map(ep => {
                   const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
                   return (
                     <button
@@ -305,7 +276,7 @@ export const Sidebar: React.FC = () => {
 
             {!collapsedSections.weather && (
               <div className="space-y-0.5 pt-0.5">
-                {weatherEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                {weatherEndpoints.map(ep => {
                   const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
                   return (
                     <button
