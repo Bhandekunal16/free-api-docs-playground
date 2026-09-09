@@ -31,25 +31,25 @@ const TreeNode: React.FC<TreeNodeProps> = ({
 
   const renderValue = (val: any) => {
     if (val === null) {
-      return <span className="text-rose-400 font-mono">null</span>;
+      return <span className="text-rose-600 dark:text-rose-400 font-mono">null</span>;
     }
     if (typeof val === 'boolean') {
-      return <span className="text-amber-400 font-mono font-medium">{val ? 'true' : 'false'}</span>;
+      return <span className="text-amber-600 dark:text-amber-400 font-mono font-medium">{val ? 'true' : 'false'}</span>;
     }
     if (typeof val === 'number') {
-      return <span className="text-amber-300 font-mono">{val}</span>;
+      return <span className="text-amber-600 dark:text-amber-300 font-mono">{val}</span>;
     }
     if (typeof val === 'string') {
       const isUrl = /^https?:\/\//.test(val);
       if (isUrl) {
         return (
-          <span className="text-emerald-300 font-mono break-all">
+          <span className="text-emerald-600 dark:text-emerald-300 font-mono break-all">
             &quot;
             <a
               href={val}
               target="_blank"
               rel="noreferrer noopener"
-              className="underline hover:text-emerald-200 transition-colors"
+              className="underline hover:text-emerald-700 dark:hover:text-emerald-200 transition-colors"
             >
               {val}
             </a>
@@ -57,24 +57,24 @@ const TreeNode: React.FC<TreeNodeProps> = ({
           </span>
         );
       }
-      return <span className="text-emerald-300 font-mono break-all">&quot;{val}&quot;</span>;
+      return <span className="text-emerald-600 dark:text-emerald-300 font-mono break-all">&quot;{val}&quot;</span>;
     }
-    return <span className="text-slate-300 font-mono">{String(val)}</span>;
+    return <span className="text-slate-700 dark:text-slate-300 font-mono">{String(val)}</span>;
   };
 
   const nameElement = name !== undefined ? (
-    <span className="text-sky-300 font-mono font-medium">
-      &quot;{name}&quot;<span className="text-slate-400 font-normal">: </span>
+    <span className="text-sky-600 dark:text-sky-300 font-mono font-medium">
+      &quot;{name}&quot;<span className="text-slate-500 dark:text-slate-400 font-normal">: </span>
     </span>
   ) : null;
 
   if (!isObject) {
     return (
-      <div className="font-mono text-xs leading-relaxed hover:bg-slate-800/40 px-1.5 py-0.5 rounded flex items-baseline">
+      <div className="font-mono text-xs leading-relaxed hover:bg-slate-100 dark:hover:bg-slate-800/40 px-1.5 py-0.5 rounded flex items-baseline">
         <span className="inline-block" style={{ width: `${depth * 16}px` }} />
         {nameElement}
         {renderValue(value)}
-        {!isLast && <span className="text-slate-500">,</span>}
+        {!isLast && <span className="text-slate-400 dark:text-slate-500">,</span>}
       </div>
     );
   }
@@ -89,8 +89,8 @@ const TreeNode: React.FC<TreeNodeProps> = ({
       <div className="font-mono text-xs leading-relaxed px-1.5 py-0.5 flex items-baseline">
         <span className="inline-block" style={{ width: `${depth * 16}px` }} />
         {nameElement}
-        <span className="text-slate-400">{openBracket}{closeBracket}</span>
-        {!isLast && <span className="text-slate-500">,</span>}
+        <span className="text-slate-600 dark:text-slate-400">{openBracket}{closeBracket}</span>
+        {!isLast && <span className="text-slate-400 dark:text-slate-500">,</span>}
       </div>
     );
   }
@@ -99,25 +99,25 @@ const TreeNode: React.FC<TreeNodeProps> = ({
     <div className="font-mono text-xs leading-relaxed">
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="hover:bg-slate-800/60 px-1.5 py-0.5 rounded cursor-pointer select-none flex items-center group transition-colors"
+        className="hover:bg-slate-100 dark:hover:bg-slate-800/60 px-1.5 py-0.5 rounded cursor-pointer select-none flex items-center group transition-colors"
       >
         <span className="inline-block" style={{ width: `${depth * 16}px` }} />
-        <span className="mr-1 text-slate-500 group-hover:text-slate-300 transition-colors">
+        <span className="mr-1 text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
           {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
         </span>
         {nameElement}
-        <span className="text-slate-400">{openBracket}</span>
+        <span className="text-slate-600 dark:text-slate-400">{openBracket}</span>
         {!isExpanded && (
-          <span className="text-slate-500 text-[11px] px-1.5 mx-1 bg-slate-800 rounded border border-slate-700/60">
+          <span className="text-slate-500 text-[11px] px-1.5 mx-1 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700/60">
             {itemCount} {itemCount === 1 ? 'item' : 'items'}
           </span>
         )}
-        {!isExpanded && <span className="text-slate-400">{closeBracket}</span>}
-        {!isExpanded && !isLast && <span className="text-slate-500">,</span>}
+        {!isExpanded && <span className="text-slate-600 dark:text-slate-400">{closeBracket}</span>}
+        {!isExpanded && !isLast && <span className="text-slate-400 dark:text-slate-500">,</span>}
       </div>
 
       {isExpanded && (
-        <div className="border-l border-slate-800/80 ml-2.5">
+        <div className="border-l border-slate-200 dark:border-slate-800/80 ml-2.5">
           {keys.map((key, idx) => (
             <TreeNode
               key={key}
@@ -131,8 +131,8 @@ const TreeNode: React.FC<TreeNodeProps> = ({
           ))}
           <div className="px-1.5 py-0.5 flex items-baseline">
             <span className="inline-block" style={{ width: `${depth * 16}px` }} />
-            <span className="text-slate-400">{closeBracket}</span>
-            {!isLast && <span className="text-slate-500">,</span>}
+            <span className="text-slate-600 dark:text-slate-400">{closeBracket}</span>
+            {!isLast && <span className="text-slate-400 dark:text-slate-500">,</span>}
           </div>
         </div>
       )}
@@ -176,17 +176,17 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 border border-slate-800 rounded-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-2xs">
       {/* Viewer toolbar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/90 border-b border-slate-800 text-xs text-slate-400">
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-100 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400">
         <div className="flex items-center space-x-2">
-          <div className="flex bg-slate-950 p-0.5 rounded border border-slate-800">
+          <div className="flex bg-white dark:bg-slate-950 p-0.5 rounded border border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setViewMode('pretty')}
               className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                 viewMode === 'pretty'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Tree / Pretty
@@ -195,8 +195,8 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
               onClick={() => setViewMode('raw')}
               className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                 viewMode === 'raw'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Raw Text
@@ -204,17 +204,17 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
           </div>
 
           {viewMode === 'pretty' && (
-            <div className="hidden sm:flex items-center space-x-1 pl-2 border-l border-slate-800">
+            <div className="hidden sm:flex items-center space-x-1 pl-2 border-l border-slate-200 dark:border-slate-800">
               <button
                 onClick={handleExpandAll}
-                className="px-2 py-1 hover:bg-slate-800 rounded text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+                className="px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-[11px] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                 title="Expand All"
               >
                 Expand All
               </button>
               <button
                 onClick={handleCollapseAll}
-                className="px-2 py-1 hover:bg-slate-800 rounded text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+                className="px-2 py-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-[11px] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                 title="Collapse All"
               >
                 Collapse All
@@ -226,12 +226,12 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={handleCopy}
-            className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700/80 text-xs font-medium transition-all"
+            className="flex items-center space-x-1.5 px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded border border-slate-200 dark:border-slate-700/80 text-xs font-medium transition-all shadow-2xs"
           >
             {copied ? (
               <>
-                <Check size={13} className="text-emerald-400" />
-                <span className="text-emerald-400">Copied</span>
+                <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-medium">Copied</span>
               </>
             ) : (
               <>
@@ -256,7 +256,7 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
             />
           </div>
         ) : (
-          <pre className="text-slate-300 font-mono text-xs leading-relaxed whitespace-pre-wrap break-all">
+          <pre className="text-slate-800 dark:text-slate-300 font-mono text-xs leading-relaxed whitespace-pre-wrap break-all">
             {rawJsonString}
           </pre>
         )}

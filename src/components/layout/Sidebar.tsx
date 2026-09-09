@@ -57,20 +57,20 @@ export const Sidebar: React.FC = () => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-14 bottom-0 left-0 z-40 w-72 bg-slate-900 border-r border-slate-800 flex flex-col transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed top-14 bottom-0 left-0 z-40 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-200 lg:translate-x-0 ${
           isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Search filter in sidebar */}
-        <div className="p-3 border-b border-slate-800/80">
+        <div className="p-3 border-b border-slate-200 dark:border-slate-800/80">
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-2.5 text-slate-500" />
+            <Search size={14} className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" />
             <input
               type="text"
               value={filterQuery}
               onChange={e => setFilterQuery(e.target.value)}
               placeholder="Filter endpoints..."
-              className="w-full pl-8 pr-3 py-1.5 bg-slate-950/70 border border-slate-800 rounded-md text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-medium"
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-md text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-medium transition-colors"
             />
           </div>
         </div>
@@ -79,7 +79,7 @@ export const Sidebar: React.FC = () => {
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 text-xs">
           {/* SECTION: GETTING STARTED & GUIDES */}
           <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
               <span>Documentation</span>
             </div>
             <div className="space-y-0.5">
@@ -88,11 +88,11 @@ export const Sidebar: React.FC = () => {
                   onClick={() => handleSelect('doc', 'overview')}
                   className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                     activeSelection.type === 'doc' && activeSelection.id === 'overview'
-                      ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                      ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <BookOpen size={14} className="shrink-0 text-indigo-400" />
+                  <BookOpen size={14} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
                   <span className="truncate">Overview</span>
                 </button>
               )}
@@ -102,11 +102,11 @@ export const Sidebar: React.FC = () => {
                   onClick={() => handleSelect('doc', 'http-status-codes')}
                   className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                     activeSelection.type === 'doc' && activeSelection.id === 'http-status-codes'
-                      ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                      ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <ShieldAlert size={14} className="shrink-0 text-amber-400" />
+                  <ShieldAlert size={14} className="shrink-0 text-amber-600 dark:text-amber-400" />
                   <span className="truncate">HTTP Status Codes</span>
                 </button>
               )}
@@ -116,11 +116,11 @@ export const Sidebar: React.FC = () => {
                   onClick={() => handleSelect('doc', 'error-handling')}
                   className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                     activeSelection.type === 'doc' && activeSelection.id === 'error-handling'
-                      ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                      ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <AlertTriangle size={14} className="shrink-0 text-rose-400" />
+                  <AlertTriangle size={14} className="shrink-0 text-rose-600 dark:text-rose-400" />
                   <span className="truncate">Error Handling</span>
                 </button>
               )}
@@ -129,7 +129,7 @@ export const Sidebar: React.FC = () => {
 
           {/* SECTION: HEALTH CHECK */}
           <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
               <span>Health Check</span>
             </div>
             <div className="space-y-0.5">
@@ -141,12 +141,12 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded shrink-0">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
                         {ep.method}
                       </span>
                       <span className="truncate font-mono text-[11px]">{ep.path}</span>
@@ -159,9 +159,9 @@ export const Sidebar: React.FC = () => {
 
           {/* SECTION: FAKE API */}
           <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
               <span>Fake API</span>
-              <span className="text-[10px] font-mono text-slate-600">3 routes</span>
+              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600">3 routes</span>
             </div>
             <div className="space-y-0.5">
               {fakeEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
@@ -172,12 +172,12 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded shrink-0">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
                         {ep.method}
                       </span>
                       <div className="min-w-0">
@@ -193,9 +193,9 @@ export const Sidebar: React.FC = () => {
 
           {/* SECTION: MOCK API */}
           <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
               <span>Mock API</span>
-              <span className="text-[10px] font-mono text-slate-600">2 routes</span>
+              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600">2 routes</span>
             </div>
             <div className="space-y-0.5">
               {mockEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
@@ -206,12 +206,12 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded shrink-0">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
                         {ep.method}
                       </span>
                       <div className="min-w-0">
@@ -227,7 +227,7 @@ export const Sidebar: React.FC = () => {
 
           {/* SECTION: COUNTRIES API */}
           <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
               <span>Countries API</span>
             </div>
             <div className="space-y-0.5">
@@ -239,12 +239,12 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded shrink-0">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
                         {ep.method}
                       </span>
                       <div className="min-w-0">
@@ -260,7 +260,7 @@ export const Sidebar: React.FC = () => {
 
           {/* SECTION: WEATHER API */}
           <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
               <span>Weather API</span>
             </div>
             <div className="space-y-0.5">
@@ -272,12 +272,12 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded shrink-0">
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
                         {ep.method}
                       </span>
                       <div className="min-w-0">
@@ -293,10 +293,10 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Footer info in sidebar */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/60 text-[11px] text-slate-500 flex items-center justify-between">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-[11px] text-slate-500 flex items-center justify-between">
           <span>Read-only GET APIs</span>
-          <span className="font-mono text-emerald-400/90 flex items-center space-x-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="font-mono text-emerald-600 dark:text-emerald-400/90 flex items-center space-x-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
             <span>Open Access</span>
           </span>
         </div>

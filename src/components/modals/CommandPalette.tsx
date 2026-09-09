@@ -81,10 +81,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-w-xl w-full overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-w-xl w-full overflow-hidden flex flex-col">
         {/* Search Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-800 space-x-3">
+        <div className="flex items-center px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 space-x-3">
           <Search size={18} className="text-slate-400 shrink-0" />
           <input
             ref={inputRef}
@@ -96,11 +96,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search endpoints, parameters, guides... (↑↓ to navigate, Enter to select)"
-            className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+            className="w-full bg-transparent text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
           />
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-200 rounded hover:bg-slate-800 transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X size={16} />
           </button>
@@ -123,7 +123,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition-all ${
                     isSelected
                       ? 'bg-indigo-600 text-white'
-                      : 'hover:bg-slate-800/80 text-slate-300'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-300'
                   }`}
                 >
                   <div className="flex items-center space-x-3 min-w-0">
@@ -132,8 +132,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                         isSelected
                           ? 'bg-white/20 text-white'
                           : item.type === 'doc'
-                          ? 'bg-indigo-500/10 text-indigo-400'
-                          : 'bg-emerald-500/10 text-emerald-400'
+                          ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                          : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                       }`}
                     >
                       {item.type === 'doc' ? <BookOpen size={14} /> : <Terminal size={14} />}
@@ -145,7 +145,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                           className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
                             isSelected
                               ? 'bg-white/20 text-white'
-                              : 'bg-slate-800 text-slate-400 border border-slate-700/60'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60'
                           }`}
                         >
                           {item.category}
@@ -153,7 +153,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                       </div>
                       <p
                         className={`text-[11px] truncate font-mono mt-0.5 ${
-                          isSelected ? 'text-indigo-100' : 'text-slate-400'
+                          isSelected ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'
                         }`}
                       >
                         {item.subtitle}
@@ -173,11 +173,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
           <div className="flex items-center space-x-3">
-            <span><kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px]">↑↓</kbd> Navigate</span>
-            <span><kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px]">Enter</kbd> Select</span>
-            <span><kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[10px]">Esc</kbd> Close</span>
+            <span><kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-[10px] text-slate-700 dark:text-slate-300">↑↓</kbd> Navigate</span>
+            <span><kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-[10px] text-slate-700 dark:text-slate-300">Enter</kbd> Select</span>
+            <span><kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-[10px] text-slate-700 dark:text-slate-300">Esc</kbd> Close</span>
           </div>
           <span className="font-mono text-slate-400">{filteredItems.length} results</span>
         </div>

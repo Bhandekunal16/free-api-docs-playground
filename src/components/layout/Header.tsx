@@ -15,6 +15,7 @@ import {
   Globe
 } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import { BaseUrlModal } from '../modals/BaseUrlModal';
 import { HistoryModal } from '../modals/HistoryModal';
 import { CommandPalette } from '../modals/CommandPalette';
@@ -50,25 +51,25 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-14 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 flex items-center justify-between">
+      <header className="sticky top-0 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between transition-colors duration-150">
         {/* Left: Brand & Mobile Toggle */}
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-md hover:bg-slate-800 transition-colors"
+            className="lg:hidden p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             aria-label="Toggle navigation menu"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
           <div className="flex items-center space-x-2.5">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20">
+            <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm">
               <Zap size={18} className="fill-white text-white" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-bold text-sm tracking-tight text-white">Free API Server</span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded">
+                <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white">Free API Server</span>
+                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded">
                   v1.0 Docs & Playground
                 </span>
               </div>
@@ -81,23 +82,23 @@ export const Header: React.FC = () => {
           {/* Base URL Pill Button */}
           <button
             onClick={() => setIsBaseUrlModalOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-950/80 hover:bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs rounded-lg transition-all shadow-inner group"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-950/80 hover:bg-slate-200 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-xs rounded-lg transition-all shadow-sm group"
             title="Click to change API Base URL"
           >
-            <div className="flex items-center space-x-1.5 text-slate-400">
-              <Globe size={13} className="text-slate-500 group-hover:text-indigo-400 transition-colors" />
+            <div className="flex items-center space-x-1.5 text-slate-500 dark:text-slate-400">
+              <Globe size={13} className="text-slate-500 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
               <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider">Base:</span>
             </div>
-            <span className="font-mono text-slate-300 font-medium max-w-[200px] truncate">
+            <span className="font-mono text-slate-700 dark:text-slate-300 font-medium max-w-[200px] truncate">
               {cleanBaseDisplay}
             </span>
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
                 serverHealth === 'healthy'
-                  ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
+                  ? 'bg-emerald-500 dark:bg-emerald-400'
                   : serverHealth === 'checking'
-                  ? 'bg-amber-400 animate-pulse'
-                  : 'bg-rose-400'
+                  ? 'bg-amber-500 dark:bg-amber-400 animate-pulse'
+                  : 'bg-rose-500 dark:bg-rose-400'
               }`}
               title={`Status: ${serverHealth}`}
             />
@@ -106,28 +107,28 @@ export const Header: React.FC = () => {
           {/* Search / Command palette trigger */}
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-xs text-slate-400 hover:text-slate-200 rounded-lg transition-all w-52 justify-between"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-52 justify-between"
           >
             <span className="flex items-center space-x-1.5 truncate">
               <Search size={13} />
               <span>Search API docs...</span>
             </span>
-            <kbd className="text-[10px] font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">
+            <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs">
               ⌘K
             </kbd>
           </button>
         </div>
 
-        {/* Right: Layout Switcher & History */}
+        {/* Right: Layout Switcher, Theme Switcher & History */}
         <div className="flex items-center space-x-2">
           {/* Layout Mode (Desktop only) */}
-          <div className="hidden xl:flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-xs">
+          <div className="hidden xl:flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
             <button
               onClick={() => setLayoutMode('split')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'split'
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Split View (Documentation + Playground)"
             >
@@ -139,7 +140,7 @@ export const Header: React.FC = () => {
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'docs'
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Documentation Only"
             >
@@ -151,7 +152,7 @@ export const Header: React.FC = () => {
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'playground'
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Playground Only"
             >
@@ -160,10 +161,13 @@ export const Header: React.FC = () => {
             </button>
           </div>
 
+          {/* Theme Switcher: Dark / Light / System */}
+          <ThemeSwitcher />
+
           {/* History Button */}
           <button
             onClick={() => setIsHistoryModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700/80 transition-colors"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700/80 transition-colors shadow-sm"
             title="View Request History"
           >
             <History size={14} />
@@ -178,7 +182,7 @@ export const Header: React.FC = () => {
           {/* Mobile search button */}
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+            className="md:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <Search size={18} />
           </button>
@@ -201,3 +205,4 @@ export const Header: React.FC = () => {
     </>
   );
 };
+

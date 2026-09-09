@@ -53,22 +53,22 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg border border-indigo-500/20">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-200 dark:border-indigo-500/20">
               <Server size={18} />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-white">API Base URL Settings</h3>
-              <p className="text-xs text-slate-400">Configure target server for documentation & playground</p>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">API Base URL Settings</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Configure target server for documentation & playground</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X size={18} />
           </button>
@@ -77,27 +77,27 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
         {/* Body */}
         <div className="p-6 space-y-5">
           {/* Status banner */}
-          <div className="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs">
+          <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
             <div className="flex items-center space-x-2">
               <span
                 className={`w-2.5 h-2.5 rounded-full ${
                   serverHealth === 'healthy'
-                    ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
+                    ? 'bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
                     : serverHealth === 'checking'
-                    ? 'bg-amber-400 animate-pulse'
-                    : 'bg-rose-400'
+                    ? 'bg-amber-500 animate-pulse'
+                    : 'bg-rose-500'
                 }`}
               />
-              <span className="font-medium text-slate-300">
+              <span className="font-medium text-slate-700 dark:text-slate-300">
                 Current Status:{' '}
-                {serverHealth === 'healthy' && <span className="text-emerald-400">Online & Reachable</span>}
-                {serverHealth === 'checking' && <span className="text-amber-400">Pinging Server...</span>}
-                {serverHealth === 'unhealthy' && <span className="text-rose-400">Unreachable / CORS Offline</span>}
+                {serverHealth === 'healthy' && <span className="text-emerald-600 dark:text-emerald-400">Online & Reachable</span>}
+                {serverHealth === 'checking' && <span className="text-amber-600 dark:text-amber-400">Pinging Server...</span>}
+                {serverHealth === 'unhealthy' && <span className="text-rose-600 dark:text-rose-400">Unreachable / CORS Offline</span>}
               </span>
             </div>
             <button
               onClick={() => checkServerHealth()}
-              className="flex items-center space-x-1 text-slate-400 hover:text-slate-200 transition-colors"
+              className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
             >
               <RefreshCw size={12} className={serverHealth === 'checking' ? 'animate-spin' : ''} />
               <span>Test Connection</span>
@@ -106,7 +106,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
 
           {/* Presets */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
               Quick Presets
             </label>
             <div className="space-y-2">
@@ -118,8 +118,8 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
                     onClick={() => handleSelectPreset(p.url)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${
                       isSelected
-                        ? 'bg-indigo-950/30 border-indigo-500/50 text-indigo-200'
-                        : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700 text-slate-300'
+                        ? 'bg-indigo-50/80 dark:bg-indigo-950/30 border-indigo-500/50 text-indigo-900 dark:text-indigo-200'
+                        : 'bg-slate-50/70 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 text-slate-800 dark:text-slate-300'
                     }`}
                   >
                     <div className="space-y-0.5">
@@ -129,9 +129,9 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
                           {p.badge}
                         </span>
                       </div>
-                      <p className="text-xs font-mono text-slate-400">{p.url}</p>
+                      <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{p.url}</p>
                     </div>
-                    {isSelected && <Check size={16} className="text-indigo-400 ml-2 shrink-0" />}
+                    {isSelected && <Check size={16} className="text-indigo-600 dark:text-indigo-400 ml-2 shrink-0" />}
                   </button>
                 );
               })}
@@ -140,7 +140,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
 
           {/* Custom Input */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
               Target Base URL
             </label>
             <div className="relative">
@@ -149,14 +149,14 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
                 value={customInput}
                 onChange={e => setCustomInput(e.target.value)}
                 placeholder="https://your-api-domain.com"
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-lg text-sm text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-600"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-600"
               />
             </div>
-            <p className="mt-1.5 text-[11px] text-slate-400">
+            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400">
               Trailing slashes will be stripped automatically. Requests will be prefixed with this URL.
             </p>
             {error && (
-              <div className="flex items-center space-x-1.5 text-xs text-rose-400 mt-2">
+              <div className="flex items-center space-x-1.5 text-xs text-rose-600 dark:text-rose-400 mt-2">
                 <AlertCircle size={14} />
                 <span>{error}</span>
               </div>
@@ -165,16 +165,16 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 px-6 py-4 bg-slate-950 border-t border-slate-800">
+        <div className="flex items-center justify-end space-x-3 px-6 py-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors shadow-2xs"
           >
             Apply & Save
           </button>
