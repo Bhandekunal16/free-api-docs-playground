@@ -57,6 +57,34 @@ export function buildUrl(
       if (endpoint.id === 'countries' && queryParams.type === 'all' && key === 'value') {
         return; // skip value when type is 'all'
       }
+
+      // Special check: for github endpoint, omit default type=users and non-applicable fields
+      if (endpoint.id === 'github') {
+        const op = queryParams.type || 'users';
+        if (key === 'type' && (val === 'users' || val === '')) {
+          return; // 'users' is the default operation, produces clean /github
+        }
+        const isUserOp = ['user', 'userRepos'].includes(op);
+        const isRepoOp = [
+          'repos', 'repoIssues', 'repoPulls', 'repoCommits', 'repoBranches',
+          'repoReleases', 'repoTags', 'repoLanguages', 'repoContributors', 'repoContents'
+        ].includes(op);
+        const isSearchOp = ['searchRepositories', 'searchUsers', 'searchIssues', 'searchCommits'].includes(op);
+
+        if ((key === 'username' || key === 'value') && !isUserOp) {
+          return;
+        }
+        if ((key === 'owner' || key === 'repo') && !isRepoOp) {
+          return;
+        }
+        if (key === 'state' && op !== 'repoIssues' && op !== 'repoPulls') {
+          return;
+        }
+        if (key === 'q' && !isSearchOp) {
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

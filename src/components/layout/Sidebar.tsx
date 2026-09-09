@@ -15,6 +15,7 @@ import {
   User,
   Users,
   Flag,
+  Github,
   ShieldAlert,
   AlertTriangle,
   ChevronDown,
@@ -48,7 +49,8 @@ export const Sidebar: React.FC = () => {
     ipify: false,
     agify: false,
     genderize: false,
-    nationalize: false
+    nationalize: false,
+    github: false
   });
 
   const toggleSection = (key: string) => {
@@ -75,6 +77,7 @@ export const Sidebar: React.FC = () => {
   const agifyEndpoints = API_ENDPOINTS.filter(e => e.category === 'agify');
   const genderizeEndpoints = API_ENDPOINTS.filter(e => e.category === 'genderize');
   const nationalizeEndpoints = API_ENDPOINTS.filter(e => e.category === 'nationalize');
+  const githubEndpoints = API_ENDPOINTS.filter(e => e.category === 'github');
 
   return (
     <>
@@ -767,6 +770,52 @@ export const Sidebar: React.FC = () => {
             {!collapsedSections.nationalize && (
               <div className="space-y-0.5 pt-0.5">
                 {nationalizeEndpoints.map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 16. SECTION: GITHUB */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('github')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Github size={12} className="text-emerald-500" />
+                <span>GitHub</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">1 route</span>
+                {collapsedSections.github ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.github && (
+              <div className="space-y-0.5 pt-0.5">
+                {githubEndpoints.map(ep => {
                   const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
                   return (
                     <button

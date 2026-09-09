@@ -94,6 +94,39 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate GitHub endpoint
+    if (endpoint.id === 'github') {
+      const op = queryParams.type || 'users';
+      const isUserOp = ['user', 'userRepos'].includes(op);
+      const isRepoOp = [
+        'repos', 'repoIssues', 'repoPulls', 'repoCommits', 'repoBranches',
+        'repoReleases', 'repoTags', 'repoLanguages', 'repoContributors', 'repoContents'
+      ].includes(op);
+      const isSearchOp = ['searchRepositories', 'searchUsers', 'searchIssues', 'searchCommits'].includes(op);
+
+      if (isUserOp) {
+        const hasUsername = (queryParams.username && queryParams.username.trim()) || (queryParams.value && queryParams.value.trim());
+        if (!hasUsername) {
+          setValidationError('Username is required for this operation (e.g. "octocat").');
+          return;
+        }
+      } else if (isRepoOp) {
+        if (!queryParams.owner || !queryParams.owner.trim()) {
+          setValidationError('Owner is required (e.g. "octocat").');
+          return;
+        }
+        if (!queryParams.repo || !queryParams.repo.trim()) {
+          setValidationError('Repository name is required (e.g. "Hello-World").');
+          return;
+        }
+      } else if (isSearchOp) {
+        if (!queryParams.q || !queryParams.q.trim()) {
+          setValidationError('Search query (q) is required (e.g. "javascript").');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -175,7 +208,30 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const isCoingeckoValueRequired = isCoingeckoEndpoint && param.name === 'value' && COINGECKO_ID_OPERATIONS.includes(selectedCoingeckoType);
     const isCoingeckoValueNotNeeded = isCoingeckoEndpoint && param.name === 'value' && !COINGECKO_ID_OPERATIONS.includes(selectedCoingeckoType);
 
-    const isRequired = (param.required && !isAllSelectedInCountries) || isBreedRequiredForDogs || isJikanValueRequired || isCoingeckoValueRequired;
+    // Context-awareness for GitHub API
+    const isGithubEndpoint = endpoint.id === 'github';
+    const selectedGithubType = queryParams.type || 'users';
+    const isGithubUserOp = ['user', 'userRepos'].includes(selectedGithubType);
+    const isGithubRepoOp = [
+      'repos', 'repoIssues', 'repoPulls', 'repoCommits', 'repoBranches',
+      'repoReleases', 'repoTags', 'repoLanguages', 'repoContributors', 'repoContents'
+    ].includes(selectedGithubType);
+    const isGithubSearchOp = ['searchRepositories', 'searchUsers', 'searchIssues', 'searchCommits'].includes(selectedGithubType);
+
+    const isGithubUsernameRequired = isGithubEndpoint && param.name === 'username' && isGithubUserOp;
+    const isGithubOwnerRequired = isGithubEndpoint && param.name === 'owner' && isGithubRepoOp;
+    const isGithubRepoRequired = isGithubEndpoint && param.name === 'repo' && isGithubRepoOp;
+    const isGithubQueryRequired = isGithubEndpoint && param.name === 'q' && isGithubSearchOp;
+
+    const isRequired =
+      (param.required && !isAllSelectedInCountries) ||
+      isBreedRequiredForDogs ||
+      isJikanValueRequired ||
+      isCoingeckoValueRequired ||
+      isGithubUsernameRequired ||
+      isGithubOwnerRequired ||
+      isGithubRepoRequired ||
+      isGithubQueryRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -200,6 +256,16 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. usd,eur (Used with simplePrice)';
     } else if (isCoingeckoEndpoint && param.name === 'vs_currency' && (selectedCoingeckoType === 'markets' || selectedCoingeckoType === 'coinMarkets')) {
       customPlaceholder = `e.g. usd (Used with ${selectedCoingeckoType})`;
+    } else if (isGithubUsernameRequired) {
+      customPlaceholder = 'e.g. octocat (Required username)';
+    } else if (isGithubOwnerRequired) {
+      customPlaceholder = 'e.g. octocat (Required owner)';
+    } else if (isGithubRepoRequired) {
+      customPlaceholder = 'e.g. Hello-World (Required repository)';
+    } else if (isGithubQueryRequired) {
+      customPlaceholder = 'e.g. javascript (Required search query)';
+    } else if (isGithubEndpoint && param.name === 'state' && selectedGithubType === 'repoIssues') {
+      customPlaceholder = 'e.g. open (Optional state: open, closed, all)';
     }
 
     return (
@@ -222,7 +288,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -258,6 +324,16 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? `Not needed when operation is "${selectedCoingeckoType}"`
             : isCoingeckoEndpoint && param.name === 'query' && selectedCoingeckoType !== 'search'
             ? 'Search keyword (used when type=search)'
+            : isGithubUsernameRequired
+            ? `Required: GitHub username for operation "${selectedGithubType}"`
+            : isGithubOwnerRequired
+            ? `Required: Repository owner for operation "${selectedGithubType}"`
+            : isGithubRepoRequired
+            ? `Required: Repository name for operation "${selectedGithubType}"`
+            : isGithubQueryRequired
+            ? `Required: Search keyword query for operation "${selectedGithubType}"`
+            : isGithubEndpoint && param.name === 'state'
+            ? 'Optional issue state filter (open, closed, all)'
             : param.description}
         </p>
       </div>
@@ -486,6 +562,108 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                           .map(renderQueryParamInput)}
                       </div>
                     </div>
+                  </div>
+                ) : endpoint.id === 'github' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          GitHub Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">17 supported operations</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Operation-Specific Conditional Parameters */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'users';
+                      const isUserOp = ['user', 'userRepos'].includes(selectedType);
+                      const isRepoOp = [
+                        'repos', 'repoIssues', 'repoPulls', 'repoCommits', 'repoBranches',
+                        'repoReleases', 'repoTags', 'repoLanguages', 'repoContributors', 'repoContents'
+                      ].includes(selectedType);
+                      const isSearchOp = ['searchRepositories', 'searchUsers', 'searchIssues', 'searchCommits'].includes(selectedType);
+
+                      if (selectedType === 'users') {
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>Default operation: Lists public GitHub users. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /github
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      if (isUserOp) {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                User Parameters
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">for type={selectedType}</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'username')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (isRepoOp) {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Repository Parameters
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">for type={selectedType}</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['owner', 'repo'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                            {selectedType === 'repoIssues' && (
+                              <div className="pt-2">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'state')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      if (isSearchOp) {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Search Parameters
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">for type={selectedType}</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'q')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -2172,6 +2172,164 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 19. GitHub API
+  {
+    id: 'github',
+    category: 'github',
+    categoryTitle: 'GitHub',
+    method: 'GET',
+    path: '/github',
+    title: 'GitHub API',
+    shortDescription: 'Provides read-only access to users, repositories, searches, and repository metadata.',
+    description: 'The GitHub API provides read-only access to users, repositories, searches, and repository metadata. Upstream responses from https://api.github.com are forwarded directly. Supports 17 operation types with intelligent conditional parameters and optional GITHUB_TOKEN backend rate-limit elevation.',
+    notes: [
+      'Upstream API: https://api.github.com',
+      'Response operation defaults to "users".',
+      'Default request GET /github lists public GitHub users.',
+      'The endpoint is read-only. Authentication (GITHUB_TOKEN) is handled securely on the server.',
+      'A 15-second timeout applies to upstream GitHub requests.',
+      'Additional query parameters (such as state=open, per_page, etc.) are forwarded directly to GitHub.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'users',
+        description: 'GitHub operation type; defaults to users.',
+        options: [
+          { label: 'users (List Users - default)', value: 'users', description: 'List public GitHub users (default)' },
+          { label: 'user (Get User)', value: 'user', description: 'Get a user profile by username' },
+          { label: 'repos (Get Repository)', value: 'repos', description: 'Get repository metadata and stats by owner & repo' },
+          { label: 'userRepos (List User Repositories)', value: 'userRepos', description: 'List public repositories for a specific user' },
+          { label: 'repoIssues (Repository Issues)', value: 'repoIssues', description: 'List repository issues (supports state filter)' },
+          { label: 'repoPulls (Repository Pull Requests)', value: 'repoPulls', description: 'List pull requests for a repository' },
+          { label: 'repoCommits (Repository Commits)', value: 'repoCommits', description: 'List commits for a repository' },
+          { label: 'repoBranches (Repository Branches)', value: 'repoBranches', description: 'List branches of a repository' },
+          { label: 'repoReleases (Repository Releases)', value: 'repoReleases', description: 'List releases for a repository' },
+          { label: 'repoTags (Repository Tags)', value: 'repoTags', description: 'List tags for a repository' },
+          { label: 'repoLanguages (Repository Languages)', value: 'repoLanguages', description: 'List programming languages for a repository' },
+          { label: 'repoContributors (Repository Contributors)', value: 'repoContributors', description: 'List contributors for a repository' },
+          { label: 'repoContents (Repository Contents)', value: 'repoContents', description: 'Get root directory contents for a repository' },
+          { label: 'searchRepositories (Search Repositories)', value: 'searchRepositories', description: 'Search GitHub repositories by keyword' },
+          { label: 'searchUsers (Search Users)', value: 'searchUsers', description: 'Search GitHub users by keyword' },
+          { label: 'searchIssues (Search Issues)', value: 'searchIssues', description: 'Search GitHub issues by keyword' },
+          { label: 'searchCommits (Search Commits)', value: 'searchCommits', description: 'Search GitHub commits by keyword' }
+        ]
+      },
+      {
+        name: 'username',
+        label: 'Username',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. octocat',
+        description: 'GitHub username (used with type=user or type=userRepos).'
+      },
+      {
+        name: 'owner',
+        label: 'Owner',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. octocat',
+        description: 'Repository owner or organization login (used with repository operations).'
+      },
+      {
+        name: 'repo',
+        label: 'Repository',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Hello-World',
+        description: 'Repository name (used with repository operations).'
+      },
+      {
+        name: 'q',
+        label: 'Search Query (q)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. javascript',
+        description: 'Search query string (used with search operations).'
+      },
+      {
+        name: 'state',
+        label: 'State Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. open',
+        description: 'State filter for issues/pull requests: open, closed, or all.'
+      }
+    ],
+    presets: [
+      {
+        id: 'github-users',
+        label: 'GitHub Users',
+        description: 'List public users in GitHub (GET /github)',
+        queryParams: { type: 'users' }
+      },
+      {
+        id: 'github-user-octocat',
+        label: 'Octocat User',
+        description: 'Get Octocat user profile (GET /github?type=user&username=octocat)',
+        queryParams: { type: 'user', username: 'octocat' }
+      },
+      {
+        id: 'github-repo-hello-world',
+        label: 'Hello World Repository',
+        description: 'Get octocat/Hello-World repo metadata (GET /github?type=repos&owner=octocat&repo=Hello-World)',
+        queryParams: { type: 'repos', owner: 'octocat', repo: 'Hello-World' }
+      },
+      {
+        id: 'github-search-repos',
+        label: 'Repository Search',
+        description: 'Search repositories for "javascript" (GET /github?type=searchRepositories&q=javascript)',
+        queryParams: { type: 'searchRepositories', q: 'javascript' }
+      },
+      {
+        id: 'github-repo-issues',
+        label: 'Open Issues',
+        description: 'Get open issues for octocat/Hello-World (GET /github?type=repoIssues&owner=octocat&repo=Hello-World&state=open)',
+        queryParams: { type: 'repoIssues', owner: 'octocat', repo: 'Hello-World', state: 'open' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/github?type=user&username=octocat',
+    exampleCurl: 'curl "http://localhost:3000/github?type=user&username=octocat"',
+    responseExample: {
+      login: 'octocat',
+      id: 583231,
+      node_id: 'MDQ6VXNlcjU4MzIzMQ==',
+      avatar_url: 'https://avatars.githubusercontent.com/u/583231?v=4',
+      html_url: 'https://github.com/octocat',
+      name: 'The Octocat',
+      company: '@github',
+      blog: 'https://github.blog',
+      location: 'San Francisco',
+      public_repos: 8,
+      public_gists: 8,
+      followers: 16540,
+      following: 9,
+      created_at: '2011-01-25T18:44:36Z',
+      updated_at: '2024-03-22T14:12:08Z'
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type or missing required parameters (owner, repo, username, or q).',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Missing required parameters: owner and repo'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
