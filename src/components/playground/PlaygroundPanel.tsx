@@ -107,9 +107,9 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
   const hasQueryParams = endpoint.queryParams.length > 0;
   const hasAnyParams = hasPathParams || hasQueryParams || customQueryParams.length > 0;
 
-  // Preset limiting: max 4 visible, rest under more
-  const visiblePresets = showAllPresets ? endpoint.presets : endpoint.presets.slice(0, 4);
-  const remainingPresetCount = Math.max(0, endpoint.presets.length - 4);
+  // Preset limiting: max 5 visible, rest under more
+  const visiblePresets = showAllPresets ? endpoint.presets : endpoint.presets.slice(0, 5);
+  const remainingPresetCount = Math.max(0, endpoint.presets.length - 5);
 
   const renderQueryParamInput = (param: ParamDefinition) => {
     const currentValue = queryParams[param.name] ?? '';
@@ -117,17 +117,36 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const isAllSelectedInCountries = isCountriesEndpoint && queryParams.type === 'all';
     const isValueFieldInCountries = isCountriesEndpoint && param.name === 'value';
 
+    // Context-awareness for Dogs API
+    const isDogsEndpoint = endpoint.id === 'dogs';
+    const selectedDogType = queryParams.type || 'random';
+    const isBreedSpecificDogOp = ['breedImage', 'breedImages', 'subBreeds', 'breedExists'].includes(selectedDogType);
+    const isBreedFieldInDogs = isDogsEndpoint && param.name === 'breed';
+    const isBreedRequiredForDogs = isBreedFieldInDogs && isBreedSpecificDogOp;
+    const isBreedNotNeededInDogs = isBreedFieldInDogs && (selectedDogType === 'random' || selectedDogType === 'breedList');
+
+    const isRequired = (param.required && !isAllSelectedInCountries) || isBreedRequiredForDogs;
+
+    let customPlaceholder = param.placeholder || `Enter ${param.name}`;
+    if (isValueFieldInCountries && isAllSelectedInCountries) {
+      customPlaceholder = 'Not required for type=all';
+    } else if (isBreedNotNeededInDogs) {
+      customPlaceholder = `Not required for type=${selectedDogType}`;
+    } else if (isDogsEndpoint && param.name === 'limit' && selectedDogType !== 'randomMultiple') {
+      customPlaceholder = 'Used with type=randomMultiple';
+    }
+
     return (
       <div key={param.name} className="space-y-1">
         <div className="flex items-center justify-between text-xs">
           <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
             <span>{param.name}</span>
-            {param.required && !isAllSelectedInCountries && (
+            {isRequired && (
               <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
             )}
           </label>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500">
-            {param.required && !isAllSelectedInCountries ? 'required' : 'optional'}
+          <span className={`text-[10px] ${isRequired ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
+            {isRequired ? 'required' : 'optional'}
           </span>
         </div>
 
@@ -150,19 +169,19 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             value={currentValue}
             disabled={isValueFieldInCountries && isAllSelectedInCountries}
             onChange={e => updateQueryParam(param.name, e.target.value)}
-            placeholder={
-              isValueFieldInCountries && isAllSelectedInCountries
-                ? 'Not required for type=all'
-                : param.placeholder || `Enter ${param.name}`
-            }
+            placeholder={customPlaceholder}
             className={`w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono ${
-              isValueFieldInCountries && isAllSelectedInCountries ? 'opacity-40 cursor-not-allowed' : ''
+              (isValueFieldInCountries && isAllSelectedInCountries) ? 'opacity-40 cursor-not-allowed' : ''
             }`}
           />
         )}
         <p className="text-[11px] text-slate-500 dark:text-slate-400">
           {isValueFieldInCountries && isAllSelectedInCountries
             ? 'Omitted because type is set to all'
+            : isBreedRequiredForDogs
+            ? 'Required when operation is breed-specific'
+            : isBreedNotNeededInDogs
+            ? `Not needed when operation is ${selectedDogType}`
             : param.description}
         </p>
       </div>

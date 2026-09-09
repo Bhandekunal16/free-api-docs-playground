@@ -1392,6 +1392,128 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 12. Dogs API
+  {
+    id: 'dogs',
+    category: 'dogs',
+    categoryTitle: 'Dogs',
+    method: 'GET',
+    path: '/dogs',
+    title: 'Dogs API',
+    shortDescription: 'The Dogs API provides dog images and breed information through the Dog API.',
+    description: 'The Dogs API provides dog images and breed information through the Dog API. Supports retrieving random dog pictures, multiple random pictures, breed-specific photos, full breed lists, sub-breeds, and verifying if a breed exists.',
+    notes: [
+      'Upstream API: https://dog.ceo/api',
+      'Operation type defaults to "random" if not specified.',
+      'Breed-specific operations (breedImage, breedImages, subBreeds, breedExists) require the "breed" parameter.',
+      'Pass "subBreed" for sub-breed specific lookups when required.',
+      'Use "limit" to specify the number of results for supported multi-image operations (e.g. randomMultiple).',
+      'Invalid operation types or missing required values return 400 Bad Request.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'Operation type; defaults to random.',
+        options: [
+          { label: 'random', value: 'random', description: 'Single random dog image URL' },
+          { label: 'randomMultiple', value: 'randomMultiple', description: 'Multiple random dog image URLs (use limit)' },
+          { label: 'breedImage', value: 'breedImage', description: 'Random image for a specific breed (requires breed)' },
+          { label: 'breedImages', value: 'breedImages', description: 'All image URLs for a specific breed (requires breed)' },
+          { label: 'breedList', value: 'breedList', description: 'List of all breeds and their sub-breeds' },
+          { label: 'subBreeds', value: 'subBreeds', description: 'List of all sub-breeds for a given breed (requires breed)' },
+          { label: 'breedExists', value: 'breedExists', description: 'Verify whether a breed exists in the registry (requires breed)' }
+        ]
+      },
+      {
+        name: 'breed',
+        label: 'Breed Name',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. hound, bulldog, retriever, husky',
+        description: 'Breed name for breed-specific operations (required for breedImage, breedImages, subBreeds, breedExists).'
+      },
+      {
+        name: 'subBreed',
+        label: 'Sub-Breed Name',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. afghan, english, golden',
+        description: 'Sub-breed name when required.'
+      },
+      {
+        name: 'limit',
+        label: 'Limit',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 5',
+        description: 'Number of results for supported list operations (e.g. randomMultiple).'
+      }
+    ],
+    presets: [
+      {
+        id: 'dogs-random',
+        label: 'Random Dog',
+        description: 'Fetch a single random dog image (GET /dogs)',
+        queryParams: { type: 'random' }
+      },
+      {
+        id: 'dogs-random-multiple',
+        label: 'Multiple Random Dogs',
+        description: 'Fetch 5 random dog images (GET /dogs?type=randomMultiple&limit=5)',
+        queryParams: { type: 'randomMultiple', limit: '5' }
+      },
+      {
+        id: 'dogs-hound-image',
+        label: 'Hound Image',
+        description: 'Fetch a random image of a hound (GET /dogs?type=breedImage&breed=hound)',
+        queryParams: { type: 'breedImage', breed: 'hound' }
+      },
+      {
+        id: 'dogs-bulldog-images',
+        label: 'Bulldog Images',
+        description: 'Fetch all bulldog images (GET /dogs?type=breedImages&breed=bulldog)',
+        queryParams: { type: 'breedImages', breed: 'bulldog' }
+      },
+      {
+        id: 'dogs-hound-subbreeds',
+        label: 'Hound Sub-Breeds',
+        description: 'List all hound sub-breeds (GET /dogs?type=subBreeds&breed=hound)',
+        queryParams: { type: 'subBreeds', breed: 'hound' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/dogs?type=breedImages&breed=bulldog',
+    exampleCurl: 'curl "http://localhost:3000/dogs?type=breedImages&breed=bulldog"',
+    responseExample: {
+      message: [
+        "https://images.dog.ceo/breeds/bulldog-boston/20200710_175933.jpg",
+        "https://images.dog.ceo/breeds/bulldog-boston/20200710_175944.jpg"
+      ],
+      status: "success"
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type or missing required breed parameter.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Breed name is required for breed-specific operations.'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
