@@ -1912,6 +1912,88 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 16. Agify API
+  {
+    id: 'agify',
+    category: 'agify',
+    categoryTitle: 'Agify',
+    method: 'GET',
+    path: '/agify',
+    title: 'Predict Age',
+    shortDescription: 'The Agify API predicts the likely age of a person from their name.',
+    description: 'The Agify API predicts the likely age of a person from their name. Supports optional country code filtering to improve age prediction accuracy.',
+    notes: [
+      'Upstream API: https://api.agify.io',
+      'Response operation defaults to "age".',
+      'The "name" parameter is required.',
+      'The "country_id" parameter is an optional two-letter country code (e.g. US, IN, GB).',
+      'Additional query parameters are forwarded to Agify.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Type / Operation',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'Response operation; currently age, defaults to age.',
+        options: [
+          { label: 'age', value: 'age', description: 'Age prediction operation (default)' }
+        ]
+      },
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'string',
+        required: true,
+        placeholder: 'e.g. michael',
+        description: 'Name used for the age prediction.'
+      },
+      {
+        name: 'country_id',
+        label: 'Country ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. US',
+        description: 'Two-letter country code used to improve the prediction.'
+      }
+    ],
+    presets: [
+      {
+        id: 'agify-michael',
+        label: 'Michael',
+        description: 'Predict age for Michael (GET /agify?name=michael)',
+        queryParams: { name: 'michael' }
+      },
+      {
+        id: 'agify-emma-us',
+        label: 'Emma + US',
+        description: 'Predict age for Emma in US (GET /agify?type=age&name=emma&country_id=US)',
+        queryParams: { type: 'age', name: 'emma', country_id: 'US' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/agify?name=michael',
+    exampleCurl: 'curl "http://localhost:3000/agify?name=michael"',
+    responseExample: {
+      success: true,
+      statusCode: 200,
+      status: true,
+      data: {
+        count: 233482,
+        name: 'michael',
+        age: 62
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

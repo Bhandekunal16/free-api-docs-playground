@@ -86,6 +86,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Agify endpoint
+    if (endpoint.id === 'agify') {
+      if (!queryParams.name || !queryParams.name.trim()) {
+        setValidationError('Name is required.');
+        return;
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
