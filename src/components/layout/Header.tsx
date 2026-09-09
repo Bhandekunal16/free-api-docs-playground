@@ -54,9 +54,9 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between relative transition-colors duration-150">
+      <header className="sticky top-0 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between gap-3 transition-colors duration-150">
         {/* Left: Brand & Mobile Toggle */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 shrink-0">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="lg:hidden p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -77,24 +77,26 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Search / Command palette trigger (Mathematically centered with laptop/desktop sizing) */}
-        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
+        {/* Center: Search / Command palette trigger in standard flex layout flow */}
+        <div className="hidden md:flex flex-1 justify-center max-w-lg mx-2 min-w-0">
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="flex items-center space-x-2 px-3.5 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-80 lg:w-[440px] xl:w-[520px] max-w-[45vw] justify-between shadow-2xs group"
+            className="flex items-center space-x-2 px-3.5 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-full justify-between shadow-2xs group"
           >
-            <span className="flex items-center space-x-2.5 truncate">
-              <Search size={14} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-              <span className="text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">Search API documentation, endpoints, models...</span>
+            <span className="flex items-center space-x-2.5 truncate min-w-0">
+              <Search size={14} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors shrink-0" />
+              <span className="text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 truncate">
+                Search API documentation...
+              </span>
             </span>
-            <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0">
+            <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0 ml-2">
               ⌘K
             </kbd>
           </button>
         </div>
 
         {/* Right: Layout Switcher, Theme Switcher & History */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 shrink-0">
           {/* Layout Mode Switcher (Visible on md screens and up) */}
           <div className="hidden md:flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
             <button
