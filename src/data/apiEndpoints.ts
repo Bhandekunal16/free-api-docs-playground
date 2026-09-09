@@ -1290,6 +1290,108 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 11. Cat Facts API
+  {
+    id: 'cat-facts',
+    category: 'cat-facts',
+    categoryTitle: 'Cat Facts',
+    method: 'GET',
+    path: '/cat-facts',
+    title: 'Cat Facts API',
+    shortDescription: 'The Cat Facts API provides random cat facts and collections of cat facts.',
+    description: 'The Cat Facts API provides random cat facts and collections of cat facts. Supports requesting a single random fact or a paginated collection of facts, with optional max_length, limit, and page filters.',
+    notes: [
+      'Upstream API: https://catfact.ninja',
+      'Default response type is "fact" if not specified.',
+      'Set "type" to "facts" to retrieve a paginated collection of cat facts.',
+      'Use "max_length" to constrain the maximum character length for a single fact.',
+      'Additional query parameters are forwarded to the upstream API.',
+      'Invalid response types are returned as 400 Bad Request errors.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Response Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'fact',
+        description: 'Response type: fact or facts; defaults to fact.',
+        options: [
+          { label: 'fact', value: 'fact', description: 'Single random cat fact object with fact and length' },
+          { label: 'facts', value: 'facts', description: 'Paginated list of cat facts with pagination metadata' }
+        ]
+      },
+      {
+        name: 'max_length',
+        label: 'Max Length',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 140',
+        description: 'Maximum length for a single fact.'
+      },
+      {
+        name: 'limit',
+        label: 'Limit',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 10',
+        description: 'Number of facts for the facts response.'
+      },
+      {
+        name: 'page',
+        label: 'Page Number',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 1',
+        description: 'Page number for the facts response.'
+      }
+    ],
+    presets: [
+      {
+        id: 'cat-facts-default',
+        label: 'Random Cat Fact',
+        description: 'Fetch a single random cat fact (GET /cat-facts)',
+        queryParams: { type: 'fact' }
+      },
+      {
+        id: 'cat-facts-list',
+        label: 'Cat Facts List',
+        description: 'Fetch 10 cat facts with pagination (GET /cat-facts?type=facts&limit=10)',
+        queryParams: { type: 'facts', limit: '10' }
+      },
+      {
+        id: 'cat-facts-short',
+        label: 'Short Cat Fact',
+        description: 'Fetch a short cat fact under 140 characters (GET /cat-facts?type=fact&max_length=140)',
+        queryParams: { type: 'fact', max_length: '140' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/cat-facts?type=facts&limit=10',
+    exampleCurl: 'curl "http://localhost:3000/cat-facts?type=facts&limit=10"',
+    responseExample: {
+      fact: "A cat's hearing is much more sensitive than humans and dogs.",
+      length: 60
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid response type or query parameters provided.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Invalid response type. Allowed values are fact or facts.'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
