@@ -1675,6 +1675,180 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 14. CoinGecko API
+  {
+    id: 'coingecko',
+    category: 'coingecko',
+    categoryTitle: 'CoinGecko',
+    method: 'GET',
+    path: '/coingecko',
+    title: 'CoinGecko API',
+    shortDescription: 'The CoinGecko API provides cryptocurrency prices, market data, and metadata.',
+    description: 'The CoinGecko API provides cryptocurrency prices, market data, and metadata. Supports price lookups, comprehensive coin metadata, top trending coins, global market statistics, category listings, exchange data, derivatives, and NFT market statistics.',
+    notes: [
+      'Upstream API: https://api.coingecko.com/api/v3',
+      'Operation type defaults to "ping" if not specified.',
+      'Operations requiring an ID (coin, exchange, exchangeTickers, nft) require the "value" parameter.',
+      'Use "ids" and "vs_currencies" for the "simplePrice" operation.',
+      'Use "vs_currency", "order", "per_page", and "page" for market rankings.',
+      'Use "query" for search operations.',
+      'Invalid operation types or missing required values return 400 Bad Request.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'ping',
+        description: 'CoinGecko operation; defaults to ping.',
+        options: [
+          { label: 'ping', value: 'ping', description: 'Check API server status' },
+          { label: 'simplePrice', value: 'simplePrice', description: 'Get current prices of tokens by ids and vs_currencies' },
+          { label: 'coins', value: 'coins', description: 'List all supported coins with id, name, and symbol' },
+          { label: 'coin', value: 'coin', description: 'Get current data and metadata for a coin by ID (requires value)' },
+          { label: 'coinMarkets', value: 'coinMarkets', description: 'List coin market data with price, volume, and rank' },
+          { label: 'markets', value: 'markets', description: 'Get market data for coins with vs_currency, order, and pagination' },
+          { label: 'trending', value: 'trending', description: 'Top-7 trending search coins and NFTs on CoinGecko' },
+          { label: 'search', value: 'search', description: 'Search for coins, categories, and markets by query' },
+          { label: 'global', value: 'global', description: 'Global cryptocurrency market metrics' },
+          { label: 'globalDefi', value: 'globalDefi', description: 'Global DeFi market metrics including market cap and dominance' },
+          { label: 'categories', value: 'categories', description: 'List all cryptocurrency categories with market data' },
+          { label: 'categoriesList', value: 'categoriesList', description: 'List all cryptocurrency category names and IDs' },
+          { label: 'exchanges', value: 'exchanges', description: 'List all active cryptocurrency exchanges' },
+          { label: 'exchange', value: 'exchange', description: 'Get exchange volume and metadata by ID (requires value)' },
+          { label: 'exchangeTickers', value: 'exchangeTickers', description: 'Get exchange tickers by ID (requires value)' },
+          { label: 'derivatives', value: 'derivatives', description: 'List all derivative tickers' },
+          { label: 'derivativesExchanges', value: 'derivativesExchanges', description: 'List all derivative exchanges' },
+          { label: 'assetPlatforms', value: 'assetPlatforms', description: 'List all asset platforms / blockchain networks' },
+          { label: 'nfts', value: 'nfts', description: 'List all supported NFT collections with ID and contract' },
+          { label: 'nft', value: 'nft', description: 'Get NFT collection data and floor price by ID (requires value)' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Value / ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. bitcoin, binance, bored-ape-yacht-club',
+        description: 'Coin, exchange, or NFT ID when required (e.g. bitcoin for coin details).'
+      },
+      {
+        name: 'ids',
+        label: 'Coin IDs',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. bitcoin,ethereum,solana',
+        description: 'Comma-separated coin IDs.'
+      },
+      {
+        name: 'vs_currency',
+        label: 'VS Currency',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. usd, eur, btc',
+        description: 'Target fiat or crypto currency for market rankings.'
+      },
+      {
+        name: 'vs_currencies',
+        label: 'VS Currencies',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. usd,eur,inr',
+        description: 'Target currencies for simple prices (comma-separated).'
+      },
+      {
+        name: 'order',
+        label: 'Order',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. market_cap_desc',
+        description: 'Market sorting order (e.g. market_cap_desc, gecko_desc, volume_desc).'
+      },
+      {
+        name: 'per_page',
+        label: 'Per Page',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 10',
+        description: 'Results per page.'
+      },
+      {
+        name: 'page',
+        label: 'Page Number',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 1',
+        description: 'Page number for paginated results.'
+      },
+      {
+        name: 'query',
+        label: 'Search Query',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. bitcoin',
+        description: 'Search term for querying coins, exchanges, and categories.'
+      }
+    ],
+    presets: [
+      {
+        id: 'coingecko-ping',
+        label: 'Ping',
+        description: 'Check CoinGecko server status (GET /coingecko)',
+        queryParams: { type: 'ping' }
+      },
+      {
+        id: 'coingecko-bitcoin-price',
+        label: 'Bitcoin Price',
+        description: 'Get live BTC price in USD (GET /coingecko?type=simplePrice&ids=bitcoin&vs_currencies=usd)',
+        queryParams: { type: 'simplePrice', ids: 'bitcoin', vs_currencies: 'usd' }
+      },
+      {
+        id: 'coingecko-bitcoin-details',
+        label: 'Bitcoin Details',
+        description: 'Get comprehensive Bitcoin info (GET /coingecko?type=coin&value=bitcoin)',
+        queryParams: { type: 'coin', value: 'bitcoin' }
+      },
+      {
+        id: 'coingecko-market-data',
+        label: 'Market Data',
+        description: 'Top 10 cryptos by market cap (GET /coingecko?type=markets&vs_currency=usd&order=market_cap_desc&per_page=10&page=1)',
+        queryParams: { type: 'markets', vs_currency: 'usd', order: 'market_cap_desc', per_page: '10', page: '1' }
+      },
+      {
+        id: 'coingecko-trending',
+        label: 'Trending',
+        description: 'Get trending search coins on CoinGecko (GET /coingecko?type=trending)',
+        queryParams: { type: 'trending' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/coingecko?type=simplePrice&ids=bitcoin&vs_currencies=usd',
+    exampleCurl: 'curl "http://localhost:3000/coingecko?type=simplePrice&ids=bitcoin&vs_currencies=usd"',
+    responseExample: {
+      bitcoin: {
+        usd: 68420.5
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type or missing required parameters.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Value / ID is required for this operation'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

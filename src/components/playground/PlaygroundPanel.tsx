@@ -46,8 +46,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
   const [copiedCurl, setCopiedCurl] = useState(false);
   const [showAllPresets, setShowAllPresets] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState<'response' | 'snippets'>('response');
+  const [validationError, setValidationError] = useState<string | null>(null);
   const responseSectionRef = useRef<HTMLDivElement>(null);
   const prevLoadingRef = useRef<boolean>(false);
+
+  // Clear validation error on param change
+  useEffect(() => {
+    setValidationError(null);
+  }, [queryParams, pathParams, endpoint.id]);
 
   // Build live URL
   const { fullUrl } = buildUrl(
@@ -68,8 +74,25 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     prevLoadingRef.current = responseState.isLoading;
   }, [responseState.isLoading, responseState.status, settings.autoScrollToResponse]);
 
+  // Send request with validation
+  const handleSendRequest = () => {
+    // Validate CoinGecko endpoint
+    if (endpoint.id === 'coingecko') {
+      const op = queryParams.type || 'ping';
+      const COINGECKO_ID_OPERATIONS = ['coin', 'exchange', 'exchangeTickers', 'nft'];
+      if (COINGECKO_ID_OPERATIONS.includes(op) && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError(`The "${op}" operation requires a coin, exchange, or NFT ID in the "Value / ID" field (e.g. "bitcoin").`);
+        return;
+      }
+    }
+
+    setValidationError(null);
+    executeRequest();
+  };
+
   // Handle Preset Selection
   const handlePresetClick = (preset: EndpointPreset) => {
+    setValidationError(null);
     applyPreset(preset);
     if (settings.autoSendPreset) {
       setTimeout(() => {
@@ -83,12 +106,12 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
-        executeRequest();
+        handleSendRequest();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [executeRequest]);
+  }, [handleSendRequest]);
 
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(fullUrl);
@@ -137,7 +160,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     ];
     const isJikanValueRequired = isJikanEndpoint && param.name === 'value' && JIKAN_ID_OPERATIONS.includes(selectedJikanType);
 
-    const isRequired = (param.required && !isAllSelectedInCountries) || isBreedRequiredForDogs || isJikanValueRequired;
+    // Context-awareness for CoinGecko API
+    const isCoingeckoEndpoint = endpoint.id === 'coingecko';
+    const selectedCoingeckoType = queryParams.type || 'ping';
+    const COINGECKO_ID_OPERATIONS = ['coin', 'exchange', 'exchangeTickers', 'nft'];
+    const isCoingeckoValueRequired = isCoingeckoEndpoint && param.name === 'value' && COINGECKO_ID_OPERATIONS.includes(selectedCoingeckoType);
+    const isCoingeckoValueNotNeeded = isCoingeckoEndpoint && param.name === 'value' && !COINGECKO_ID_OPERATIONS.includes(selectedCoingeckoType);
+
+    const isRequired = (param.required && !isAllSelectedInCountries) || isBreedRequiredForDogs || isJikanValueRequired || isCoingeckoValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -150,6 +180,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = `e.g. 1 (Required for ${selectedJikanType})`;
     } else if (isJikanEndpoint && param.name === 'value') {
       customPlaceholder = `e.g. 1 (ID for ${selectedJikanType}, or leave empty for list)`;
+    } else if (isCoingeckoValueRequired) {
+      customPlaceholder = `e.g. bitcoin (Required for ${selectedCoingeckoType})`;
+    } else if (isCoingeckoValueNotNeeded) {
+      customPlaceholder = `Not required for type=${selectedCoingeckoType}`;
+    } else if (isCoingeckoEndpoint && param.name === 'query' && selectedCoingeckoType === 'search') {
+      customPlaceholder = 'e.g. bitcoin (Used with type=search)';
+    } else if (isCoingeckoEndpoint && param.name === 'ids' && selectedCoingeckoType === 'simplePrice') {
+      customPlaceholder = 'e.g. bitcoin,ethereum (Used with simplePrice)';
+    } else if (isCoingeckoEndpoint && param.name === 'vs_currencies' && selectedCoingeckoType === 'simplePrice') {
+      customPlaceholder = 'e.g. usd,eur (Used with simplePrice)';
+    } else if (isCoingeckoEndpoint && param.name === 'vs_currency' && (selectedCoingeckoType === 'markets' || selectedCoingeckoType === 'coinMarkets')) {
+      customPlaceholder = `e.g. usd (Used with ${selectedCoingeckoType})`;
     }
 
     return (
@@ -202,6 +244,12 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? `Required: Resource ID is required for "${selectedJikanType}"`
             : isJikanEndpoint && param.name === 'value'
             ? `Optional ID for ${selectedJikanType} (omit to retrieve list/search)`
+            : isCoingeckoValueRequired
+            ? `Required: Coin, exchange, or NFT ID is required for "${selectedCoingeckoType}"`
+            : isCoingeckoValueNotNeeded
+            ? `Not needed when operation is "${selectedCoingeckoType}"`
+            : isCoingeckoEndpoint && param.name === 'query' && selectedCoingeckoType !== 'search'
+            ? 'Search keyword (used when type=search)'
             : param.description}
         </p>
       </div>
@@ -372,6 +420,65 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                       </div>
                     </div>
                   </div>
+                ) : endpoint.id === 'coingecko' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation */}
+                    <div className="space-y-2">
+                      <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                        Operation
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['type', 'value'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Price / Market Parameters */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Price & Market Parameters
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">for simplePrice | markets | coinMarkets</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['ids', 'vs_currency', 'vs_currencies', 'order'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 3. Pagination */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Pagination
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">for list & market queries</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['per_page', 'page'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 4. Search */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Search
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">for type=search</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['query'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {endpoint.queryParams.map(renderQueryParamInput)}
@@ -463,6 +570,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
           </a>
         </div>
 
+        {/* Validation Warning Banner */}
+        {validationError && (
+          <div className="flex items-center space-x-2.5 px-3.5 py-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-lg text-xs text-amber-800 dark:text-amber-300 animate-in fade-in duration-150">
+            <AlertCircle size={15} className="shrink-0 text-amber-600 dark:text-amber-400" />
+            <div className="flex-1 font-medium">{validationError}</div>
+          </div>
+        )}
+
         {/* Primary Action Buttons Bar */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
           {/* Secondary Actions */}
@@ -504,7 +619,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
 
           {/* Dominant Primary Action: Send Request */}
           <button
-            onClick={() => executeRequest()}
+            onClick={handleSendRequest}
             disabled={responseState.isLoading}
             className="flex items-center space-x-2 px-6 py-2.5 min-h-[42px] bg-slate-900 hover:bg-slate-800 active:bg-black dark:bg-slate-100 dark:hover:bg-white dark:active:bg-slate-200 text-white dark:text-slate-900 font-semibold text-xs rounded-lg shadow-sm transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
