@@ -77,17 +77,17 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Search / Command palette trigger (Mathematically centered) */}
+        {/* Center: Search / Command palette trigger (Mathematically centered with laptop/desktop sizing) */}
         <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-64 lg:w-72 justify-between shadow-2xs"
+            className="flex items-center space-x-2 px-3.5 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-80 lg:w-[440px] xl:w-[520px] max-w-[45vw] justify-between shadow-2xs group"
           >
-            <span className="flex items-center space-x-2 truncate">
-              <Search size={13} />
-              <span>Search API documentation...</span>
+            <span className="flex items-center space-x-2.5 truncate">
+              <Search size={14} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+              <span className="text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">Search API documentation, endpoints, models...</span>
             </span>
-            <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0">
               ⌘K
             </kbd>
           </button>
