@@ -1994,6 +1994,89 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 17. Genderize API
+  {
+    id: 'genderize',
+    category: 'genderize',
+    categoryTitle: 'Genderize',
+    method: 'GET',
+    path: '/genderize',
+    title: 'Predict Gender',
+    shortDescription: 'The Genderize API predicts the likely gender of a person from their name.',
+    description: 'The Genderize API predicts the likely gender of a person from their name. Supports optional country code filtering to improve gender prediction accuracy.',
+    notes: [
+      'Upstream API: https://api.genderize.io',
+      'Response operation defaults to "gender".',
+      'The "name" parameter is required.',
+      'The "country_id" parameter is an optional two-letter country code (e.g. US, IN, GB).',
+      'Additional query parameters are forwarded to Genderize.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Type / Operation',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'Response operation; currently gender, defaults to gender.',
+        options: [
+          { label: 'gender', value: 'gender', description: 'Gender prediction operation (default)' }
+        ]
+      },
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'string',
+        required: true,
+        placeholder: 'e.g. michael',
+        description: 'Name used for the gender prediction.'
+      },
+      {
+        name: 'country_id',
+        label: 'Country ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. US',
+        description: 'Two-letter country code used to improve the prediction.'
+      }
+    ],
+    presets: [
+      {
+        id: 'genderize-michael',
+        label: 'Michael',
+        description: 'Predict gender for Michael (GET /genderize?name=michael)',
+        queryParams: { name: 'michael' }
+      },
+      {
+        id: 'genderize-emma-us',
+        label: 'Emma + US',
+        description: 'Predict gender for Emma in US (GET /genderize?type=gender&name=emma&country_id=US)',
+        queryParams: { type: 'gender', name: 'emma', country_id: 'US' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/genderize?name=michael',
+    exampleCurl: 'curl "http://localhost:3000/genderize?name=michael"',
+    responseExample: {
+      success: true,
+      statusCode: 200,
+      status: true,
+      data: {
+        count: 107560,
+        name: 'michael',
+        gender: 'male',
+        probability: 1.0
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
