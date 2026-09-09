@@ -12,13 +12,9 @@ export function normalizeBaseUrl(url: string): string {
   let normalized = url.trim();
   // Remove trailing slashes
   normalized = normalized.replace(/\/+$/, '');
-  // If protocol missing and not localhost, prefix https://
+  // If protocol missing, prefix https://
   if (!/^https?:\/\//i.test(normalized)) {
-    if (normalized.startsWith('localhost') || normalized.startsWith('127.0.0.1')) {
-      normalized = `http://${normalized}`;
-    } else {
-      normalized = `https://${normalized}`;
-    }
+    normalized = `https://${normalized}`;
   }
   return normalized;
 }

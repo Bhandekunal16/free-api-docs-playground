@@ -26,7 +26,7 @@ export const DEFAULT_DEVELOPER_SETTINGS: DeveloperSettings = {
 };
 
 export const DEFAULT_DEVELOPER_PROFILE: DeveloperProfile = {
-  name: 'Developer Sandbox',
+  name: 'Kunal Bhande',
   email: 'bhandekunal16@gmail.com',
   role: 'API Engineer'
 };
@@ -115,7 +115,14 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [profile, setProfile] = useState<DeveloperProfile>(() => {
     try {
       const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
-      return stored ? { ...DEFAULT_DEVELOPER_PROFILE, ...JSON.parse(stored) } : DEFAULT_DEVELOPER_PROFILE;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.name === 'Developer Sandbox' || !parsed.email || parsed.email.includes('sandbox.local')) {
+          return DEFAULT_DEVELOPER_PROFILE;
+        }
+        return { ...DEFAULT_DEVELOPER_PROFILE, ...parsed };
+      }
+      return DEFAULT_DEVELOPER_PROFILE;
     } catch {
       return DEFAULT_DEVELOPER_PROFILE;
     }

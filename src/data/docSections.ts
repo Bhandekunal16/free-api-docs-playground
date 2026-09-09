@@ -50,18 +50,15 @@ export const DOC_ARTICLES: Record<string, DocArticle> = {
       },
       {
         heading: 'Base URL Configuration',
-        content: 'The default production endpoint is hosted at https://free-api-server.vercel.app/. You can customize the Base URL at any time in the top bar to point to a local instance (e.g., http://localhost:3000) or your own deployed mirror.',
+        content: 'The default production endpoint is hosted at https://free-api-server.vercel.app/. You can customize the Base URL in the top bar to point to your own custom proxy or deployed mirror if needed.',
         subsections: [
           {
             title: 'Configuring Base URL',
             body: 'The playground automatically normalizes trailing slashes and ensures all path and query parameters are combined accurately.',
             codeBlock: {
               language: 'bash',
-              code: `# Default Production Base URL
-https://free-api-server.vercel.app
-
-# Example Local Server Base URL
-http://localhost:3000`
+              code: `# Production Base URL
+https://free-api-server.vercel.app`
             }
           }
         ]

@@ -17,22 +17,10 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
 
   const presets = [
     {
-      name: 'Production Cloud (Default)',
+      name: 'Official Production API',
       url: DEFAULT_BASE_URL,
-      badge: 'Recommended',
+      badge: 'Live & Recommended',
       badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-    },
-    {
-      name: 'Local Dev Server',
-      url: 'http://localhost:3000',
-      badge: 'Local Port 3000',
-      badgeColor: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-    },
-    {
-      name: 'Local Dev Port 8000',
-      url: 'http://localhost:8000',
-      badge: 'Local Port 8000',
-      badgeColor: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
     }
   ];
 
