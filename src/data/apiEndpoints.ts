@@ -603,11 +603,11 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
     statusCodes: [COMMON_STATUS_CODES[0], COMMON_STATUS_CODES[1], COMMON_STATUS_CODES[2]]
   },
 
-  // 7. Countries API
+  // 7. Geography API (Countries)
   {
     id: 'countries',
-    category: 'countries',
-    categoryTitle: 'Countries API',
+    category: 'geography',
+    categoryTitle: 'Geography',
     method: 'GET',
     path: '/countries',
     title: 'Country Lookup',

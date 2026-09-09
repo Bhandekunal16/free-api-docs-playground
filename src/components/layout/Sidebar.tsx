@@ -3,15 +3,13 @@ import {
   BookOpen,
   Activity,
   Layers,
-  Database,
   Globe,
   CloudSun,
   ShieldAlert,
   AlertTriangle,
   Search,
-  ChevronRight,
-  ExternalLink,
-  ChevronDown
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
 import { API_ENDPOINTS } from '../../data/apiEndpoints';
@@ -26,6 +24,19 @@ export const Sidebar: React.FC = () => {
   } = useApi();
 
   const [filterQuery, setFilterQuery] = useState<string>('');
+  
+  // Collapsible section states
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    docs: false,
+    health: false,
+    fake: false,
+    geography: false,
+    weather: false
+  });
+
+  const toggleSection = (key: string) => {
+    setCollapsedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleSelect = (type: 'endpoint' | 'doc', id: string) => {
     setActiveSelection({ type, id });
@@ -34,9 +45,8 @@ export const Sidebar: React.FC = () => {
 
   // Group endpoints
   const healthEndpoints = API_ENDPOINTS.filter(e => e.category === 'health');
-  const fakeEndpoints = API_ENDPOINTS.filter(e => e.category === 'fake');
-  const mockEndpoints = API_ENDPOINTS.filter(e => e.category === 'mock');
-  const countriesEndpoints = API_ENDPOINTS.filter(e => e.category === 'countries');
+  const fakeEndpoints = API_ENDPOINTS.filter(e => e.category === 'fake' || e.category === 'mock');
+  const geographyEndpoints = API_ENDPOINTS.filter(e => e.category === 'geography');
   const weatherEndpoints = API_ENDPOINTS.filter(e => e.category === 'weather');
 
   const filterItem = (title: string, path?: string) => {
@@ -69,226 +79,250 @@ export const Sidebar: React.FC = () => {
               type="text"
               value={filterQuery}
               onChange={e => setFilterQuery(e.target.value)}
-              placeholder="Filter endpoints..."
+              placeholder="Filter endpoints & docs..."
               className="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-md text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-medium transition-colors"
             />
           </div>
         </div>
 
         {/* Navigation list */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 text-xs">
-          {/* SECTION: GETTING STARTED & GUIDES */}
-          <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-              <span>Documentation</span>
-            </div>
-            <div className="space-y-0.5">
-              {filterItem(DOC_ARTICLES.overview.title) && (
-                <button
-                  onClick={() => handleSelect('doc', 'overview')}
-                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-                    activeSelection.type === 'doc' && activeSelection.id === 'overview'
-                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                  }`}
-                >
-                  <BookOpen size={14} className="shrink-0 text-slate-700 dark:text-slate-300" />
-                  <span className="truncate">Overview</span>
-                </button>
-              )}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 text-xs">
+          {/* 1. SECTION: DOCS */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('docs')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <BookOpen size={12} className="text-slate-500" />
+                <span>Docs</span>
+              </span>
+              {collapsedSections.docs ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+            </button>
 
-              {filterItem(DOC_ARTICLES['http-status-codes'].title) && (
-                <button
-                  onClick={() => handleSelect('doc', 'http-status-codes')}
-                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-                    activeSelection.type === 'doc' && activeSelection.id === 'http-status-codes'
-                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                  }`}
-                >
-                  <ShieldAlert size={14} className="shrink-0 text-amber-600 dark:text-amber-400" />
-                  <span className="truncate">HTTP Status Codes</span>
-                </button>
-              )}
-
-              {filterItem(DOC_ARTICLES['error-handling'].title) && (
-                <button
-                  onClick={() => handleSelect('doc', 'error-handling')}
-                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-                    activeSelection.type === 'doc' && activeSelection.id === 'error-handling'
-                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                  }`}
-                >
-                  <AlertTriangle size={14} className="shrink-0 text-rose-600 dark:text-rose-400" />
-                  <span className="truncate">Error Handling</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* SECTION: HEALTH CHECK */}
-          <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-              <span>Health Check</span>
-            </div>
-            <div className="space-y-0.5">
-              {healthEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
-                const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
-                return (
+            {!collapsedSections.docs && (
+              <div className="space-y-0.5 pt-0.5">
+                {filterItem(DOC_ARTICLES.overview.title) && (
                   <button
-                    key={ep.id}
-                    onClick={() => handleSelect('endpoint', ep.id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      isActive
+                    onClick={() => handleSelect('doc', 'overview')}
+                    className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                      activeSelection.type === 'doc' && activeSelection.id === 'overview'
                         ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
-                    <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
-                        {ep.method}
-                      </span>
-                      <span className="truncate font-mono text-[11px]">{ep.path}</span>
-                    </div>
+                    <BookOpen size={14} className="shrink-0 text-slate-700 dark:text-slate-300" />
+                    <span className="truncate">Overview</span>
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                )}
 
-          {/* SECTION: FAKE API */}
-          <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-              <span>Fake API</span>
-              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600">3 routes</span>
-            </div>
-            <div className="space-y-0.5">
-              {fakeEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
-                const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
-                return (
+                {filterItem(DOC_ARTICLES['http-status-codes'].title) && (
                   <button
-                    key={ep.id}
-                    onClick={() => handleSelect('endpoint', ep.id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      isActive
+                    onClick={() => handleSelect('doc', 'http-status-codes')}
+                    className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                      activeSelection.type === 'doc' && activeSelection.id === 'http-status-codes'
                         ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
-                    <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
-                        {ep.method}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="truncate font-mono text-[11px]">{ep.path}</div>
-                        <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                    <ShieldAlert size={14} className="shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span className="truncate">HTTP Status Codes</span>
+                  </button>
+                )}
+
+                {filterItem(DOC_ARTICLES['error-handling'].title) && (
+                  <button
+                    onClick={() => handleSelect('doc', 'error-handling')}
+                    className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                      activeSelection.type === 'doc' && activeSelection.id === 'error-handling'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                    }`}
+                  >
+                    <AlertTriangle size={14} className="shrink-0 text-rose-600 dark:text-rose-400" />
+                    <span className="truncate">Error Handling</span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 2. SECTION: HEALTH CHECK */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('health')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Activity size={12} className="text-emerald-500" />
+                <span>Health Check</span>
+              </span>
+              {collapsedSections.health ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+            </button>
+
+            {!collapsedSections.health && (
+              <div className="space-y-0.5 pt-0.5">
+                {healthEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <span className="truncate font-mono text-[11px]">{ep.path}</span>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* SECTION: MOCK API */}
-          <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-              <span>Mock API</span>
-              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600">2 routes</span>
-            </div>
-            <div className="space-y-0.5">
-              {mockEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
-                const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
-                return (
-                  <button
-                    key={ep.id}
-                    onClick={() => handleSelect('endpoint', ep.id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      isActive
-                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
-                        {ep.method}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="truncate font-mono text-[11px]">{ep.path}</div>
-                        <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+          {/* 3. SECTION: FAKE API */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('fake')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Layers size={12} className="text-slate-500" />
+                <span>Fake API</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">5 routes</span>
+                {collapsedSections.fake ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.fake && (
+              <div className="space-y-0.5 pt-0.5">
+                {fakeEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* SECTION: COUNTRIES API */}
-          <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-              <span>Countries API</span>
-            </div>
-            <div className="space-y-0.5">
-              {countriesEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
-                const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
-                return (
-                  <button
-                    key={ep.id}
-                    onClick={() => handleSelect('endpoint', ep.id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      isActive
-                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
-                        {ep.method}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="truncate font-mono text-[11px]">{ep.path}</div>
-                        <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+          {/* 4. SECTION: GEOGRAPHY */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('geography')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Globe size={12} className="text-slate-500" />
+                <span>Geography</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">1 route</span>
+                {collapsedSections.geography ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.geography && (
+              <div className="space-y-0.5 pt-0.5">
+                {geographyEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* SECTION: WEATHER API */}
-          <div>
-            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 flex items-center justify-between">
-              <span>Weather API</span>
-            </div>
-            <div className="space-y-0.5">
-              {weatherEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
-                const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
-                return (
-                  <button
-                    key={ep.id}
-                    onClick={() => handleSelect('endpoint', ep.id)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
-                      isActive
-                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2 min-w-0">
-                      <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
-                        {ep.method}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="truncate font-mono text-[11px]">{ep.path}</div>
-                        <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+          {/* 5. SECTION: WEATHER */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('weather')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <CloudSun size={12} className="text-slate-500" />
+                <span>Weather</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">1 route</span>
+                {collapsedSections.weather ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.weather && (
+              <div className="space-y-0.5 pt-0.5">
+                {weatherEndpoints.filter(e => filterItem(e.title, e.path)).map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
