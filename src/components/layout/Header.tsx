@@ -15,7 +15,6 @@ import {
   Globe
 } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
-import { ThemeSwitcher } from './ThemeSwitcher';
 import { ProfileMenu } from './ProfileMenu';
 import { BaseUrlModal } from '../modals/BaseUrlModal';
 import { HistoryModal } from '../modals/HistoryModal';
@@ -169,9 +168,6 @@ export const Header: React.FC = () => {
               <span className="hidden lg:inline">Playground</span>
             </button>
           </div>
-
-          {/* Theme Switcher: Dark / Light / System */}
-          <ThemeSwitcher />
 
           {/* History Button */}
           <button
