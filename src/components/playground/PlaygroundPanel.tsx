@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Play,
   RotateCcw,
@@ -38,12 +38,15 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     responseState,
     executeRequest,
     resetParams,
-    applyPreset
+    applyPreset,
+    settings
   } = useApi();
 
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedCurl, setCopiedCurl] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState<'response' | 'snippets'>('response');
+  const responseSectionRef = useRef<HTMLDivElement>(null);
+  const prevLoadingRef = useRef<boolean>(false);
 
   // Build live URL
   const { fullUrl } = buildUrl(
@@ -53,6 +56,26 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     queryParams,
     customQueryParams
   );
+
+  // Auto-scroll to response if enabled
+  useEffect(() => {
+    if (prevLoadingRef.current && !responseState.isLoading && responseState.status !== null) {
+      if (settings.autoScrollToResponse && responseSectionRef.current) {
+        responseSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+    prevLoadingRef.current = responseState.isLoading;
+  }, [responseState.isLoading, responseState.status, settings.autoScrollToResponse]);
+
+  // Handle Preset Selection (Auto-execute if enabled in settings)
+  const handlePresetClick = (preset: EndpointPreset) => {
+    applyPreset(preset);
+    if (settings.autoSendPreset) {
+      setTimeout(() => {
+        executeRequest();
+      }, 50);
+    }
+  };
 
   // Keyboard shortcut Ctrl+Enter or Cmd+Enter to execute request
   useEffect(() => {
@@ -101,7 +124,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
               {endpoint.presets.slice(0, 3).map(preset => (
                 <button
                   key={preset.id}
-                  onClick={() => applyPreset(preset)}
+                  onClick={() => handlePresetClick(preset)}
                   className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-md border border-slate-200 dark:border-slate-700/60 transition-colors whitespace-nowrap shadow-2xs"
                   title={preset.description}
                 >
@@ -371,7 +394,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       </div>
 
       {/* 3. Output Tabs: Response Viewer vs. Code Snippets */}
-      <div className="space-y-3">
+      <div ref={responseSectionRef} className="space-y-3">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
           <div className="flex items-center space-x-1">
             <button

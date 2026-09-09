@@ -16,9 +16,11 @@ import {
 } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { ProfileMenu } from './ProfileMenu';
 import { BaseUrlModal } from '../modals/BaseUrlModal';
 import { HistoryModal } from '../modals/HistoryModal';
 import { CommandPalette } from '../modals/CommandPalette';
+import { ProfileSettingsModal } from '../modals/ProfileSettingsModal';
 
 export const Header: React.FC = () => {
   const {
@@ -34,6 +36,13 @@ export const Header: React.FC = () => {
   const [isBaseUrlModalOpen, setIsBaseUrlModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState<'profile' | 'settings' | 'shortcuts'>('profile');
+
+  const handleOpenSettingsModal = (tab: 'profile' | 'settings' | 'shortcuts' = 'profile') => {
+    setProfileModalTab(tab);
+    setIsProfileModalOpen(true);
+  };
 
   // Global shortcut Cmd+K or Ctrl+K
   useEffect(() => {
@@ -179,6 +188,9 @@ export const Header: React.FC = () => {
             )}
           </button>
 
+          {/* Profile & Settings Menu Dropdown */}
+          <ProfileMenu onOpenFullSettings={handleOpenSettingsModal} />
+
           {/* Mobile search button */}
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
@@ -201,6 +213,11 @@ export const Header: React.FC = () => {
       <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
+      />
+      <ProfileSettingsModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        initialTab={profileModalTab}
       />
     </>
   );

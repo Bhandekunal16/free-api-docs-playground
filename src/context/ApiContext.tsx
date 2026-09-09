@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { EndpointDefinition, EndpointPreset, RequestHistoryItem, ApiResponseState } from '../types/api';
+import { EndpointDefinition, EndpointPreset, RequestHistoryItem, ApiResponseState, DeveloperSettings, DeveloperProfile } from '../types/api';
 import { API_ENDPOINTS, getEndpointById } from '../data/apiEndpoints';
 import { DEFAULT_BASE_URL, normalizeBaseUrl, buildUrl, formatBytes } from '../utils/url';
 
@@ -14,6 +14,22 @@ interface CustomQueryParam {
   value: string;
   enabled: boolean;
 }
+
+export const DEFAULT_DEVELOPER_SETTINGS: DeveloperSettings = {
+  autoSendPreset: false,
+  autoScrollToResponse: true,
+  wrapLines: true,
+  showTimingBreakdown: true,
+  prettyPrintJson: true,
+  saveHistory: true,
+  defaultSnippetLang: 'curl'
+};
+
+export const DEFAULT_DEVELOPER_PROFILE: DeveloperProfile = {
+  name: 'Developer Sandbox',
+  email: 'bhandekunal16@gmail.com',
+  role: 'API Engineer'
+};
 
 interface ApiContextType {
   baseUrl: string;
@@ -48,6 +64,11 @@ interface ApiContextType {
   setLayoutMode: (mode: 'split' | 'docs' | 'playground') => void;
   activeSnippetTab: 'curl' | 'fetch' | 'axios' | 'python';
   setActiveSnippetTab: (tab: 'curl' | 'fetch' | 'axios' | 'python') => void;
+  settings: DeveloperSettings;
+  updateSetting: <K extends keyof DeveloperSettings>(key: K, value: DeveloperSettings[K]) => void;
+  resetSettings: () => void;
+  profile: DeveloperProfile;
+  updateProfile: (updates: Partial<DeveloperProfile>) => void;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -69,6 +90,8 @@ const INITIAL_RESPONSE: ApiResponseState = {
 
 const BASE_URL_STORAGE_KEY = 'free_api_server_base_url';
 const HISTORY_STORAGE_KEY = 'free_api_server_history_v1';
+const SETTINGS_STORAGE_KEY = 'free_api_server_settings_v1';
+const PROFILE_STORAGE_KEY = 'free_api_server_profile_v1';
 
 export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [baseUrl, setBaseUrlState] = useState<string>(() => {
@@ -79,6 +102,57 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return DEFAULT_BASE_URL;
     }
   });
+
+  const [settings, setSettings] = useState<DeveloperSettings>(() => {
+    try {
+      const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      return stored ? { ...DEFAULT_DEVELOPER_SETTINGS, ...JSON.parse(stored) } : DEFAULT_DEVELOPER_SETTINGS;
+    } catch {
+      return DEFAULT_DEVELOPER_SETTINGS;
+    }
+  });
+
+  const [profile, setProfile] = useState<DeveloperProfile>(() => {
+    try {
+      const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
+      return stored ? { ...DEFAULT_DEVELOPER_PROFILE, ...JSON.parse(stored) } : DEFAULT_DEVELOPER_PROFILE;
+    } catch {
+      return DEFAULT_DEVELOPER_PROFILE;
+    }
+  });
+
+  const updateSetting = useCallback(<K extends keyof DeveloperSettings>(key: K, value: DeveloperSettings[K]) => {
+    setSettings(prev => {
+      const next = { ...prev, [key]: value };
+      try {
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const resetSettings = useCallback(() => {
+    setSettings(DEFAULT_DEVELOPER_SETTINGS);
+    try {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(DEFAULT_DEVELOPER_SETTINGS));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const updateProfile = useCallback((updates: Partial<DeveloperProfile>) => {
+    setProfile(prev => {
+      const next = { ...prev, ...updates };
+      try {
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
 
   const [activeSelection, setActiveSelection] = useState<ActiveSelection>({
     type: 'endpoint',
@@ -314,15 +388,17 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         responsePreview: isJson ? JSON.stringify(parsedData).slice(0, 100) : rawText.slice(0, 100)
       };
 
-      setHistory(prev => {
-        const updated = [historyItem, ...prev.slice(0, 29)];
-        try {
-          localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated));
-        } catch {
-          // ignore
-        }
-        return updated;
-      });
+      if (settings.saveHistory) {
+        setHistory(prev => {
+          const updated = [historyItem, ...prev.slice(0, 29)];
+          try {
+            localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated));
+          } catch {
+            // ignore
+          }
+          return updated;
+        });
+      }
 
     } catch (err: any) {
       const endTime = performance.now();
@@ -350,7 +426,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isLoading: false
       });
     }
-  }, [activeEndpoint, baseUrl, pathParams, queryParams, customQueryParams]);
+  }, [activeEndpoint, baseUrl, pathParams, queryParams, customQueryParams, settings.saveHistory]);
 
   const clearHistory = useCallback(() => {
     setHistory([]);
@@ -402,7 +478,12 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         layoutMode,
         setLayoutMode,
         activeSnippetTab,
-        setActiveSnippetTab
+        setActiveSnippetTab,
+        settings,
+        updateSetting,
+        resetSettings,
+        profile,
+        updateProfile
       }}
     >
       {children}

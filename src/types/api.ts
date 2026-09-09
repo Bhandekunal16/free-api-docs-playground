@@ -81,6 +81,23 @@ export interface RequestHistoryItem {
   responsePreview?: string;
 }
 
+export interface DeveloperProfile {
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: string;
+}
+
+export interface DeveloperSettings {
+  autoSendPreset: boolean;
+  autoScrollToResponse: boolean;
+  wrapLines: boolean;
+  showTimingBreakdown: boolean;
+  prettyPrintJson: boolean;
+  saveHistory: boolean;
+  defaultSnippetLang: 'curl' | 'fetch' | 'axios' | 'python';
+}
+
 export interface ApiResponseState {
   status: number | null;
   statusText: string;
@@ -95,3 +112,4 @@ export interface ApiResponseState {
   requestUrl: string;
   isLoading: boolean;
 }
+

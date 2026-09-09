@@ -15,6 +15,7 @@ import {
 import { ApiResponseState } from '../../types/api';
 import { JsonViewer } from '../ui/JsonViewer';
 import { formatBytes } from '../../utils/url';
+import { useApi } from '../../context/ApiContext';
 
 interface ResponseViewerProps {
   responseState: ApiResponseState;
@@ -22,6 +23,7 @@ interface ResponseViewerProps {
 }
 
 export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, onRetry }) => {
+  const { settings } = useApi();
   const [showHeaders, setShowHeaders] = useState<boolean>(false);
   const [copiedRaw, setCopiedRaw] = useState<boolean>(false);
 
@@ -92,14 +94,14 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
             </span>
           </span>
 
-          {timeMs !== null && (
+          {settings.showTimingBreakdown && timeMs !== null && (
             <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400 font-mono">
               <Clock size={12} className="text-slate-400 dark:text-slate-500" />
               <span>{timeMs} ms</span>
             </div>
           )}
 
-          {sizeBytes !== null && sizeBytes > 0 && (
+          {settings.showTimingBreakdown && sizeBytes !== null && sizeBytes > 0 && (
             <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400 font-mono">
               <HardDrive size={12} className="text-slate-400 dark:text-slate-500" />
               <span>{formatBytes(sizeBytes)}</span>
@@ -179,7 +181,10 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
 
       {/* Main Body Viewer */}
       <div className="space-y-1.5">
-        <JsonViewer data={data !== null ? data : rawText} initialExpandedDepth={3} />
+        <JsonViewer
+          data={data !== null ? data : rawText}
+          initialExpandedDepth={settings.prettyPrintJson ? 3 : 1}
+        />
       </div>
     </div>
   );
