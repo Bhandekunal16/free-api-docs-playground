@@ -113,30 +113,30 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
           {Object.keys(headers).length > 0 && (
             <button
               onClick={() => setShowHeaders(!showHeaders)}
-              className={`flex items-center space-x-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 min-h-[36px] rounded-lg text-xs font-medium border transition-colors ${
                 showHeaders
                   ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700'
                   : 'bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800'
               }`}
             >
-              <List size={12} />
+              <List size={13} />
               <span>Headers ({Object.keys(headers).length})</span>
             </button>
           )}
 
           <button
             onClick={handleCopyRaw}
-            className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-xs font-medium border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
+            className="flex items-center space-x-1.5 px-3 py-1.5 min-h-[36px] bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
             title="Copy Response Body"
           >
             {copiedRaw ? (
               <>
-                <Check size={12} className="text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-600 dark:text-emerald-400">Copied</span>
+                <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-medium">Copied</span>
               </>
             ) : (
               <>
-                <Copy size={12} />
+                <Copy size={13} />
                 <span>Copy Body</span>
               </>
             )}
@@ -146,7 +146,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
 
       {/* Optional Headers Drawer */}
       {showHeaders && Object.keys(headers).length > 0 && (
-        <div className="p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono space-y-1.5 shadow-2xs">
+        <div className="p-3.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono space-y-1.5 shadow-2xs">
           <div className="text-[10px] font-sans font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 pb-1">
             Response Headers
           </div>
@@ -172,8 +172,8 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
             The browser could not complete the request. Common causes:
           </p>
           <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
-            <li>Target server is unreachable or offline</li>
-            <li>If using a custom localhost URL, verify your server has CORS headers enabled</li>
+            <li>Target server is unreachable or temporary network outage</li>
+            <li>If using a custom mirror URL, verify your server has CORS headers enabled</li>
             <li>Verify your internet connection and verify Base URL is set to <code className="text-amber-700 dark:text-amber-300 font-mono">https://free-api-server.vercel.app</code></li>
           </ul>
         </div>

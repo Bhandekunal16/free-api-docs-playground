@@ -44,6 +44,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
 
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedCurl, setCopiedCurl] = useState(false);
+  const [showAllPresets, setShowAllPresets] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState<'response' | 'snippets'>('response');
   const responseSectionRef = useRef<HTMLDivElement>(null);
   const prevLoadingRef = useRef<boolean>(false);
@@ -67,7 +68,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     prevLoadingRef.current = responseState.isLoading;
   }, [responseState.isLoading, responseState.status, settings.autoScrollToResponse]);
 
-  // Handle Preset Selection (Auto-execute if enabled in settings)
+  // Handle Preset Selection
   const handlePresetClick = (preset: EndpointPreset) => {
     applyPreset(preset);
     if (settings.autoSendPreset) {
@@ -102,42 +103,259 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     setTimeout(() => setCopiedCurl(false), 2000);
   };
 
-  return (
-    <div className="flex flex-col h-full space-y-5 p-4 sm:p-6 max-w-4xl mx-auto animate-in fade-in duration-150">
-      {/* 1. Request Builder Header Bar */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
-              <Sliders size={16} />
-            </span>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Interactive Playground</h2>
-          </div>
+  const hasPathParams = endpoint.pathParams.length > 0;
+  const hasQueryParams = endpoint.queryParams.length > 0;
+  const hasAnyParams = hasPathParams || hasQueryParams || customQueryParams.length > 0;
 
-          {/* Quick Presets Pills */}
-          {endpoint.presets.length > 0 && (
-            <div className="hidden sm:flex items-center space-x-1.5 overflow-x-auto py-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-1">
-                <Sparkles size={11} className="text-amber-500 dark:text-amber-400" />
-                <span>Presets:</span>
-              </span>
-              {endpoint.presets.slice(0, 3).map(preset => (
-                <button
-                  key={preset.id}
-                  onClick={() => handlePresetClick(preset)}
-                  className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-md border border-slate-200 dark:border-slate-700/60 transition-colors whitespace-nowrap shadow-2xs"
-                  title={preset.description}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
+  // Preset limiting: max 3 visible, rest under more
+  const visiblePresets = showAllPresets ? endpoint.presets : endpoint.presets.slice(0, 3);
+  const remainingPresetCount = Math.max(0, endpoint.presets.length - 3);
+
+  return (
+    <div className="flex flex-col h-full space-y-6 p-4 sm:p-6 max-w-4xl mx-auto animate-in fade-in duration-150">
+      {/* 1. PLAYGROUND HEADER & PRESETS (Hick's Law: 3-4 visible presets max) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center space-x-2">
+          <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+            <Sliders size={14} />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Interactive Playground</h2>
+          </div>
+        </div>
+
+        {endpoint.presets.length > 0 && (
+          <div className="flex items-center flex-wrap gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1">
+              Presets:
+            </span>
+            {visiblePresets.map(preset => (
+              <button
+                key={preset.id}
+                onClick={() => handlePresetClick(preset)}
+                className="px-2.5 py-1 min-h-[30px] text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded-md border border-slate-200 dark:border-slate-700/80 transition-colors whitespace-nowrap shadow-2xs"
+                title={preset.description}
+              >
+                {preset.label}
+              </button>
+            ))}
+            {remainingPresetCount > 0 && !showAllPresets && (
+              <button
+                onClick={() => setShowAllPresets(true)}
+                className="px-2 py-1 min-h-[30px] text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+              >
+                +{remainingPresetCount} more
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 2. PARAMETERS CONFIGURATION (Progressive Disclosure) */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Parameters
+          </span>
+          {hasAnyParams && (
+            <button
+              onClick={resetParams}
+              className="flex items-center space-x-1 px-2 py-1 text-[11px] font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+              title="Reset parameters to defaults"
+            >
+              <RotateCcw size={11} />
+              <span>Reset</span>
+            </button>
           )}
         </div>
 
-        {/* Live URL Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-inner p-1.5 gap-2">
-          <div className="flex items-center px-2 py-1 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-emerald-700 dark:text-emerald-400 font-mono font-bold text-xs shrink-0 self-start sm:self-auto">
+        {!hasAnyParams ? (
+          <div className="px-4 py-3.5 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+            <span>No required parameters for this endpoint. Default payload ready.</span>
+            <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">GET Ready</span>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Path Parameters (Only if exist) */}
+            {hasPathParams && (
+              <div className="space-y-2.5">
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Path Parameters
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {endpoint.pathParams.map(param => {
+                    const currentValue = pathParams[param.name] ?? (param.defaultValue || '');
+                    return (
+                      <div key={param.name} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
+                            <span>:{param.name}</span>
+                            {param.required && <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>}
+                          </label>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">{param.type}</span>
+                        </div>
+
+                        {param.options && param.options.length > 0 ? (
+                          <select
+                            value={currentValue}
+                            onChange={e => updatePathParam(param.name, e.target.value)}
+                            className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
+                          >
+                            {param.options.map(opt => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label} ({opt.value})
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={param.type === 'number' ? 'number' : 'text'}
+                            value={currentValue}
+                            onChange={e => updatePathParam(param.name, e.target.value)}
+                            placeholder={param.placeholder || `Enter ${param.name}`}
+                            className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
+                          />
+                        )}
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{param.description}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Query Parameters (Only if exist) */}
+            {hasQueryParams && (
+              <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Query Parameters
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {endpoint.queryParams.map(param => {
+                    const currentValue = queryParams[param.name] ?? '';
+                    const isCountriesEndpoint = endpoint.id === 'countries';
+                    const isAllSelectedInCountries = isCountriesEndpoint && queryParams.type === 'all';
+                    const isValueFieldInCountries = isCountriesEndpoint && param.name === 'value';
+
+                    return (
+                      <div key={param.name} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
+                            <span>{param.name}</span>
+                            {param.required && !isAllSelectedInCountries && (
+                              <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
+                            )}
+                          </label>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                            {param.required && !isAllSelectedInCountries ? 'required' : 'optional'}
+                          </span>
+                        </div>
+
+                        {param.options && param.options.length > 0 ? (
+                          <select
+                            value={currentValue}
+                            onChange={e => updateQueryParam(param.name, e.target.value)}
+                            className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
+                          >
+                            {!param.required && <option value="">(Default)</option>}
+                            {param.options.map(opt => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={param.type === 'number' ? 'number' : 'text'}
+                            value={currentValue}
+                            disabled={isValueFieldInCountries && isAllSelectedInCountries}
+                            onChange={e => updateQueryParam(param.name, e.target.value)}
+                            placeholder={
+                              isValueFieldInCountries && isAllSelectedInCountries
+                                ? 'Not required for type=all'
+                                : param.placeholder || `Enter ${param.name}`
+                            }
+                            className={`w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono ${
+                              isValueFieldInCountries && isAllSelectedInCountries ? 'opacity-40 cursor-not-allowed' : ''
+                            }`}
+                          />
+                        )}
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {isValueFieldInCountries && isAllSelectedInCountries
+                            ? 'Omitted because type is set to all'
+                            : param.description}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Custom Query Parameters */}
+            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  Custom Parameters
+                </span>
+                <button
+                  onClick={addCustomQueryParam}
+                  className="flex items-center space-x-1 px-2.5 py-1 min-h-[32px] text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 transition-colors"
+                >
+                  <Plus size={12} />
+                  <span>Add Param</span>
+                </button>
+              </div>
+
+              {customQueryParams.length > 0 && (
+                <div className="space-y-2">
+                  {customQueryParams.map(item => (
+                    <div key={item.id} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={item.enabled}
+                        onChange={e => updateCustomQueryParam(item.id, { enabled: e.target.checked })}
+                        className="rounded bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 focus:ring-slate-500 h-4 w-4"
+                      />
+                      <input
+                        type="text"
+                        value={item.key}
+                        onChange={e => updateCustomQueryParam(item.id, { key: e.target.value })}
+                        placeholder="Key (e.g. filter)"
+                        className="w-1/3 px-2.5 py-1.5 min-h-[36px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs text-slate-800 dark:text-slate-200 font-mono"
+                      />
+                      <input
+                        type="text"
+                        value={item.value}
+                        onChange={e => updateCustomQueryParam(item.id, { value: e.target.value })}
+                        placeholder="Value (e.g. active)"
+                        className="flex-1 px-2.5 py-1.5 min-h-[36px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs text-slate-800 dark:text-slate-200 font-mono"
+                      />
+                      <button
+                        onClick={() => removeCustomQueryParam(item.id)}
+                        className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+                        aria-label="Remove parameter"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 3. REQUEST & EXECUTION SECTION (Separated from configuration) */}
+      <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Request & Live URL
+        </div>
+
+        {/* Live URL Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2 gap-2">
+          <div className="flex items-center px-2 py-1 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded text-emerald-700 dark:text-emerald-400 font-mono font-bold text-xs shrink-0 self-start sm:self-auto">
             {endpoint.method}
           </div>
 
@@ -145,297 +363,106 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             {fullUrl}
           </div>
 
-          <div className="flex items-center space-x-1 shrink-0 self-end sm:self-auto">
+          <a
+            href={fullUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs self-end sm:self-auto"
+            title="Open raw request in new tab"
+            aria-label="Open in new tab"
+          >
+            <ExternalLink size={14} />
+          </a>
+        </div>
+
+        {/* Primary Action Buttons Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+          {/* Secondary Actions */}
+          <div className="flex items-center space-x-2">
             <button
               onClick={handleCopyUrl}
-              className="flex items-center space-x-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
-              title="Copy live URL"
+              className="flex items-center space-x-1.5 px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
             >
               {copiedUrl ? (
                 <>
-                  <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-medium">Copied</span>
+                  <Check size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-600 dark:text-emerald-400 font-medium">URL Copied</span>
                 </>
               ) : (
                 <>
-                  <Copy size={13} />
-                  <span className="text-[11px]">Copy</span>
+                  <Copy size={14} />
+                  <span>Copy URL</span>
                 </>
               )}
             </button>
 
-            <a
-              href={fullUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="p-1.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
-              title="Open raw request in new tab"
-            >
-              <ExternalLink size={14} />
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Parameters Configuration Box */}
-      <div className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 space-y-5 shadow-2xs">
-        {/* Path Parameters Section */}
-        {endpoint.pathParams.length > 0 && (
-          <div className="space-y-3">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center space-x-1.5">
-              <span>Path Parameters</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {endpoint.pathParams.map(param => {
-                const currentValue = pathParams[param.name] ?? (param.defaultValue || '');
-                return (
-                  <div key={param.name} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
-                        <span>:{param.name}</span>
-                        {param.required && <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>}
-                      </label>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500">{param.type}</span>
-                    </div>
-
-                    {param.options && param.options.length > 0 ? (
-                      <select
-                        value={currentValue}
-                        onChange={e => updatePathParam(param.name, e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono"
-                      >
-                        {param.options.map(opt => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label} ({opt.value})
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type={param.type === 'number' ? 'number' : 'text'}
-                        value={currentValue}
-                        onChange={e => updatePathParam(param.name, e.target.value)}
-                        placeholder={param.placeholder || `Enter ${param.name}`}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono"
-                      />
-                    )}
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">{param.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Query Parameters Section */}
-        {endpoint.queryParams.length > 0 && (
-          <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800/80">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center justify-between">
-              <span>Query Parameters</span>
-              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 lowercase">auto-encoded in URL</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {endpoint.queryParams.map(param => {
-                const currentValue = queryParams[param.name] ?? '';
-                const isCountriesEndpoint = endpoint.id === 'countries';
-                const isAllSelectedInCountries = isCountriesEndpoint && queryParams.type === 'all';
-                const isValueFieldInCountries = isCountriesEndpoint && param.name === 'value';
-
-                return (
-                  <div key={param.name} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
-                        <span>{param.name}</span>
-                        {param.required && !isAllSelectedInCountries && (
-                          <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
-                        )}
-                      </label>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500">
-                        {param.required && !isAllSelectedInCountries ? 'required' : 'optional'}
-                      </span>
-                    </div>
-
-                    {param.options && param.options.length > 0 ? (
-                      <select
-                        value={currentValue}
-                        onChange={e => updateQueryParam(param.name, e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono"
-                      >
-                        {!param.required && <option value="">(None / Default)</option>}
-                        {param.options.map(opt => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type={param.type === 'number' ? 'number' : 'text'}
-                        value={currentValue}
-                        disabled={isValueFieldInCountries && isAllSelectedInCountries}
-                        onChange={e => updateQueryParam(param.name, e.target.value)}
-                        placeholder={
-                          isValueFieldInCountries && isAllSelectedInCountries
-                            ? 'Not required for type=all'
-                            : param.placeholder || `Enter ${param.name}`
-                        }
-                        className={`w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono ${
-                          isValueFieldInCountries && isAllSelectedInCountries ? 'opacity-40 cursor-not-allowed' : ''
-                        }`}
-                      />
-                    )}
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                      {isValueFieldInCountries && isAllSelectedInCountries
-                        ? 'Omitted because type is set to all'
-                        : param.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Custom Query Parameters */}
-        <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800/80">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-              Custom Query Parameters
-            </span>
-            <button
-              onClick={addCustomQueryParam}
-              className="flex items-center space-x-1 px-2 py-1 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-medium rounded border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
-            >
-              <Plus size={12} />
-              <span>Add Parameter</span>
-            </button>
-          </div>
-
-          {customQueryParams.length > 0 && (
-            <div className="space-y-2">
-              {customQueryParams.map(item => (
-                <div key={item.id} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={item.enabled}
-                    onChange={e => updateCustomQueryParam(item.id, { enabled: e.target.checked })}
-                    className="rounded bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 focus:ring-slate-500"
-                  />
-                  <input
-                    type="text"
-                    value={item.key}
-                    onChange={e => updateCustomQueryParam(item.id, { key: e.target.value })}
-                    placeholder="Key (e.g. filter)"
-                    className="w-1/3 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs text-slate-800 dark:text-slate-200 font-mono"
-                  />
-                  <input
-                    type="text"
-                    value={item.value}
-                    onChange={e => updateCustomQueryParam(item.id, { value: e.target.value })}
-                    placeholder="Value (e.g. active)"
-                    className="flex-1 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs text-slate-800 dark:text-slate-200 font-mono"
-                  />
-                  <button
-                    onClick={() => removeCustomQueryParam(item.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-          <button
-            onClick={resetParams}
-            className="flex items-center space-x-1.5 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
-          >
-            <RotateCcw size={13} />
-            <span>Reset Parameters</span>
-          </button>
-
-          <div className="flex items-center space-x-2">
             <button
               onClick={handleCopyCurl}
-              className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
+              className="flex items-center space-x-1.5 px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
             >
               {copiedCurl ? (
                 <>
-                  <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-emerald-600 dark:text-emerald-400">cURL Copied</span>
+                  <Check size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-600 dark:text-emerald-400 font-medium">cURL Copied</span>
                 </>
               ) : (
                 <>
-                  <Terminal size={13} />
+                  <Terminal size={14} />
                   <span>Copy cURL</span>
                 </>
               )}
             </button>
-
-            {/* Solid clean button with no gradients */}
-            <button
-              onClick={() => executeRequest()}
-              disabled={responseState.isLoading}
-              className="flex items-center space-x-2 px-5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-semibold text-xs rounded-lg shadow-sm transition-colors disabled:opacity-50"
-            >
-              <Play size={14} className={responseState.isLoading ? 'animate-spin' : 'fill-current'} />
-              <span>{responseState.isLoading ? 'Executing...' : 'Send Request'}</span>
-              <kbd className="hidden sm:inline-block ml-1.5 px-1.5 py-0.5 bg-white/20 dark:bg-black/20 text-white dark:text-slate-900 rounded text-[10px] font-mono">
-                ⌘↵
-              </kbd>
-            </button>
           </div>
+
+          {/* Dominant Primary Action: Send Request */}
+          <button
+            onClick={() => executeRequest()}
+            disabled={responseState.isLoading}
+            className="flex items-center space-x-2 px-6 py-2.5 min-h-[42px] bg-slate-900 hover:bg-slate-800 active:bg-black dark:bg-slate-100 dark:hover:bg-white dark:active:bg-slate-200 text-white dark:text-slate-900 font-semibold text-xs rounded-lg shadow-sm transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          >
+            <Play size={14} className={responseState.isLoading ? 'animate-spin' : 'fill-current'} />
+            <span>{responseState.isLoading ? 'Executing Request...' : 'Send Request'}</span>
+            <kbd className="ml-2 px-1.5 py-0.5 bg-white/20 dark:bg-black/20 text-white dark:text-slate-900 rounded text-[10px] font-mono">
+              ⌘↵
+            </kbd>
+          </button>
         </div>
       </div>
 
-      {/* 3. Output Tabs: Response Viewer vs. Code Snippets */}
-      <div ref={responseSectionRef} className="space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-          <div className="flex items-center space-x-1">
+      {/* 4. RESPONSE OUTPUT SECTION */}
+      <div ref={responseSectionRef} className="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setActiveBottomTab('response')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 min-h-[34px] rounded-md text-xs font-semibold transition-colors ${
                 activeBottomTab === 'response'
-                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xs'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <Terminal size={14} />
-              <span>Response Output</span>
-              {responseState.status !== null && (
-                <span
-                  className={`ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                    responseState.status >= 200 && responseState.status < 300
-                      ? activeBottomTab === 'response'
-                        ? 'bg-emerald-500/20 text-emerald-300 dark:text-emerald-700'
-                        : 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
-                      : activeBottomTab === 'response'
-                      ? 'bg-rose-500/20 text-rose-300 dark:text-rose-700'
-                      : 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400'
-                  }`}
-                >
-                  {responseState.status === 0 ? 'ERR' : responseState.status}
-                </span>
-              )}
+              <Terminal size={13} />
+              <span>Response</span>
             </button>
 
             <button
               onClick={() => setActiveBottomTab('snippets')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 min-h-[34px] rounded-md text-xs font-semibold transition-colors ${
                 activeBottomTab === 'snippets'
-                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xs'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <Code2 size={14} />
-              <span>Client Code Snippets</span>
+              <Code2 size={13} />
+              <span>Code Snippets</span>
             </button>
           </div>
+
+          {responseState.status !== null && activeBottomTab === 'response' && (
+            <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+              {responseState.timeMs !== null ? `${responseState.timeMs}ms` : ''}
+            </span>
+          )}
         </div>
 
         {activeBottomTab === 'response' ? (

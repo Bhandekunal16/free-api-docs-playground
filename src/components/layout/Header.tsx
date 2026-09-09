@@ -87,7 +87,7 @@ export const Header: React.FC = () => {
           {/* Base URL Pill Button */}
           <button
             onClick={() => setIsBaseUrlModalOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-950/80 hover:bg-slate-200 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-xs rounded-lg transition-all shadow-sm group"
+            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100 dark:bg-slate-950/80 hover:bg-slate-200 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-xs rounded-lg transition-all shadow-sm group"
             title="Click to change API Base URL"
           >
             <div className="flex items-center space-x-1.5 text-slate-500 dark:text-slate-400">
@@ -112,7 +112,7 @@ export const Header: React.FC = () => {
           {/* Search / Command palette trigger */}
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-52 justify-between"
+            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-52 justify-between"
           >
             <span className="flex items-center space-x-1.5 truncate">
               <Search size={13} />
@@ -127,12 +127,12 @@ export const Header: React.FC = () => {
         {/* Right: Layout Switcher, Theme Switcher & History */}
         <div className="flex items-center space-x-2">
           {/* Layout Mode Switcher (Visible on md screens and up) */}
-          <div className="hidden md:flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+          <div className="hidden md:flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
             <button
               onClick={() => setLayoutMode('split')}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 min-h-[32px] rounded-md text-xs font-semibold transition-colors ${
                 layoutMode === 'split'
-                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold shadow-2xs'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Split View (Documentation + Playground)"
@@ -142,10 +142,10 @@ export const Header: React.FC = () => {
             </button>
             <button
               onClick={() => setLayoutMode('docs')}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+              className={`flex items-center space-x-1.5 px-2.5 py-1.5 min-h-[32px] rounded-md text-xs font-medium transition-colors ${
                 layoutMode === 'docs'
                   ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Documentation Only"
             >
@@ -154,10 +154,10 @@ export const Header: React.FC = () => {
             </button>
             <button
               onClick={() => setLayoutMode('playground')}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+              className={`flex items-center space-x-1.5 px-2.5 py-1.5 min-h-[32px] rounded-md text-xs font-medium transition-colors ${
                 layoutMode === 'playground'
                   ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Playground Only"
             >
@@ -169,7 +169,7 @@ export const Header: React.FC = () => {
           {/* History Button */}
           <button
             onClick={() => setIsHistoryModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700/80 transition-colors shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-1.5 min-h-[36px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700/80 transition-colors shadow-sm"
             title="View Request History"
           >
             <History size={14} />
