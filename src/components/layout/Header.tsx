@@ -11,8 +11,7 @@ import {
   BookOpen,
   PlaySquare,
   Sparkles,
-  Zap,
-  Globe
+  Zap
 } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
 import { ProfileMenu } from './ProfileMenu';
@@ -23,8 +22,6 @@ import { ProfileSettingsModal } from '../modals/ProfileSettingsModal';
 
 export const Header: React.FC = () => {
   const {
-    baseUrl,
-    serverHealth,
     history,
     layoutMode,
     setLayoutMode,
@@ -55,8 +52,6 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const cleanBaseDisplay = baseUrl.replace(/^https?:\/\//, '');
-
   return (
     <>
       <header className="sticky top-0 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between transition-colors duration-150">
@@ -82,41 +77,15 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Base URL Switcher & Search */}
-        <div className="hidden md:flex items-center space-x-3">
-          {/* Base URL Pill Button */}
-          <button
-            onClick={() => setIsBaseUrlModalOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100 dark:bg-slate-950/80 hover:bg-slate-200 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-xs rounded-lg transition-all shadow-sm group"
-            title="Click to change API Base URL"
-          >
-            <div className="flex items-center space-x-1.5 text-slate-500 dark:text-slate-400">
-              <Globe size={13} className="text-slate-500 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors" />
-              <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider">Base:</span>
-            </div>
-            <span className="font-mono text-slate-700 dark:text-slate-300 font-medium max-w-[200px] truncate">
-              {cleanBaseDisplay}
-            </span>
-            <span
-              className={`w-2 h-2 rounded-full shrink-0 ${
-                serverHealth === 'healthy'
-                  ? 'bg-emerald-500 dark:bg-emerald-400'
-                  : serverHealth === 'checking'
-                  ? 'bg-amber-500 dark:bg-amber-400 animate-pulse'
-                  : 'bg-rose-500 dark:bg-rose-400'
-              }`}
-              title={`Status: ${serverHealth}`}
-            />
-          </button>
-
-          {/* Search / Command palette trigger */}
+        {/* Center: Search / Command palette trigger */}
+        <div className="hidden md:flex items-center">
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-52 justify-between"
+            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-64 justify-between shadow-2xs"
           >
-            <span className="flex items-center space-x-1.5 truncate">
+            <span className="flex items-center space-x-2 truncate">
               <Search size={13} />
-              <span>Search API docs...</span>
+              <span>Search API documentation...</span>
             </span>
             <kbd className="text-[10px] font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs">
               ⌘K
@@ -182,7 +151,10 @@ export const Header: React.FC = () => {
           </button>
 
           {/* Profile & Settings Menu Dropdown */}
-          <ProfileMenu onOpenFullSettings={handleOpenSettingsModal} />
+          <ProfileMenu
+            onOpenFullSettings={handleOpenSettingsModal}
+            onOpenBaseUrlModal={() => setIsBaseUrlModalOpen(true)}
+          />
 
           {/* Mobile search button */}
           <button
