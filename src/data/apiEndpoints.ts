@@ -2077,6 +2077,101 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 18. Nationalize API
+  {
+    id: 'nationalize',
+    category: 'nationalize',
+    categoryTitle: 'Nationalize',
+    method: 'GET',
+    path: '/nationalize',
+    title: 'Predict Nationality',
+    shortDescription: 'The Nationalize API predicts the likely nationality of a person from their name.',
+    description: 'The Nationalize API predicts the likely nationality of a person from their name. Supports optional country code filtering to narrow the nationality prediction.',
+    notes: [
+      'Upstream API: https://api.nationalize.io',
+      'Response operation defaults to "nationality".',
+      'The "name" parameter is required.',
+      'The "country_id" parameter is an optional two-letter country code (e.g. US, IN, GB) used to narrow the prediction.',
+      'Additional query parameters are forwarded to Nationalize.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Type / Operation',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'Response operation; currently nationality, defaults to nationality.',
+        options: [
+          { label: 'nationality', value: 'nationality', description: 'Nationality prediction operation (default)' }
+        ]
+      },
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'string',
+        required: true,
+        placeholder: 'e.g. michael',
+        description: 'Name used for the nationality prediction.'
+      },
+      {
+        name: 'country_id',
+        label: 'Country ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. US',
+        description: 'Two-letter country code used to narrow the prediction.'
+      }
+    ],
+    presets: [
+      {
+        id: 'nationalize-michael',
+        label: 'Michael',
+        description: 'Predict nationality for Michael (GET /nationalize?name=michael)',
+        queryParams: { name: 'michael' }
+      },
+      {
+        id: 'nationalize-emma-us',
+        label: 'Emma + US',
+        description: 'Predict nationality for Emma narrowed by US (GET /nationalize?type=nationality&name=emma&country_id=US)',
+        queryParams: { type: 'nationality', name: 'emma', country_id: 'US' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/nationalize?name=michael',
+    exampleCurl: 'curl "http://localhost:3000/nationalize?name=michael"',
+    responseExample: {
+      success: true,
+      statusCode: 200,
+      status: true,
+      data: {
+        count: 233482,
+        name: 'michael',
+        country: [
+          {
+            country_id: 'US',
+            probability: 0.089
+          },
+          {
+            country_id: 'AU',
+            probability: 0.057
+          },
+          {
+            country_id: 'NZ',
+            probability: 0.046
+          }
+        ]
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

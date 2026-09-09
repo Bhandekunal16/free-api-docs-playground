@@ -86,8 +86,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
-    // Validate Agify & Genderize endpoints
-    if (endpoint.id === 'agify' || endpoint.id === 'genderize') {
+    // Validate Agify, Genderize & Nationalize endpoints
+    if (endpoint.id === 'agify' || endpoint.id === 'genderize' || endpoint.id === 'nationalize') {
       if (!queryParams.name || !queryParams.name.trim()) {
         setValidationError('Name is required.');
         return;
