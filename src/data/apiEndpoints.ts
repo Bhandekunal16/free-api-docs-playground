@@ -1514,6 +1514,167 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 13. Jikan API
+  {
+    id: 'jikan',
+    category: 'jikan',
+    categoryTitle: 'Jikan',
+    method: 'GET',
+    path: '/jikan',
+    title: 'Jikan API',
+    shortDescription: 'The Jikan API provides access to MyAnimeList data for anime, manga, characters, and people.',
+    description: 'The Jikan API provides access to MyAnimeList data for anime, manga, characters, and people. Supports searching catalogues, retrieving comprehensive resource details, character rosters, episode listings, staff, news, reviews, and recommendations.',
+    notes: [
+      'Upstream API: https://api.jikan.moe/v4',
+      'Resource or operation type defaults to "anime" if not specified.',
+      'Operations containing an ID placeholder require the "value" parameter (e.g. animeFull, animeCharacters, mangaFull, characterFull, personFull).',
+      'List operations support "limit" and "page" for result pagination.',
+      'Invalid types or missing required values return 400 Bad Request.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Resource / Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'anime',
+        description: 'Jikan resource or operation; defaults to anime.',
+        options: [
+          { label: 'anime', value: 'anime', description: 'Anime search and listing (or single anime when value is provided)' },
+          { label: 'manga', value: 'manga', description: 'Manga search and listing (or single manga when value is provided)' },
+          { label: 'characters', value: 'characters', description: 'Characters search and listing (or single character when value is provided)' },
+          { label: 'people', value: 'people', description: 'People/voice actors search and listing (or single person when value is provided)' },
+          { label: 'producers', value: 'producers', description: 'Anime producers and animation studios list' },
+          { label: 'magazines', value: 'magazines', description: 'Manga magazine publishers list' },
+          { label: 'genres', value: 'genres', description: 'Anime and manga genres list' },
+          { label: 'themes', value: 'themes', description: 'Anime and manga themes list' },
+          { label: 'demographics', value: 'demographics', description: 'Demographics list (e.g. Shounen, Seinen, Shoujo)' },
+          { label: 'animeGenres', value: 'animeGenres', description: 'Explicit anime genres list' },
+          { label: 'mangaGenres', value: 'mangaGenres', description: 'Explicit manga genres list' },
+          { label: 'animeThemes', value: 'animeThemes', description: 'Explicit anime themes list' },
+          { label: 'mangaThemes', value: 'mangaThemes', description: 'Explicit manga themes list' },
+          { label: 'animeFull', value: 'animeFull', description: 'Full comprehensive anime details (requires value)' },
+          { label: 'animeCharacters', value: 'animeCharacters', description: 'Characters in anime by ID (requires value)' },
+          { label: 'animeStaff', value: 'animeStaff', description: 'Staff members for anime by ID (requires value)' },
+          { label: 'animeEpisodes', value: 'animeEpisodes', description: 'Episodes list for anime by ID (requires value)' },
+          { label: 'animeNews', value: 'animeNews', description: 'News related to anime by ID (requires value)' },
+          { label: 'animeRecommendations', value: 'animeRecommendations', description: 'Anime recommendations by ID (requires value)' },
+          { label: 'animeReviews', value: 'animeReviews', description: 'User reviews for anime by ID (requires value)' },
+          { label: 'animePictures', value: 'animePictures', description: 'Image galleries for anime by ID (requires value)' },
+          { label: 'animeVideos', value: 'animeVideos', description: 'Trailers, PVs, and clips for anime by ID (requires value)' },
+          { label: 'animeRelations', value: 'animeRelations', description: 'Related anime, prequel/sequel relations by ID (requires value)' },
+          { label: 'animeStreaming', value: 'animeStreaming', description: 'Official legal streaming links by ID (requires value)' },
+          { label: 'mangaFull', value: 'mangaFull', description: 'Full comprehensive manga details (requires value)' },
+          { label: 'mangaCharacters', value: 'mangaCharacters', description: 'Characters appearing in manga by ID (requires value)' },
+          { label: 'mangaNews', value: 'mangaNews', description: 'News related to manga by ID (requires value)' },
+          { label: 'mangaRecommendations', value: 'mangaRecommendations', description: 'Manga recommendations by ID (requires value)' },
+          { label: 'mangaReviews', value: 'mangaReviews', description: 'User reviews for manga by ID (requires value)' },
+          { label: 'mangaPictures', value: 'mangaPictures', description: 'Image galleries for manga by ID (requires value)' },
+          { label: 'characterFull', value: 'characterFull', description: 'Full character profile by ID (requires value)' },
+          { label: 'characterPictures', value: 'characterPictures', description: 'Pictures of character by ID (requires value)' },
+          { label: 'personFull', value: 'personFull', description: 'Full person/staff profile by ID (requires value)' },
+          { label: 'personPictures', value: 'personPictures', description: 'Pictures of person by ID (requires value)' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Resource ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 1, 20, 5114',
+        description: 'Anime, manga, character, or person ID when required (e.g. 1 for Cowboy Bebop).'
+      },
+      {
+        name: 'limit',
+        label: 'Limit',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 10',
+        description: 'Number of list results.'
+      },
+      {
+        name: 'page',
+        label: 'Page Number',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 2',
+        description: 'Page number for paginated results.'
+      }
+    ],
+    presets: [
+      {
+        id: 'jikan-anime',
+        label: 'Anime',
+        description: 'Fetch default anime list (GET /jikan)',
+        queryParams: { type: 'anime' }
+      },
+      {
+        id: 'jikan-anime-1',
+        label: 'Anime #1',
+        description: 'Fetch Cowboy Bebop by ID (GET /jikan?type=anime&value=1)',
+        queryParams: { type: 'anime', value: '1' }
+      },
+      {
+        id: 'jikan-anime-full-1',
+        label: 'Anime Full #1',
+        description: 'Fetch full Cowboy Bebop details (GET /jikan?type=animeFull&value=1)',
+        queryParams: { type: 'animeFull', value: '1' }
+      },
+      {
+        id: 'jikan-anime-page-2',
+        label: 'Anime Page 2',
+        description: 'Fetch page 2 of anime list with limit 10 (GET /jikan?type=anime&limit=10&page=2)',
+        queryParams: { type: 'anime', limit: '10', page: '2' }
+      },
+      {
+        id: 'jikan-anime-characters',
+        label: 'Anime Characters',
+        description: 'Fetch characters for anime #1 (GET /jikan?type=animeCharacters&value=1)',
+        queryParams: { type: 'animeCharacters', value: '1' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/jikan?type=anime&value=1',
+    exampleCurl: 'curl "http://localhost:3000/jikan?type=anime&value=1"',
+    responseExample: {
+      data: {
+        mal_id: 1,
+        url: "https://myanimelist.net/anime/1/Cowboy_Bebop",
+        images: {
+          jpg: {
+            image_url: "https://cdn.myanimelist.net/images/anime/4/19644.jpg"
+          }
+        },
+        title: "Cowboy Bebop",
+        title_english: "Cowboy Bebop",
+        title_japanese: "カウボーイビバップ",
+        type: "TV",
+        source: "Original",
+        episodes: 26,
+        status: "Finished Airing",
+        score: 8.75,
+        year: 1998
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid type or missing required value parameter.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Resource ID is required for this operation'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

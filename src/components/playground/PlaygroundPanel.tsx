@@ -125,7 +125,19 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const isBreedRequiredForDogs = isBreedFieldInDogs && isBreedSpecificDogOp;
     const isBreedNotNeededInDogs = isBreedFieldInDogs && (selectedDogType === 'random' || selectedDogType === 'breedList');
 
-    const isRequired = (param.required && !isAllSelectedInCountries) || isBreedRequiredForDogs;
+    // Context-awareness for Jikan API
+    const isJikanEndpoint = endpoint.id === 'jikan';
+    const selectedJikanType = queryParams.type || 'anime';
+    const JIKAN_ID_OPERATIONS = [
+      'animeFull', 'animeCharacters', 'animeStaff', 'animeEpisodes', 'animeNews',
+      'animeRecommendations', 'animeReviews', 'animePictures', 'animeVideos',
+      'animeRelations', 'animeStreaming', 'mangaFull', 'mangaCharacters', 'mangaNews',
+      'mangaRecommendations', 'mangaReviews', 'mangaPictures', 'characterFull',
+      'characterPictures', 'personFull', 'personPictures'
+    ];
+    const isJikanValueRequired = isJikanEndpoint && param.name === 'value' && JIKAN_ID_OPERATIONS.includes(selectedJikanType);
+
+    const isRequired = (param.required && !isAllSelectedInCountries) || isBreedRequiredForDogs || isJikanValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -134,6 +146,10 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = `Not required for type=${selectedDogType}`;
     } else if (isDogsEndpoint && param.name === 'limit' && selectedDogType !== 'randomMultiple') {
       customPlaceholder = 'Used with type=randomMultiple';
+    } else if (isJikanValueRequired) {
+      customPlaceholder = `e.g. 1 (Required for ${selectedJikanType})`;
+    } else if (isJikanEndpoint && param.name === 'value') {
+      customPlaceholder = `e.g. 1 (ID for ${selectedJikanType}, or leave empty for list)`;
     }
 
     return (
@@ -182,6 +198,10 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? 'Required when operation is breed-specific'
             : isBreedNotNeededInDogs
             ? `Not needed when operation is ${selectedDogType}`
+            : isJikanValueRequired
+            ? `Required: Resource ID is required for "${selectedJikanType}"`
+            : isJikanEndpoint && param.name === 'value'
+            ? `Optional ID for ${selectedJikanType} (omit to retrieve list/search)`
             : param.description}
         </p>
       </div>

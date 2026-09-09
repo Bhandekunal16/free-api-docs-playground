@@ -36,7 +36,7 @@ export interface StatusCodeDoc {
   responseExample?: any;
 }
 
-export type EndpointCategory = 'health' | 'fake' | 'mock' | 'geography' | 'weather' | 'pokemon' | 'rick-and-morty' | 'cat-facts' | 'dogs';
+export type EndpointCategory = 'health' | 'fake' | 'mock' | 'geography' | 'weather' | 'pokemon' | 'rick-and-morty' | 'cat-facts' | 'dogs' | 'jikan';
 
 export interface EndpointDefinition {
   id: string;
