@@ -38,10 +38,10 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
     <div className="space-y-8 py-6 px-4 sm:px-6 max-w-4xl mx-auto animate-in fade-in duration-150">
       {/* 1. Header & Route */}
       <div className="space-y-3 border-b border-slate-200 dark:border-slate-800 pb-6">
-        <div className="flex items-center space-x-2 text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase tracking-wider">
+        <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
           <span>{endpoint.categoryTitle}</span>
           <span>/</span>
-          <span className="text-slate-500 dark:text-slate-400">{endpoint.title}</span>
+          <span className="text-slate-700 dark:text-slate-300">{endpoint.title}</span>
         </div>
 
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{endpoint.title}</h1>
@@ -92,13 +92,13 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
               <button
                 key={preset.id}
                 onClick={() => handlePresetClick(preset)}
-                className="flex flex-col text-left p-3 rounded-lg bg-white dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 hover:border-indigo-500/60 dark:hover:border-indigo-500/60 hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-all group shadow-2xs"
+                className="flex flex-col text-left p-3 rounded-lg bg-white dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-900/80 transition-all group shadow-2xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                     {preset.label}
                   </span>
-                  <Play size={11} className="text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 opacity-60 group-hover:opacity-100 transition-all" />
+                  <Play size={11} className="text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 opacity-60 group-hover:opacity-100 transition-all" />
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                   {preset.description}
@@ -112,7 +112,7 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
       {/* 3. Description & Notes */}
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-          <Info size={16} className="text-indigo-600 dark:text-indigo-400" />
+          <Info size={16} className="text-slate-700 dark:text-slate-300" />
           <span>Endpoint Overview</span>
         </h2>
         <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
@@ -120,8 +120,8 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
         </p>
 
         {endpoint.notes && endpoint.notes.length > 0 && (
-          <div className="p-3.5 bg-slate-100/80 dark:bg-slate-950/90 border-l-2 border-indigo-500 rounded-r-lg space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
-            <div className="font-semibold text-indigo-600 dark:text-indigo-300 text-[11px] uppercase tracking-wider">
+          <div className="p-3.5 bg-slate-100/80 dark:bg-slate-950/90 border-l-2 border-slate-500 rounded-r-lg space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+            <div className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] uppercase tracking-wider">
               Implementation Notes
             </div>
             <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -137,7 +137,7 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
       {endpoint.pathParams.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-            <Table size={16} className="text-indigo-600 dark:text-indigo-400" />
+            <Table size={16} className="text-slate-700 dark:text-slate-300" />
             <span>Path Parameters</span>
           </h2>
 
@@ -149,13 +149,13 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
                     <th className="py-2.5 px-3">Parameter</th>
                     <th className="py-2.5 px-3">Type</th>
                     <th className="py-2.5 px-3">Requirement</th>
-                    <th className="py-2.5 px-3">Description & Allowed Values</th>
+                    <th className="py-2.5 px-3">Description & Options</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono">
                   {endpoint.pathParams.map(param => (
                     <tr key={param.name} className="hover:bg-slate-50 dark:hover:bg-slate-900/40">
-                      <td className="py-3 px-3 font-semibold text-indigo-600 dark:text-indigo-300">:{param.name}</td>
+                      <td className="py-3 px-3 font-semibold text-slate-900 dark:text-slate-100">:{param.name}</td>
                       <td className="py-3 px-3">
                         <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-[11px]">
                           {param.type}
@@ -201,7 +201,7 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
       {endpoint.queryParams.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-            <Table size={16} className="text-indigo-600 dark:text-indigo-400" />
+            <Table size={16} className="text-slate-700 dark:text-slate-300" />
             <span>Query Parameters</span>
           </h2>
 
@@ -219,7 +219,7 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono">
                   {endpoint.queryParams.map(param => (
                     <tr key={param.name} className="hover:bg-slate-50 dark:hover:bg-slate-900/40">
-                      <td className="py-3 px-3 font-semibold text-sky-600 dark:text-sky-300">{param.name}</td>
+                      <td className="py-3 px-3 font-semibold text-slate-900 dark:text-slate-100">{param.name}</td>
                       <td className="py-3 px-3">
                         <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded text-[11px]">
                           {param.type}
@@ -269,7 +269,7 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
       {/* 6. Response Schema / Example */}
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-          <Code2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+          <Code2 size={16} className="text-slate-700 dark:text-slate-300" />
           <span>Expected Response (200 OK)</span>
         </h2>
         <JsonViewer data={endpoint.responseExample} initialExpandedDepth={2} />
@@ -278,7 +278,7 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
       {/* 7. HTTP Status Codes */}
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-          <CheckCircle2 size={16} className="text-indigo-600 dark:text-indigo-400" />
+          <CheckCircle2 size={16} className="text-slate-700 dark:text-slate-300" />
           <span>Supported Status Codes</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

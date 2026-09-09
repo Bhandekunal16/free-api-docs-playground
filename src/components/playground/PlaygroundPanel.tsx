@@ -85,7 +85,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="p-1.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-200 dark:border-indigo-500/20">
+            <span className="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
               <Sliders size={16} />
             </span>
             <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Interactive Playground</h2>
@@ -169,7 +169,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                 return (
                   <div key={param.name} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-mono text-indigo-600 dark:text-indigo-300 font-semibold flex items-center space-x-1">
+                      <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
                         <span>:{param.name}</span>
                         {param.required && <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>}
                       </label>
@@ -180,7 +180,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                       <select
                         value={currentValue}
                         onChange={e => updatePathParam(param.name, e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono"
                       >
                         {param.options.map(opt => (
                           <option key={opt.value} value={opt.value}>
@@ -194,7 +194,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                         value={currentValue}
                         onChange={e => updatePathParam(param.name, e.target.value)}
                         placeholder={param.placeholder || `Enter ${param.name}`}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono"
                       />
                     )}
                     <p className="text-[10px] text-slate-500 dark:text-slate-400">{param.description}</p>
@@ -223,7 +223,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                 return (
                   <div key={param.name} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-mono text-sky-600 dark:text-sky-300 font-semibold flex items-center space-x-1">
+                      <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
                         <span>{param.name}</span>
                         {param.required && !isAllSelectedInCountries && (
                           <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
@@ -238,7 +238,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                       <select
                         value={currentValue}
                         onChange={e => updateQueryParam(param.name, e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono"
                       >
                         {!param.required && <option value="">(None / Default)</option>}
                         {param.options.map(opt => (
@@ -258,7 +258,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                             ? 'Not required for type=all'
                             : param.placeholder || `Enter ${param.name}`
                         }
-                        className={`w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono ${
+                        className={`w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-mono ${
                           isValueFieldInCountries && isAllSelectedInCountries ? 'opacity-40 cursor-not-allowed' : ''
                         }`}
                       />
@@ -283,7 +283,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             </span>
             <button
               onClick={addCustomQueryParam}
-              className="flex items-center space-x-1 px-2 py-1 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-indigo-600 dark:text-indigo-400 text-xs font-medium rounded border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
+              className="flex items-center space-x-1 px-2 py-1 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-medium rounded border border-slate-200 dark:border-slate-800 transition-colors shadow-2xs"
             >
               <Plus size={12} />
               <span>Add Parameter</span>
@@ -298,7 +298,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                     type="checkbox"
                     checked={item.enabled}
                     onChange={e => updateCustomQueryParam(item.id, { enabled: e.target.checked })}
-                    className="rounded bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 focus:ring-slate-500"
                   />
                   <input
                     type="text"
@@ -358,11 +358,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             <button
               onClick={() => executeRequest()}
               disabled={responseState.isLoading}
-              className="flex items-center space-x-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg shadow-sm transition-colors disabled:opacity-50"
+              className="flex items-center space-x-2 px-5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-semibold text-xs rounded-lg shadow-sm transition-colors disabled:opacity-50"
             >
-              <Play size={14} className={responseState.isLoading ? 'animate-spin' : 'fill-white'} />
+              <Play size={14} className={responseState.isLoading ? 'animate-spin' : 'fill-current'} />
               <span>{responseState.isLoading ? 'Executing...' : 'Send Request'}</span>
-              <kbd className="hidden sm:inline-block ml-1.5 px-1.5 py-0.5 bg-black/20 text-emerald-100 rounded text-[10px] font-mono">
+              <kbd className="hidden sm:inline-block ml-1.5 px-1.5 py-0.5 bg-white/20 dark:bg-black/20 text-white dark:text-slate-900 rounded text-[10px] font-mono">
                 ⌘↵
               </kbd>
             </button>
@@ -378,7 +378,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
               onClick={() => setActiveBottomTab('response')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                 activeBottomTab === 'response'
-                  ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
@@ -388,7 +388,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                 <span
                   className={`ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
                     responseState.status >= 200 && responseState.status < 300
-                      ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                      ? activeBottomTab === 'response'
+                        ? 'bg-emerald-500/20 text-emerald-300 dark:text-emerald-700'
+                        : 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                      : activeBottomTab === 'response'
+                      ? 'bg-rose-500/20 text-rose-300 dark:text-rose-700'
                       : 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400'
                   }`}
                 >
@@ -401,7 +405,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
               onClick={() => setActiveBottomTab('snippets')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                 activeBottomTab === 'snippets'
-                  ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >

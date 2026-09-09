@@ -31,7 +31,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
     return (
       <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl space-y-3 min-h-[300px] shadow-2xs">
         <div className="relative">
-          <div className="w-10 h-10 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+          <div className="w-10 h-10 rounded-full border-2 border-slate-300 dark:border-slate-700 border-t-slate-800 dark:border-t-slate-200 animate-spin" />
         </div>
         <div className="text-center space-y-1">
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-200">Sending API Request...</p>
@@ -113,7 +113,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
               onClick={() => setShowHeaders(!showHeaders)}
               className={`flex items-center space-x-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
                 showHeaders
-                  ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/40'
+                  ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700'
                   : 'bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800'
               }`}
             >
@@ -151,7 +151,7 @@ export const ResponseViewer: React.FC<ResponseViewerProps> = ({ responseState, o
           <div className="max-h-48 overflow-y-auto space-y-1 divide-y divide-slate-100 dark:divide-slate-800/40">
             {Object.entries(headers).map(([k, v]) => (
               <div key={k} className="flex pt-1 items-baseline">
-                <span className="text-indigo-600 dark:text-indigo-400 font-semibold w-48 shrink-0 break-all">{k}:</span>
+                <span className="text-slate-900 dark:text-slate-100 font-semibold w-48 shrink-0 break-all">{k}:</span>
                 <span className="text-slate-700 dark:text-slate-300 break-all">{v}</span>
               </div>
             ))}

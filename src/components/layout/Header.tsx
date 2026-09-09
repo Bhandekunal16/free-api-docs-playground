@@ -63,13 +63,13 @@ export const Header: React.FC = () => {
           </button>
 
           <div className="flex items-center space-x-2.5">
-            <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm">
-              <Zap size={18} className="fill-white text-white" />
+            <div className="h-8 w-8 rounded-lg bg-slate-900 dark:bg-slate-100 flex items-center justify-center text-white dark:text-slate-900 font-bold shadow-sm">
+              <Zap size={18} className="fill-current" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white">Free API Server</span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded">
                   v1.0 Docs & Playground
                 </span>
               </div>
@@ -86,7 +86,7 @@ export const Header: React.FC = () => {
             title="Click to change API Base URL"
           >
             <div className="flex items-center space-x-1.5 text-slate-500 dark:text-slate-400">
-              <Globe size={13} className="text-slate-500 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
+              <Globe size={13} className="text-slate-500 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors" />
               <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider">Base:</span>
             </div>
             <span className="font-mono text-slate-700 dark:text-slate-300 font-medium max-w-[200px] truncate">
@@ -127,7 +127,7 @@ export const Header: React.FC = () => {
               onClick={() => setLayoutMode('split')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'split'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Split View (Documentation + Playground)"
@@ -139,7 +139,7 @@ export const Header: React.FC = () => {
               onClick={() => setLayoutMode('docs')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'docs'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Documentation Only"
@@ -151,7 +151,7 @@ export const Header: React.FC = () => {
               onClick={() => setLayoutMode('playground')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'playground'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Playground Only"
@@ -173,7 +173,7 @@ export const Header: React.FC = () => {
             <History size={14} />
             <span className="hidden sm:inline">History</span>
             {history.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 bg-indigo-600 text-white rounded-full text-[10px] font-bold">
+              <span className="ml-1 px-1.5 py-0.2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full text-[10px] font-bold">
                 {history.length}
               </span>
             )}

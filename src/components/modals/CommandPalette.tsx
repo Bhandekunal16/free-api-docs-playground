@@ -122,7 +122,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition-all ${
                     isSelected
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-sm'
                       : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-800 dark:text-slate-300'
                   }`}
                 >
@@ -130,9 +130,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                     <div
                       className={`p-1.5 rounded shrink-0 ${
                         isSelected
-                          ? 'bg-white/20 text-white'
+                          ? 'bg-white/20 dark:bg-black/20 text-white dark:text-slate-900'
                           : item.type === 'doc'
-                          ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                           : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                       }`}
                     >
@@ -144,7 +144,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                         <span
                           className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
                             isSelected
-                              ? 'bg-white/20 text-white'
+                              ? 'bg-white/20 dark:bg-black/20 text-white dark:text-slate-900'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60'
                           }`}
                         >
@@ -153,7 +153,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                       </div>
                       <p
                         className={`text-[11px] truncate font-mono mt-0.5 ${
-                          isSelected ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'
+                          isSelected ? 'text-slate-300 dark:text-slate-700' : 'text-slate-500 dark:text-slate-400'
                         }`}
                       >
                         {item.subtitle}
@@ -163,7 +163,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                   <ArrowRight
                     size={14}
                     className={`ml-2 shrink-0 transition-opacity ${
-                      isSelected ? 'opacity-100 text-white' : 'opacity-0'
+                      isSelected ? 'opacity-100 text-white dark:text-slate-900' : 'opacity-0'
                     }`}
                   />
                 </button>

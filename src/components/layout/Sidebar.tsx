@@ -70,7 +70,7 @@ export const Sidebar: React.FC = () => {
               value={filterQuery}
               onChange={e => setFilterQuery(e.target.value)}
               placeholder="Filter endpoints..."
-              className="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-md text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-medium transition-colors"
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-md text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 font-medium transition-colors"
             />
           </div>
         </div>
@@ -88,11 +88,11 @@ export const Sidebar: React.FC = () => {
                   onClick={() => handleSelect('doc', 'overview')}
                   className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                     activeSelection.type === 'doc' && activeSelection.id === 'overview'
-                      ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <BookOpen size={14} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
+                  <BookOpen size={14} className="shrink-0 text-slate-700 dark:text-slate-300" />
                   <span className="truncate">Overview</span>
                 </button>
               )}
@@ -102,7 +102,7 @@ export const Sidebar: React.FC = () => {
                   onClick={() => handleSelect('doc', 'http-status-codes')}
                   className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                     activeSelection.type === 'doc' && activeSelection.id === 'http-status-codes'
-                      ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
@@ -116,7 +116,7 @@ export const Sidebar: React.FC = () => {
                   onClick={() => handleSelect('doc', 'error-handling')}
                   className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                     activeSelection.type === 'doc' && activeSelection.id === 'error-handling'
-                      ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
@@ -141,7 +141,7 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
@@ -172,7 +172,7 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
@@ -206,7 +206,7 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
@@ -239,7 +239,7 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
@@ -272,7 +272,7 @@ export const Sidebar: React.FC = () => {
                     onClick={() => handleSelect('endpoint', ep.id)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-500/30'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >

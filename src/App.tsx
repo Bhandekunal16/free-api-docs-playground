@@ -13,7 +13,7 @@ const MainLayout: React.FC = () => {
   const isDocSection = activeSelection.type === 'doc';
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-150">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-slate-800 selection:text-white dark:selection:bg-slate-200 dark:selection:text-slate-900 transition-colors duration-150">
       {/* Top Header */}
       <Header />
 

@@ -185,7 +185,7 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
               onClick={() => setViewMode('pretty')}
               className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                 viewMode === 'pretty'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
@@ -195,7 +195,7 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
               onClick={() => setViewMode('raw')}
               className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                 viewMode === 'raw'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >

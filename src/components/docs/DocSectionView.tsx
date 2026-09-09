@@ -21,11 +21,11 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
   const getIcon = () => {
     switch (article.icon) {
       case 'ShieldAlert':
-        return <ShieldAlert size={24} className="text-amber-400" />;
+        return <ShieldAlert size={24} className="text-amber-500" />;
       case 'AlertTriangle':
-        return <AlertTriangle size={24} className="text-rose-400" />;
+        return <AlertTriangle size={24} className="text-rose-500" />;
       default:
-        return <BookOpen size={24} className="text-indigo-400" />;
+        return <BookOpen size={24} className="text-slate-700 dark:text-slate-300" />;
     }
   };
 
@@ -38,7 +38,7 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
             {getIcon()}
           </div>
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Developer Reference
             </span>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{article.title}</h1>
@@ -52,7 +52,7 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         {article.sections.map((sec, secIdx) => (
           <div key={secIdx} className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-600 dark:bg-slate-400" />
               <span>{sec.heading}</span>
             </h2>
 
@@ -108,7 +108,7 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
       </div>
 
       {/* Quick Links Footer - Solid Clean Background, No Gradients */}
-      <div className="p-5 bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-500/20 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="p-5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
           <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Ready to test endpoints?</h4>
           <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -117,7 +117,7 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         </div>
         <button
           onClick={() => setActiveSelection({ type: 'endpoint', id: 'fake-collection' })}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition-colors shadow-sm shrink-0"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-lg text-xs font-semibold transition-colors shadow-sm shrink-0"
         >
           <span>Try Fake API</span>
           <ArrowRight size={14} />

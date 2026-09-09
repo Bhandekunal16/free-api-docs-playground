@@ -20,19 +20,19 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
       name: 'Production Cloud (Default)',
       url: DEFAULT_BASE_URL,
       badge: 'Recommended',
-      badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
     },
     {
       name: 'Local Dev Server',
       url: 'http://localhost:3000',
       badge: 'Local Port 3000',
-      badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      badgeColor: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
     },
     {
       name: 'Local Dev Port 8000',
       url: 'http://localhost:8000',
       badge: 'Local Port 8000',
-      badgeColor: 'bg-slate-700/40 text-slate-300 border-slate-700'
+      badgeColor: 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
     }
   ];
 
@@ -58,7 +58,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-200 dark:border-indigo-500/20">
+            <div className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
               <Server size={18} />
             </div>
             <div>
@@ -118,7 +118,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
                     onClick={() => handleSelectPreset(p.url)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${
                       isSelected
-                        ? 'bg-indigo-50/80 dark:bg-indigo-950/30 border-indigo-500/50 text-indigo-900 dark:text-indigo-200'
+                        ? 'bg-slate-200/90 dark:bg-slate-800 border-slate-400 dark:border-slate-600 text-slate-900 dark:text-white'
                         : 'bg-slate-50/70 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 text-slate-800 dark:text-slate-300'
                     }`}
                   >
@@ -131,7 +131,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
                       </div>
                       <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{p.url}</p>
                     </div>
-                    {isSelected && <Check size={16} className="text-indigo-600 dark:text-indigo-400 ml-2 shrink-0" />}
+                    {isSelected && <Check size={16} className="text-slate-900 dark:text-white ml-2 shrink-0" />}
                   </button>
                 );
               })}
@@ -149,7 +149,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
                 value={customInput}
                 onChange={e => setCustomInput(e.target.value)}
                 placeholder="https://your-api-domain.com"
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-600"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 placeholder-slate-400 dark:placeholder-slate-600"
               />
             </div>
             <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400">
@@ -174,7 +174,7 @@ export const BaseUrlModal: React.FC<BaseUrlModalProps> = ({ isOpen, onClose }) =
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors shadow-2xs"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-lg text-sm font-medium transition-colors shadow-2xs"
           >
             Apply & Save
           </button>

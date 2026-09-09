@@ -24,7 +24,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-200 dark:border-indigo-500/20">
+            <div className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
               <History size={18} />
             </div>
             <div>
@@ -99,7 +99,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
 
                     <button
                       onClick={() => handleSelectAndExecute(item)}
-                      className="flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 hover:text-white rounded text-xs font-medium transition-all border border-indigo-200 dark:border-transparent shadow-2xs"
+                      className="flex items-center space-x-1 px-2.5 py-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded text-xs font-medium transition-all border border-slate-300 dark:border-slate-700 shadow-2xs"
                     >
                       <span>Load in Playground</span>
                       <ArrowUpRight size={12} />

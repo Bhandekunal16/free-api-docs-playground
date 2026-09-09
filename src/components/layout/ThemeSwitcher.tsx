@@ -14,7 +14,7 @@ export const ThemeSwitcher: React.FC = () => {
     {
       mode: 'dark',
       label: 'Dark',
-      icon: <Moon size={13} className="text-indigo-400" />
+      icon: <Moon size={13} className="text-slate-600 dark:text-slate-300" />
     },
     {
       mode: 'system',
