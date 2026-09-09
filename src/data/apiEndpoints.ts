@@ -1106,6 +1106,190 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 10. Rick and Morty API
+  {
+    id: 'rick-and-morty',
+    category: 'rick-and-morty',
+    categoryTitle: 'Rick and Morty',
+    method: 'GET',
+    path: '/rick-and-morty',
+    title: 'Rick and Morty API',
+    shortDescription: 'The Rick and Morty API provides access to characters, locations, and episodes.',
+    description: 'The Rick and Morty API provides access to characters, locations, and episodes from the Rick and Morty universe. Filter characters by status, species, gender, or type, query locations by dimension, or look up episodes by episode code.',
+    notes: [
+      'Upstream API: https://rickandmortyapi.com/api',
+      'Resource type defaults to "character" (options: character, location, episode).',
+      'Pass "value" with a resource ID or name to fetch a specific record directly.',
+      'All query parameters other than "resource" and "value" are forwarded directly to the upstream API.',
+      'Invalid resource types are returned as 400 Bad Request errors.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'resource',
+        label: 'Resource Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'character',
+        description: 'Resource type: character, location, or episode; defaults to character.',
+        options: [
+          { label: 'character', value: 'character', description: 'Characters, statuses, species, origins, and avatar images' },
+          { label: 'location', value: 'location', description: 'Planets, space stations, dimensions, and resident character lists' },
+          { label: 'episode', value: 'episode', description: 'Show episodes, season air dates, and character appearance lists' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Resource Name or ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 2, rick, 1',
+        description: 'Resource name or ID to retrieve a single specific resource.'
+      },
+      {
+        name: 'page',
+        label: 'Page Number',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 1',
+        description: 'Page number for list requests.'
+      },
+      {
+        name: 'name',
+        label: 'Name Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. rick, morty, smith',
+        description: 'Character name filter.'
+      },
+      {
+        name: 'status',
+        label: 'Status Filter',
+        type: 'enum',
+        required: false,
+        description: 'Character status filter.',
+        options: [
+          { label: 'alive', value: 'alive', description: 'Alive characters' },
+          { label: 'dead', value: 'dead', description: 'Deceased characters' },
+          { label: 'unknown', value: 'unknown', description: 'Unknown status' }
+        ]
+      },
+      {
+        name: 'species',
+        label: 'Species Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. human, alien, robot, humanoid',
+        description: 'Character species filter.'
+      },
+      {
+        name: 'gender',
+        label: 'Gender Filter',
+        type: 'enum',
+        required: false,
+        description: 'Character gender filter.',
+        options: [
+          { label: 'female', value: 'female', description: 'Female characters' },
+          { label: 'male', value: 'male', description: 'Male characters' },
+          { label: 'genderless', value: 'genderless', description: 'Genderless characters' },
+          { label: 'unknown', value: 'unknown', description: 'Unknown gender' }
+        ]
+      },
+      {
+        name: 'type',
+        label: 'Type / Subspecies',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. parasite, genetic experiment',
+        description: 'Character type or subspecies filter.'
+      },
+      {
+        name: 'dimension',
+        label: 'Dimension Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Dimension C-137, Replacement Dimension',
+        description: 'Location dimension filter.'
+      },
+      {
+        name: 'episode',
+        label: 'Episode Code Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. S01E01, S03E03',
+        description: 'Episode code filter (e.g. S01E01).'
+      }
+    ],
+    presets: [
+      {
+        id: 'rick-and-morty-default',
+        label: 'Default Characters',
+        description: 'Fetch default character list (GET /rick-and-morty)',
+        queryParams: { resource: 'character' }
+      },
+      {
+        id: 'rick-and-morty-char-2',
+        label: 'Character #2',
+        description: 'Fetch Morty Smith by ID (GET /rick-and-morty?resource=character&value=2)',
+        queryParams: { resource: 'character', value: '2' }
+      },
+      {
+        id: 'rick-and-morty-rick-alive',
+        label: 'Rick — Alive',
+        description: 'Search alive characters named Rick (GET /rick-and-morty?resource=character&name=rick&status=alive)',
+        queryParams: { resource: 'character', name: 'rick', status: 'alive' }
+      },
+      {
+        id: 'rick-and-morty-episode-1',
+        label: 'Episode #1',
+        description: 'Fetch Pilot episode by ID (GET /rick-and-morty?resource=episode&value=1)',
+        queryParams: { resource: 'episode', value: '1' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/rick-and-morty?resource=character&value=2',
+    exampleCurl: 'curl "http://localhost:3000/rick-and-morty?resource=character&value=2"',
+    responseExample: {
+      id: 2,
+      name: "Morty Smith",
+      status: "Alive",
+      species: "Human",
+      type: "",
+      gender: "Male",
+      origin: {
+        name: "Earth (C-137)",
+        url: "https://rickandmortyapi.com/api/location/1"
+      },
+      location: {
+        name: "Citadel of Ricks",
+        url: "https://rickandmortyapi.com/api/location/3"
+      },
+      image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
+      episode: [
+        "https://rickandmortyapi.com/api/episode/1",
+        "https://rickandmortyapi.com/api/episode/2"
+      ],
+      url: "https://rickandmortyapi.com/api/character/2",
+      created: "2017-11-04T18:50:21.651Z"
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid resource type or invalid query parameters provided.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Invalid resource type'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

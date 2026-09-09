@@ -1,6 +1,6 @@
 {
   "name": "Free API Server — Docs & Interactive Playground",
-  "description": "Interactive developer documentation, request builder, and live playground for Free API Server endpoints including Fake, Mock, Weather, Countries, and Pokémon APIs.",
+  "description": "Interactive developer documentation, request builder, and live playground for Free API Server endpoints including Fake, Mock, Weather, Countries, Pokémon, and Rick and Morty APIs.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { EndpointDefinition, EndpointPreset } from '../../types/api';
+import { EndpointDefinition, EndpointPreset, ParamDefinition } from '../../types/api';
 import { useApi } from '../../context/ApiContext';
 import { buildUrl } from '../../utils/url';
 import { ResponseViewer } from './ResponseViewer';
@@ -107,9 +107,67 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
   const hasQueryParams = endpoint.queryParams.length > 0;
   const hasAnyParams = hasPathParams || hasQueryParams || customQueryParams.length > 0;
 
-  // Preset limiting: max 3 visible, rest under more
-  const visiblePresets = showAllPresets ? endpoint.presets : endpoint.presets.slice(0, 3);
-  const remainingPresetCount = Math.max(0, endpoint.presets.length - 3);
+  // Preset limiting: max 4 visible, rest under more
+  const visiblePresets = showAllPresets ? endpoint.presets : endpoint.presets.slice(0, 4);
+  const remainingPresetCount = Math.max(0, endpoint.presets.length - 4);
+
+  const renderQueryParamInput = (param: ParamDefinition) => {
+    const currentValue = queryParams[param.name] ?? '';
+    const isCountriesEndpoint = endpoint.id === 'countries';
+    const isAllSelectedInCountries = isCountriesEndpoint && queryParams.type === 'all';
+    const isValueFieldInCountries = isCountriesEndpoint && param.name === 'value';
+
+    return (
+      <div key={param.name} className="space-y-1">
+        <div className="flex items-center justify-between text-xs">
+          <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
+            <span>{param.name}</span>
+            {param.required && !isAllSelectedInCountries && (
+              <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
+            )}
+          </label>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+            {param.required && !isAllSelectedInCountries ? 'required' : 'optional'}
+          </span>
+        </div>
+
+        {param.options && param.options.length > 0 ? (
+          <select
+            value={currentValue}
+            onChange={e => updateQueryParam(param.name, e.target.value)}
+            className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
+          >
+            {!param.required && <option value="">(Default)</option>}
+            {param.options.map(opt => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type={param.type === 'number' ? 'number' : 'text'}
+            value={currentValue}
+            disabled={isValueFieldInCountries && isAllSelectedInCountries}
+            onChange={e => updateQueryParam(param.name, e.target.value)}
+            placeholder={
+              isValueFieldInCountries && isAllSelectedInCountries
+                ? 'Not required for type=all'
+                : param.placeholder || `Enter ${param.name}`
+            }
+            className={`w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono ${
+              isValueFieldInCountries && isAllSelectedInCountries ? 'opacity-40 cursor-not-allowed' : ''
+            }`}
+          />
+        )}
+        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+          {isValueFieldInCountries && isAllSelectedInCountries
+            ? 'Omitted because type is set to all'
+            : param.description}
+        </p>
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col h-full space-y-6 p-4 sm:p-6 max-w-4xl mx-auto animate-in fade-in duration-150">
@@ -230,65 +288,56 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                 <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Query Parameters
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {endpoint.queryParams.map(param => {
-                    const currentValue = queryParams[param.name] ?? '';
-                    const isCountriesEndpoint = endpoint.id === 'countries';
-                    const isAllSelectedInCountries = isCountriesEndpoint && queryParams.type === 'all';
-                    const isValueFieldInCountries = isCountriesEndpoint && param.name === 'value';
 
-                    return (
-                      <div key={param.name} className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
-                            <span>{param.name}</span>
-                            {param.required && !isAllSelectedInCountries && (
-                              <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
-                            )}
-                          </label>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">
-                            {param.required && !isAllSelectedInCountries ? 'required' : 'optional'}
-                          </span>
-                        </div>
-
-                        {param.options && param.options.length > 0 ? (
-                          <select
-                            value={currentValue}
-                            onChange={e => updateQueryParam(param.name, e.target.value)}
-                            className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
-                          >
-                            {!param.required && <option value="">(Default)</option>}
-                            {param.options.map(opt => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type={param.type === 'number' ? 'number' : 'text'}
-                            value={currentValue}
-                            disabled={isValueFieldInCountries && isAllSelectedInCountries}
-                            onChange={e => updateQueryParam(param.name, e.target.value)}
-                            placeholder={
-                              isValueFieldInCountries && isAllSelectedInCountries
-                                ? 'Not required for type=all'
-                                : param.placeholder || `Enter ${param.name}`
-                            }
-                            className={`w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono ${
-                              isValueFieldInCountries && isAllSelectedInCountries ? 'opacity-40 cursor-not-allowed' : ''
-                            }`}
-                          />
-                        )}
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                          {isValueFieldInCountries && isAllSelectedInCountries
-                            ? 'Omitted because type is set to all'
-                            : param.description}
-                        </p>
+                {endpoint.id === 'rick-and-morty' ? (
+                  <div className="space-y-4">
+                    {/* 1. Core Resource & Lookup */}
+                    <div className="space-y-2">
+                      <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                        Core Resource & Lookup
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['resource', 'value', 'page'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Character Filters */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Character Filters
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">for resource=character</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['name', 'status', 'species', 'gender', 'type'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 3. Location & Episode Specific Filters */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Location & Episode Filters
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">for resource=location | episode</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['dimension', 'episode'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {endpoint.queryParams.map(renderQueryParamInput)}
+                  </div>
+                )}
               </div>
             )}
 

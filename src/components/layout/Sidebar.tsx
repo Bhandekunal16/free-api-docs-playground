@@ -6,6 +6,7 @@ import {
   Globe,
   CloudSun,
   Sparkles,
+  Tv,
   ShieldAlert,
   AlertTriangle,
   ChevronDown,
@@ -30,7 +31,8 @@ export const Sidebar: React.FC = () => {
     fake: false,
     geography: false,
     weather: false,
-    pokemon: false
+    pokemon: false,
+    rickAndMorty: false
   });
 
   const toggleSection = (key: string) => {
@@ -48,6 +50,7 @@ export const Sidebar: React.FC = () => {
   const geographyEndpoints = API_ENDPOINTS.filter(e => e.category === 'geography');
   const weatherEndpoints = API_ENDPOINTS.filter(e => e.category === 'weather');
   const pokemonEndpoints = API_ENDPOINTS.filter(e => e.category === 'pokemon');
+  const rickAndMortyEndpoints = API_ENDPOINTS.filter(e => e.category === 'rick-and-morty');
 
   return (
     <>
@@ -326,6 +329,52 @@ export const Sidebar: React.FC = () => {
             {!collapsedSections.pokemon && (
               <div className="space-y-0.5 pt-0.5">
                 {pokemonEndpoints.map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 7. SECTION: RICK AND MORTY */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('rickAndMorty')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Tv size={12} className="text-cyan-500" />
+                <span>Rick and Morty</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">1 route</span>
+                {collapsedSections.rickAndMorty ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.rickAndMorty && (
+              <div className="space-y-0.5 pt-0.5">
+                {rickAndMortyEndpoints.map(ep => {
                   const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
                   return (
                     <button
