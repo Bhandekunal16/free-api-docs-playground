@@ -71,6 +71,14 @@ export const Sidebar: React.FC = () => {
           isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
+        {/* Top Menubar Header with Version & Mode Badge */}
+        <div className="px-3 pt-3 pb-2 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
+          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">Explorer</span>
+          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded shadow-2xs">
+            v1.0 Docs & Playground
+          </span>
+        </div>
+
         {/* Search filter in sidebar */}
         <div className="p-3 border-b border-slate-200 dark:border-slate-800/80">
           <div className="relative">
