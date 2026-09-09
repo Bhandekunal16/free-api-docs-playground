@@ -54,7 +54,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between transition-colors duration-150">
+      <header className="sticky top-0 z-40 h-14 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between relative transition-colors duration-150">
         {/* Left: Brand & Mobile Toggle */}
         <div className="flex items-center space-x-3">
           <button
@@ -77,11 +77,11 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Search / Command palette trigger */}
-        <div className="hidden md:flex items-center">
+        {/* Center: Search / Command palette trigger (Mathematically centered) */}
+        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-64 justify-between shadow-2xs"
+            className="flex items-center space-x-2 px-3 py-1.5 min-h-[36px] bg-slate-100/80 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg transition-all w-64 lg:w-72 justify-between shadow-2xs"
           >
             <span className="flex items-center space-x-2 truncate">
               <Search size={13} />
