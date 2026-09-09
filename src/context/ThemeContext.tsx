@@ -20,9 +20,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (stored === 'light' || stored === 'dark' || stored === 'system') {
         return stored;
       }
-      return 'system';
+      return 'light';
     } catch {
-      return 'system';
+      return 'light';
     }
   });
 

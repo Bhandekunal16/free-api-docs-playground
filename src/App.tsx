@@ -30,12 +30,12 @@ const MainLayout: React.FC = () => {
             </div>
           ) : activeEndpoint ? (
             /* Endpoint View: Split or Single View */
-            <div className="flex-1 flex flex-col 2xl:flex-row min-w-0 divide-y 2xl:divide-y-0 2xl:divide-x divide-slate-200 dark:divide-slate-800">
+            <div className="flex-1 flex flex-col xl:flex-row min-w-0 divide-y xl:divide-y-0 xl:divide-x divide-slate-200 dark:divide-slate-800">
               {/* Center / Left Pane: API Documentation */}
               {(layoutMode === 'split' || layoutMode === 'docs') && (
                 <div
                   className={`flex-1 overflow-y-auto bg-white dark:bg-slate-900 ${
-                    layoutMode === 'split' ? '2xl:max-w-[50%]' : 'w-full'
+                    layoutMode === 'split' ? 'xl:w-1/2 xl:max-w-[50%]' : 'w-full'
                   }`}
                 >
                   <EndpointDocView endpoint={activeEndpoint} />
@@ -46,7 +46,7 @@ const MainLayout: React.FC = () => {
               {(layoutMode === 'split' || layoutMode === 'playground') && (
                 <div
                   className={`flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950/40 ${
-                    layoutMode === 'split' ? '2xl:max-w-[50%]' : 'w-full'
+                    layoutMode === 'split' ? 'xl:w-1/2 xl:max-w-[50%]' : 'w-full'
                   }`}
                 >
                   <PlaygroundPanel endpoint={activeEndpoint} />

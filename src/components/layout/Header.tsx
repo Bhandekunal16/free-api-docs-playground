@@ -121,43 +121,43 @@ export const Header: React.FC = () => {
 
         {/* Right: Layout Switcher, Theme Switcher & History */}
         <div className="flex items-center space-x-2">
-          {/* Layout Mode (Desktop only) */}
-          <div className="hidden xl:flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+          {/* Layout Mode Switcher (Visible on md screens and up) */}
+          <div className="hidden md:flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
             <button
               onClick={() => setLayoutMode('split')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'split'
-                  ? 'bg-indigo-600 text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Split View (Documentation + Playground)"
             >
               <Columns size={13} />
-              <span>Split</span>
+              <span className="hidden lg:inline">Split</span>
             </button>
             <button
               onClick={() => setLayoutMode('docs')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'docs'
-                  ? 'bg-indigo-600 text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Documentation Only"
             >
               <BookOpen size={13} />
-              <span>Docs</span>
+              <span className="hidden lg:inline">Docs</span>
             </button>
             <button
               onClick={() => setLayoutMode('playground')}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 layoutMode === 'playground'
-                  ? 'bg-indigo-600 text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
               title="Playground Only"
             >
               <PlaySquare size={13} />
-              <span>Playground</span>
+              <span className="hidden lg:inline">Playground</span>
             </button>
           </div>
 
