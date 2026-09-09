@@ -1849,6 +1849,69 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 15. IPify API
+  {
+    id: 'ipify',
+    category: 'ipify',
+    categoryTitle: 'IPify',
+    method: 'GET',
+    path: '/ipify',
+    title: 'Public IP',
+    shortDescription: 'The IPify API returns the public IP address of the requesting client.',
+    description: 'The IPify API returns the public IP address of the requesting client. Responses are normalized into the standard service envelope and support both raw IP text and JSON formats depending on upstream response headers.',
+    notes: [
+      'Upstream API: https://api.ipify.org',
+      'Response operation defaults to "ip".',
+      'The endpoint is read-only and requires no authentication.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Type / Operation',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'Response operation; currently ip, defaults to ip.',
+        options: [
+          { label: 'ip', value: 'ip', description: 'Public client IP address (default)' }
+        ]
+      }
+    ],
+    presets: [
+      {
+        id: 'ipify-default',
+        label: 'Default Public IP',
+        description: 'Get public IP address (GET /ipify)',
+        queryParams: {}
+      },
+      {
+        id: 'ipify-explicit',
+        label: 'Explicit IP Operation',
+        description: 'Get public IP with explicit type param (GET /ipify?type=ip)',
+        queryParams: { type: 'ip' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/ipify',
+    exampleCurl: 'curl http://localhost:3000/ipify',
+    responseExample: {
+      success: true,
+      statusCode: 200,
+      status: true,
+      message: 'Success',
+      data: {
+        ip: '203.0.113.195'
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
