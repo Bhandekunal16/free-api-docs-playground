@@ -925,6 +925,187 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       }
     },
     statusCodes: [COMMON_STATUS_CODES[0], COMMON_STATUS_CODES[1], COMMON_STATUS_CODES[3], COMMON_STATUS_CODES[5]]
+  },
+
+  // 9. Pokémon API
+  {
+    id: 'pokemon',
+    category: 'pokemon',
+    categoryTitle: 'Pokémon',
+    method: 'GET',
+    path: '/pokemon',
+    title: 'Pokémon API',
+    shortDescription: 'The Pokémon API provides access to PokéAPI resources.',
+    description: 'The Pokémon API provides access to PokéAPI resources. Query Pokémon, abilities, berries, moves, items, locations, and other game data with support for name/ID lookups and pagination.',
+    notes: [
+      'Upstream API: https://pokeapi.co/api/v2',
+      'Default resource type is "pokemon" if not specified.',
+      'Pass "value" with a resource name (e.g. "charizard", "thunderbolt") or numeric ID to fetch a specific resource.',
+      'Use "limit" and "offset" for pagination when listing resources.',
+      'Invalid resource types are returned as 400 Bad Request errors.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Resource Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'pokemon',
+        description: 'Pokémon resource type; defaults to pokemon.',
+        options: [
+          { label: 'pokemon', value: 'pokemon', description: 'Pokémon characters, stats, types, and sprites' },
+          { label: 'ability', value: 'ability', description: 'Pokémon passive abilities and combat effects' },
+          { label: 'berry', value: 'berry', description: 'Berries and their effects on Pokémon' },
+          { label: 'characteristic', value: 'characteristic', description: 'Stat characteristics and descriptions' },
+          { label: 'eggGroup', value: 'eggGroup', description: 'Egg groups determining breeding compatibility' },
+          { label: 'gender', value: 'gender', description: 'Gender differences and rates for Pokémon' },
+          { label: 'growthRate', value: 'growthRate', description: 'Experience growth rates for leveling up' },
+          { label: 'item', value: 'item', description: 'In-game items, medicines, and held objects' },
+          { label: 'itemAttribute', value: 'itemAttribute', description: 'Attributes applied to item effects' },
+          { label: 'itemCategory', value: 'itemCategory', description: 'Categories grouping related items' },
+          { label: 'itemFlingEffect', value: 'itemFlingEffect', description: 'Item effects when using the move Fling' },
+          { label: 'itemPocket', value: 'itemPocket', description: 'Inventory pockets holding items' },
+          { label: 'location', value: 'location', description: 'In-game geographical areas and landmarks' },
+          { label: 'locationArea', value: 'locationArea', description: 'Sub-areas within game locations' },
+          { label: 'machine', value: 'machine', description: 'Technical and Hidden Machines (TMs & HMs)' },
+          { label: 'move', value: 'move', description: 'Combat moves, power, accuracy, and PP' },
+          { label: 'nature', value: 'nature', description: 'Natures affecting Pokémon stat growth' },
+          { label: 'palParkArea', value: 'palParkArea', description: 'Pal Park areas from Generation IV' },
+          { label: 'pokeathlonStat', value: 'pokeathlonStat', description: 'Pokéathlon mini-game performance stats' },
+          { label: 'pokedex', value: 'pokedex', description: 'Regional and national Pokédex listings' },
+          { label: 'region', value: 'region', description: 'Major Pokémon game regions (Kanto, Johto, etc.)' },
+          { label: 'stat', value: 'stat', description: 'Core battle statistics (HP, Attack, Speed, etc.)' },
+          { label: 'type', value: 'type', description: 'Elemental types (Fire, Water, Grass, Electric, etc.)' },
+          { label: 'version', value: 'version', description: 'Game versions within the Pokémon franchise' },
+          { label: 'versionGroup', value: 'versionGroup', description: 'Groupings of game versions' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Resource Name or ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. charizard, thunderbolt, 25',
+        description: 'Resource name or ID to retrieve a single specific resource.'
+      },
+      {
+        name: 'limit',
+        label: 'Limit',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 20',
+        description: 'Number of list results to return.'
+      },
+      {
+        name: 'offset',
+        label: 'Offset',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 0',
+        description: 'Number of list results to skip.'
+      }
+    ],
+    presets: [
+      {
+        id: 'pokemon-default',
+        label: 'Default',
+        description: 'Fetch default Pokémon list (GET /pokemon)',
+        queryParams: { type: 'pokemon' }
+      },
+      {
+        id: 'pokemon-by-name',
+        label: 'Pokémon by name',
+        description: 'Fetch Charizard details (GET /pokemon?type=pokemon&value=charizard)',
+        queryParams: { type: 'pokemon', value: 'charizard' }
+      },
+      {
+        id: 'pokemon-move-by-name',
+        label: 'Move by name',
+        description: 'Fetch Thunderbolt move details (GET /pokemon?type=move&value=thunderbolt)',
+        queryParams: { type: 'move', value: 'thunderbolt' }
+      },
+      {
+        id: 'pokemon-pagination',
+        label: 'Pagination',
+        description: 'Fetch paginated Pokémon list with limit and offset (GET /pokemon?type=pokemon&limit=20&offset=20)',
+        queryParams: { type: 'pokemon', limit: '20', offset: '20' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/pokemon?type=pokemon&value=charizard',
+    exampleCurl: 'curl "http://localhost:3000/pokemon?type=pokemon&value=charizard"',
+    responseExample: {
+      id: 6,
+      name: "charizard",
+      base_experience: 267,
+      height: 17,
+      is_default: true,
+      order: 7,
+      weight: 905,
+      abilities: [
+        {
+          ability: {
+            name: "blaze",
+            url: "https://pokeapi.co/api/v2/ability/66/"
+          },
+          is_hidden: false,
+          slot: 1
+        },
+        {
+          ability: {
+            name: "solar-power",
+            url: "https://pokeapi.co/api/v2/ability/94/"
+          },
+          is_hidden: true,
+          slot: 3
+        }
+      ],
+      types: [
+        {
+          slot: 1,
+          type: {
+            name: "fire",
+            url: "https://pokeapi.co/api/v2/type/10/"
+          }
+        },
+        {
+          slot: 2,
+          type: {
+            name: "flying",
+            url: "https://pokeapi.co/api/v2/type/3/"
+          }
+        }
+      ],
+      stats: [
+        { base_stat: 78, effort: 0, stat: { name: "hp" } },
+        { base_stat: 84, effort: 0, stat: { name: "attack" } },
+        { base_stat: 78, effort: 0, stat: { name: "defense" } },
+        { base_stat: 109, effort: 3, stat: { name: "special-attack" } },
+        { base_stat: 85, effort: 0, stat: { name: "special-defense" } },
+        { base_stat: 100, effort: 0, stat: { name: "speed" } }
+      ],
+      sprites: {
+        front_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+        front_shiny: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png"
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid resource type or invalid query parameters provided.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Invalid resource type'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
