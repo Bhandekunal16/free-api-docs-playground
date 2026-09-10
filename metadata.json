@@ -1,6 +1,6 @@
 {
   "name": "Free API Server — Docs & Interactive Playground",
-  "description": "Interactive developer documentation, request builder, and live playground for Free API Server endpoints including Fake, Mock, Weather, Countries, Pokémon, Rick and Morty, Cat Facts, Dogs, Jikan, CoinGecko, IPify, Agify, Genderize, Nationalize, GitHub, and Open Library APIs.",
+  "description": "Interactive developer documentation, request builder, and live playground for Free API Server endpoints including Fake, Mock, Weather, Countries, Pokémon, Rick and Morty, Cat Facts, Dogs, Jikan, CoinGecko, IPify, Agify, Genderize, Nationalize, GitHub, Open Library, and Gutendex APIs.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

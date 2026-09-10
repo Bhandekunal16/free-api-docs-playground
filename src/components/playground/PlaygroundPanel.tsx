@@ -143,6 +143,15 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Gutendex endpoint
+    if (endpoint.id === 'gutendex') {
+      const op = queryParams.type || 'books';
+      if (op === 'book' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('The "book" operation requires a book ID in the "Book ID (value)" field (e.g. "11").');
+        return;
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -245,6 +254,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const isOpenLibraryIdOp = ['work', 'edition', 'author', 'subject', 'isbn'].includes(selectedOpenLibraryType);
     const isOpenLibraryValueRequired = isOpenLibraryEndpoint && param.name === 'value' && isOpenLibraryIdOp;
 
+    // Context-awareness for Gutendex API
+    const isGutendexEndpoint = endpoint.id === 'gutendex';
+    const selectedGutendexType = queryParams.type || 'books';
+    const isGutendexValueRequired = isGutendexEndpoint && param.name === 'value' && selectedGutendexType === 'book';
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -254,7 +268,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isGithubOwnerRequired ||
       isGithubRepoRequired ||
       isGithubQueryRequired ||
-      isOpenLibraryValueRequired;
+      isOpenLibraryValueRequired ||
+      isGutendexValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -300,6 +315,10 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. pride and prejudice (Optional search query)';
     } else if (isOpenLibraryEndpoint && param.name === 'title') {
       customPlaceholder = 'e.g. pride and prejudice (Optional title filter)';
+    } else if (isGutendexValueRequired) {
+      customPlaceholder = 'e.g. 11 (Required Gutenberg Book ID)';
+    } else if (isGutendexEndpoint && param.name === 'search') {
+      customPlaceholder = 'e.g. frankenstein (Optional search query)';
     }
 
     return (
@@ -322,7 +341,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -374,6 +393,10 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? 'Optional query keyword to search works and editions'
             : isOpenLibraryEndpoint && param.name === 'title'
             ? 'Optional title filter for book search'
+            : isGutendexValueRequired
+            ? `Required: Gutenberg book ID for operation "${selectedGutendexType}"`
+            : isGutendexEndpoint && param.name === 'search'
+            ? 'Optional search term to filter Project Gutenberg catalog'
             : param.description}
         </p>
       </div>
@@ -758,6 +781,66 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                                  'ISBN'}
                               </span>
                               <span className="text-[10px] text-slate-400 font-mono">for type={selectedType}</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'gutendex' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Gutendex Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">2 supported operations</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Operation-Specific Dynamic Inputs */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'books';
+
+                      if (selectedType === 'books') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Books Catalog Search
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">optional search filter</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'search')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'book') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Book Identifier
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">required for type=book</span>
                             </div>
                             <div className="grid grid-cols-1 gap-3">
                               {endpoint.queryParams

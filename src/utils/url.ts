@@ -106,6 +106,27 @@ export function buildUrl(
         }
       }
 
+      // Special check: for gutendex endpoint, omit default type=books (when no search) and non-applicable fields
+      if (endpoint.id === 'gutendex') {
+        const op = queryParams.type || 'books';
+        const isBooksOp = op === 'books';
+        const isBookIdOp = op === 'book';
+
+        if (key === 'type' && (val === 'books' || val === '')) {
+          const hasSearchParam = queryParams.search && queryParams.search.trim();
+          if (!hasSearchParam) {
+            return; // clean /gutendex for default books with no search parameter
+          }
+        }
+
+        if (key === 'search' && !isBooksOp) {
+          return;
+        }
+        if (key === 'value' && !isBookIdOp) {
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

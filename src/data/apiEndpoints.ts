@@ -2465,6 +2465,142 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 21. Gutendex API
+  {
+    id: 'gutendex',
+    category: 'gutendex',
+    categoryTitle: 'Gutendex',
+    method: 'GET',
+    path: '/gutendex',
+    title: 'Gutendex API',
+    shortDescription: 'Provides public-domain book metadata and catalog search from the Project Gutenberg collection.',
+    description: 'The Gutendex API provides public-domain book metadata and catalog search from the Project Gutenberg collection. Responses forward data directly from Gutendex (https://gutendex.com). Supports 2 operation types: books (list books / catalog search) and book (get a specific book by Gutenberg ID).',
+    notes: [
+      'Upstream API: https://gutendex.com',
+      'Response operation defaults to "books".',
+      'Default request GET /gutendex lists public-domain books.',
+      'The endpoint is read-only.',
+      'A 15-second timeout applies to upstream Gutendex requests.',
+      'Additional query parameters (such as search, languages, topic, author_year_start, etc.) are forwarded directly to Gutendex.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'books',
+        description: 'Gutendex operation type; defaults to books.',
+        options: [
+          { label: 'books (List Books & Search - default)', value: 'books', description: 'List books with optional filters or search keyword' },
+          { label: 'book (Book by ID)', value: 'book', description: 'Get a specific book by Gutenberg numeric ID (e.g. 11)' }
+        ]
+      },
+      {
+        name: 'search',
+        label: 'Search Query',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. frankenstein',
+        description: 'Search term for titles and authors in the Gutenberg catalog (used with type=books).'
+      },
+      {
+        name: 'value',
+        label: 'Book ID (value)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 11',
+        description: 'Project Gutenberg book numeric identifier (required for type=book).'
+      }
+    ],
+    presets: [
+      {
+        id: 'gutendex-all-books',
+        label: 'All Books',
+        description: 'List public-domain books (GET /gutendex)',
+        queryParams: { type: 'books' }
+      },
+      {
+        id: 'gutendex-search-frankenstein',
+        label: 'Search Frankenstein',
+        description: 'Search books for "frankenstein" (GET /gutendex?type=books&search=frankenstein)',
+        queryParams: { type: 'books', search: 'frankenstein' }
+      },
+      {
+        id: 'gutendex-book-id',
+        label: 'Book by ID (11)',
+        description: 'Get book metadata for ID 11 (GET /gutendex?type=book&value=11)',
+        queryParams: { type: 'book', value: '11' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/gutendex?type=books&search=frankenstein',
+    exampleCurl: 'curl "http://localhost:3000/gutendex?type=books&search=frankenstein"',
+    responseExample: {
+      count: 1,
+      next: null,
+      previous: null,
+      results: [
+        {
+          id: 84,
+          title: 'Frankenstein; Or, The Modern Prometheus',
+          authors: [
+            {
+              name: 'Shelley, Mary Wollstonecraft',
+              birth_year: 1797,
+              death_year: 1851
+            }
+          ],
+          translators: [],
+          subjects: [
+            "Frankenstein's monster (Fictitious character) -- Fiction",
+            'Frankenstein, Victor (Fictitious character) -- Fiction',
+            'Gothic fiction',
+            'Horror tales',
+            'Monsters -- Fiction',
+            'Science fiction',
+            'Scientists -- Fiction'
+          ],
+          bookshelves: [
+            'Gothic Fiction',
+            'Movie Books',
+            'Precursors of Science Fiction',
+            'Science Fiction by Women'
+          ],
+          languages: ['en'],
+          copyright: false,
+          media_type: 'Text',
+          formats: {
+            'text/html': 'https://www.gutenberg.org/ebooks/84.html.images',
+            'application/epub+zip': 'https://www.gutenberg.org/ebooks/84.epub3.images',
+            'application/x-mobipocket-ebook': 'https://www.gutenberg.org/ebooks/84.kf8.images',
+            'application/rdf+xml': 'https://www.gutenberg.org/ebooks/84.rdf',
+            'image/jpeg': 'https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg',
+            'text/plain; charset=us-ascii': 'https://www.gutenberg.org/ebooks/84.txt.utf-8'
+          },
+          download_count: 89452
+        }
+      ]
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required identifier 'value' for operation 'book'.",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Missing required 'value' parameter for type=book"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
