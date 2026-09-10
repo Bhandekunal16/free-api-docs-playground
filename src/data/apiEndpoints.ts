@@ -2477,8 +2477,16 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
     title: 'Gutendex API',
     shortDescription: 'Provides public-domain book metadata and catalog search from the Project Gutenberg collection.',
     description: 'The Gutendex API provides public-domain book metadata and catalog search from the Project Gutenberg collection. Responses forward data directly from Gutendex (https://gutendex.com). Supports 2 operation types: books (list books / catalog search) and book (get a specific book by Gutenberg ID).',
+    badge: {
+      text: 'Working on',
+      icon: 'lock',
+      type: 'warning'
+    },
+    warningNotice: 'Deployment & Reliability Notice: Gutendex upstream API has known latency/timeout issues in Vercel/serverless environments. Fully functional in local development, but Open Library (/open-library) is recommended for production books integration.',
     notes: [
+      'Status: Working on / Lock tag (Unstable on Vercel deployments due to upstream Project Gutenberg latency)',
       'Upstream API: https://gutendex.com',
+      'Recommended alternative for production/Vercel: Open Library API (/open-library)',
       'Response operation defaults to "books".',
       'Default request GET /gutendex lists public-domain books.',
       'The endpoint is read-only.',

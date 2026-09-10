@@ -18,6 +18,7 @@ import {
   Github,
   Library,
   BookMarked,
+  Lock,
   ShieldAlert,
   AlertTriangle,
   ChevronDown,
@@ -905,8 +906,11 @@ export const Sidebar: React.FC = () => {
                 <BookMarked size={12} className="text-amber-500" />
                 <span>Gutendex</span>
               </span>
-              <div className="flex items-center space-x-1">
-                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">1 route</span>
+              <div className="flex items-center space-x-1.5">
+                <span className="flex items-center space-x-1 px-1.5 py-0.5 text-[9px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded">
+                  <Lock size={9} />
+                  <span>Working on</span>
+                </span>
                 {collapsedSections.gutendex ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
               </div>
             </button>
@@ -934,6 +938,10 @@ export const Sidebar: React.FC = () => {
                           <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
                         </div>
                       </div>
+                      <span className="flex items-center space-x-1 px-1.5 py-0.5 text-[9px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded shrink-0 ml-1">
+                        <Lock size={8} />
+                        <span>Dev Only</span>
+                      </span>
                     </button>
                   );
                 })}

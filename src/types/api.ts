@@ -48,6 +48,12 @@ export interface EndpointDefinition {
   shortDescription: string;
   description: string;
   notes?: string[];
+  badge?: {
+    text: string;
+    icon?: 'lock' | 'alert' | 'wrench';
+    type?: 'warning' | 'info' | 'caution';
+  };
+  warningNotice?: string;
   pathParams: ParamDefinition[];
   queryParams: ParamDefinition[];
   presets: EndpointPreset[];

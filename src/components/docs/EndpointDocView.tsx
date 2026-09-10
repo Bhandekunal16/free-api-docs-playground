@@ -10,7 +10,9 @@ import {
   Play,
   ArrowRight,
   Zap,
-  Info
+  Info,
+  Lock,
+  AlertTriangle
 } from 'lucide-react';
 import { EndpointDefinition } from '../../types/api';
 import { useApi } from '../../context/ApiContext';
@@ -44,8 +46,31 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
           <span className="text-slate-700 dark:text-slate-300">{endpoint.title}</span>
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{endpoint.title}</h1>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{endpoint.title}</h1>
+          {endpoint.badge && (
+            <span className="flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-md">
+              <Lock size={12} />
+              <span>{endpoint.badge.text}</span>
+            </span>
+          )}
+        </div>
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{endpoint.shortDescription}</p>
+
+        {/* Warning Notice if applicable */}
+        {endpoint.warningNotice && (
+          <div className="p-3.5 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 dark:border-amber-500/40 rounded-xl flex items-start space-x-3 text-xs text-amber-900 dark:text-amber-200">
+            <Lock className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={16} />
+            <div className="space-y-1">
+              <div className="font-semibold text-amber-950 dark:text-amber-100 flex items-center space-x-1.5">
+                <span>Working On / Vercel Deployment Notice</span>
+              </div>
+              <p className="leading-relaxed text-amber-800 dark:text-amber-300">
+                {endpoint.warningNotice}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Route Bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">

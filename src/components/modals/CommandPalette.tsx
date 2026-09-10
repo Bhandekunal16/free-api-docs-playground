@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, BookOpen, Terminal, Sparkles, ArrowRight } from 'lucide-react';
+import { Search, X, BookOpen, Terminal, Sparkles, ArrowRight, Lock } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
 import { API_ENDPOINTS } from '../../data/apiEndpoints';
 import { DOC_ARTICLES } from '../../data/docSections';
@@ -31,7 +31,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       title: doc.title,
       category: 'Documentation Guide',
       subtitle: doc.shortDescription,
-      badge: 'Guide'
+      badge: 'Guide',
+      statusBadge: undefined as { text: string; icon?: string } | undefined
     })),
     // Endpoints
     ...API_ENDPOINTS.map(ep => ({
@@ -41,6 +42,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       category: ep.categoryTitle,
       subtitle: `${ep.method} ${ep.path}`,
       badge: ep.method,
+      statusBadge: ep.badge,
       path: ep.path
     }))
   ];
@@ -150,6 +152,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                         >
                           {item.category}
                         </span>
+                        {item.statusBadge && (
+                          <span
+                            className={`flex items-center space-x-0.5 text-[9px] px-1.5 py-0.5 rounded font-semibold ${
+                              isSelected
+                                ? 'bg-amber-400 text-amber-950 font-bold'
+                                : 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20'
+                            }`}
+                          >
+                            <Lock size={8} />
+                            <span>{item.statusBadge.text}</span>
+                          </span>
+                        )}
                       </div>
                       <p
                         className={`text-[11px] truncate font-mono mt-0.5 ${

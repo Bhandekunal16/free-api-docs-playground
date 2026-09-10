@@ -12,7 +12,9 @@ import {
   Terminal,
   Code2,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  AlertTriangle
 } from 'lucide-react';
 import { EndpointDefinition, EndpointPreset, ParamDefinition } from '../../types/api';
 import { useApi } from '../../context/ApiContext';
@@ -411,8 +413,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
           <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
             <Sliders size={14} />
           </div>
-          <div>
+          <div className="flex items-center space-x-2">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Interactive Playground</h2>
+            {endpoint.badge && (
+              <span className="flex items-center space-x-1 px-2 py-0.5 text-[10px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-md">
+                <Lock size={10} />
+                <span>{endpoint.badge.text}</span>
+              </span>
+            )}
           </div>
         </div>
 
@@ -442,6 +450,21 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
           </div>
         )}
       </div>
+
+      {/* Deployment & Reliability Notice (e.g. Gutendex Vercel warning) */}
+      {endpoint.warningNotice && (
+        <div className="p-3.5 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 dark:border-amber-500/40 rounded-xl flex items-start space-x-3 text-xs text-amber-900 dark:text-amber-200">
+          <Lock className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={16} />
+          <div className="space-y-1">
+            <div className="font-semibold text-amber-950 dark:text-amber-100 flex items-center space-x-1.5">
+              <span>Working On / Vercel Deployment Notice</span>
+            </div>
+            <p className="leading-relaxed text-amber-800 dark:text-amber-300">
+              {endpoint.warningNotice}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 2. PARAMETERS CONFIGURATION (Progressive Disclosure) */}
       <div className="space-y-4">
