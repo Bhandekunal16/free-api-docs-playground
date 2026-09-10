@@ -127,6 +127,23 @@ export function buildUrl(
         }
       }
 
+      // Special check: for open-food-facts endpoint, omit non-applicable fields
+      if (endpoint.id === 'open-food-facts') {
+        const op = queryParams.type || 'product';
+        const isProductsOp = op === 'products';
+        const isIdentifierOp = [
+          'product', 'category', 'brand', 'ingredient', 'additive',
+          'allergen', 'label', 'packagingMaterial'
+        ].includes(op);
+
+        if (key === 'search_terms' && !isProductsOp) {
+          return;
+        }
+        if (key === 'value' && !isIdentifierOp) {
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

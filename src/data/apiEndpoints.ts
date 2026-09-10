@@ -2609,6 +2609,141 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 22. Open Food Facts API
+  {
+    id: 'open-food-facts',
+    category: 'open-food-facts',
+    categoryTitle: 'Open Food Facts',
+    method: 'GET',
+    path: '/open-food-facts',
+    title: 'Open Food Facts API',
+    shortDescription: 'Provides product metadata, categories, ingredients, labels, brands, additives, allergens, and packaging information.',
+    description: 'The Open Food Facts API provides product metadata, categories, ingredients, labels, brands, additives, allergens, and packaging information from the Open Food Facts global open database. Responses forward data directly from Open Food Facts API v2 (https://world.openfoodfacts.org/api/v2).',
+    notes: [
+      'Upstream API: https://world.openfoodfacts.org/api/v2',
+      'Response operation defaults to "product".',
+      'Identifier-based operations require the "value" parameter and return 400 Bad Request if omitted.',
+      'The endpoint is read-only.',
+      'A 15-second timeout applies to upstream Open Food Facts requests.',
+      'Additional query parameters are forwarded directly to Open Food Facts API v2.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'product',
+        description: 'Open Food Facts operation type; defaults to product.',
+        options: [
+          { label: 'product (Product Barcode Lookup - default)', value: 'product', description: 'Product barcode lookup (requires value=barcode)' },
+          { label: 'products (Search & Filter Products)', value: 'products', description: 'Search products catalog (optional search_terms)' },
+          { label: 'categories (List Categories)', value: 'categories', description: 'List known product categories' },
+          { label: 'category (Category Details)', value: 'category', description: 'Category identifier lookup (requires value)' },
+          { label: 'brands (List Brands)', value: 'brands', description: 'List brands' },
+          { label: 'brand (Brand Details)', value: 'brand', description: 'Brand identifier lookup (requires value)' },
+          { label: 'ingredients (List Ingredients)', value: 'ingredients', description: 'List ingredients' },
+          { label: 'ingredient (Ingredient Details)', value: 'ingredient', description: 'Ingredient identifier lookup (requires value)' },
+          { label: 'additives (List Additives)', value: 'additives', description: 'List additives' },
+          { label: 'additive (Additive Details)', value: 'additive', description: 'Additive identifier lookup (requires value)' },
+          { label: 'allergens (List Allergens)', value: 'allergens', description: 'List allergens' },
+          { label: 'allergen (Allergen Details)', value: 'allergen', description: 'Allergen identifier lookup (requires value)' },
+          { label: 'labels (List Labels)', value: 'labels', description: 'List labels' },
+          { label: 'label (Label Details)', value: 'label', description: 'Label identifier lookup (requires value)' },
+          { label: 'packaging (List Packaging)', value: 'packaging', description: 'List packaging entries' },
+          { label: 'packagingMaterial (Packaging Material Details)', value: 'packagingMaterial', description: 'Packaging material identifier lookup (requires value)' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Identifier (value)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 737628064502 (barcode) or beverages (category)',
+        description: 'Target identifier or barcode required for specific item lookup operations.'
+      },
+      {
+        name: 'search_terms',
+        label: 'Search Terms',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. milk',
+        description: 'Search keyword to filter products (used with type=products).'
+      }
+    ],
+    presets: [
+      {
+        id: 'off-product-lookup',
+        label: 'Product Lookup (737628064502)',
+        description: 'Get product metadata by barcode (GET /open-food-facts?type=product&value=737628064502)',
+        queryParams: { type: 'product', value: '737628064502' }
+      },
+      {
+        id: 'off-product-search',
+        label: 'Product Search (milk)',
+        description: 'Search products catalog for milk (GET /open-food-facts?type=products&search_terms=milk)',
+        queryParams: { type: 'products', search_terms: 'milk' }
+      },
+      {
+        id: 'off-category',
+        label: 'Category (beverages)',
+        description: 'Get category details for beverages (GET /open-food-facts?type=category&value=beverages)',
+        queryParams: { type: 'category', value: 'beverages' }
+      },
+      {
+        id: 'off-brand',
+        label: 'Brand (nestle)',
+        description: 'Get brand details for Nestle (GET /open-food-facts?type=brand&value=nestle)',
+        queryParams: { type: 'brand', value: 'nestle' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/open-food-facts?type=product&value=737628064502',
+    exampleCurl: 'curl "http://localhost:3000/open-food-facts?type=product&value=737628064502"',
+    responseExample: {
+      code: '737628064502',
+      product: {
+        _id: '737628064502',
+        product_name: 'Thai Peanut Noodle Kit',
+        generic_name: 'Noodle Kit',
+        brands: 'Simply Asia',
+        categories: 'Plant-based foods and beverages, Plant-based foods, Cereals and potatoes, Meals, Noodle dishes',
+        ingredients_text: 'Noodles: wheat flour, water, salt. Sauce: water, peanut butter, sugar, soy sauce, sesame oil, spices.',
+        allergens: 'en:peanuts, en:soybeans, en:gluten',
+        nutriments: {
+          'energy-kcal_100g': 380,
+          fat_100g: 12,
+          carbohydrates_100g: 56,
+          proteins_100g: 10,
+          salt_100g: 1.8
+        },
+        nutriscore_grade: 'd',
+        nova_group: 4,
+        ecoscore_grade: 'b'
+      },
+      status: 1,
+      status_verbose: 'product found'
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required identifier 'value' for operation requiring an ID (such as product, category, brand, etc.).",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Missing required 'value' parameter for type=product"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

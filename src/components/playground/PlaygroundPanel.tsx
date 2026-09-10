@@ -154,6 +154,28 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Open Food Facts endpoint
+    if (endpoint.id === 'open-food-facts') {
+      const op = queryParams.type || 'product';
+      const isIdOp = [
+        'product', 'category', 'brand', 'ingredient', 'additive',
+        'allergen', 'label', 'packagingMaterial'
+      ].includes(op);
+      if (isIdOp && (!queryParams.value || !queryParams.value.trim())) {
+        const idLabel =
+          op === 'product' ? 'product barcode (e.g. "737628064502")' :
+          op === 'category' ? 'category identifier (e.g. "beverages")' :
+          op === 'brand' ? 'brand identifier (e.g. "nestle")' :
+          op === 'ingredient' ? 'ingredient identifier (e.g. "en:sugar")' :
+          op === 'additive' ? 'additive identifier (e.g. "en:e330")' :
+          op === 'allergen' ? 'allergen identifier (e.g. "en:peanuts")' :
+          op === 'label' ? 'label identifier (e.g. "en:organic")' :
+          'packaging material identifier (e.g. "en:plastic")';
+        setValidationError(`The "${op}" operation requires an identifier in the "Identifier (value)" field (${idLabel}).`);
+        return;
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -261,6 +283,15 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const selectedGutendexType = queryParams.type || 'books';
     const isGutendexValueRequired = isGutendexEndpoint && param.name === 'value' && selectedGutendexType === 'book';
 
+    // Context-awareness for Open Food Facts API
+    const isOpenFoodFactsEndpoint = endpoint.id === 'open-food-facts';
+    const selectedOpenFoodFactsType = queryParams.type || 'product';
+    const isOpenFoodFactsIdOp = [
+      'product', 'category', 'brand', 'ingredient', 'additive',
+      'allergen', 'label', 'packagingMaterial'
+    ].includes(selectedOpenFoodFactsType);
+    const isOpenFoodFactsValueRequired = isOpenFoodFactsEndpoint && param.name === 'value' && isOpenFoodFactsIdOp;
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -271,7 +302,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isGithubRepoRequired ||
       isGithubQueryRequired ||
       isOpenLibraryValueRequired ||
-      isGutendexValueRequired;
+      isGutendexValueRequired ||
+      isOpenFoodFactsValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -321,6 +353,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. 11 (Required Gutenberg Book ID)';
     } else if (isGutendexEndpoint && param.name === 'search') {
       customPlaceholder = 'e.g. frankenstein (Optional search query)';
+    } else if (isOpenFoodFactsValueRequired) {
+      customPlaceholder =
+        selectedOpenFoodFactsType === 'product' ? 'e.g. 737628064502 (Product Barcode)' :
+        selectedOpenFoodFactsType === 'category' ? 'e.g. beverages (Category Identifier)' :
+        selectedOpenFoodFactsType === 'brand' ? 'e.g. nestle (Brand Identifier)' :
+        selectedOpenFoodFactsType === 'ingredient' ? 'e.g. en:sugar (Ingredient Identifier)' :
+        selectedOpenFoodFactsType === 'additive' ? 'e.g. en:e330 (Additive Identifier)' :
+        selectedOpenFoodFactsType === 'allergen' ? 'e.g. en:peanuts (Allergen Identifier)' :
+        selectedOpenFoodFactsType === 'label' ? 'e.g. en:organic (Label Identifier)' :
+        'e.g. en:plastic (Packaging Material Identifier)';
+    } else if (isOpenFoodFactsEndpoint && param.name === 'search_terms') {
+      customPlaceholder = 'e.g. milk (Optional product search query)';
     }
 
     return (
@@ -343,7 +387,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -399,6 +443,10 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? `Required: Gutenberg book ID for operation "${selectedGutendexType}"`
             : isGutendexEndpoint && param.name === 'search'
             ? 'Optional search term to filter Project Gutenberg catalog'
+            : isOpenFoodFactsValueRequired
+            ? `Required: Identifier for operation "${selectedOpenFoodFactsType}"`
+            : isOpenFoodFactsEndpoint && param.name === 'search_terms'
+            ? 'Optional search keyword to filter products catalog'
             : param.description}
         </p>
       </div>
@@ -870,6 +918,106 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                                 .filter(p => p.name === 'value')
                                 .map(renderQueryParamInput)}
                             </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'open-food-facts' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Open Food Facts Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">16 supported operations</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Operation-Specific Dynamic Inputs */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'product';
+                      const isProductsOp = selectedType === 'products';
+                      const isIdOp = [
+                        'product', 'category', 'brand', 'ingredient', 'additive',
+                        'allergen', 'label', 'packagingMaterial'
+                      ].includes(selectedType);
+                      const isListOp = [
+                        'categories', 'brands', 'ingredients', 'additives',
+                        'allergens', 'labels', 'packaging'
+                      ].includes(selectedType);
+
+                      if (isProductsOp) {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Product Search Parameters
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">optional search query</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'search_terms')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (isIdOp) {
+                        const idLabel =
+                          selectedType === 'product' ? 'Product Barcode' :
+                          selectedType === 'category' ? 'Category Identifier' :
+                          selectedType === 'brand' ? 'Brand Identifier' :
+                          selectedType === 'ingredient' ? 'Ingredient Identifier' :
+                          selectedType === 'additive' ? 'Additive Identifier' :
+                          selectedType === 'allergen' ? 'Allergen Identifier' :
+                          selectedType === 'label' ? 'Label Identifier' :
+                          'Packaging Material Identifier';
+
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                {idLabel}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">required for type={selectedType}</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (isListOp) {
+                        const listDescriptions: Record<string, string> = {
+                          categories: 'List known product categories',
+                          brands: 'List brands',
+                          ingredients: 'List ingredients',
+                          additives: 'List additives',
+                          allergens: 'List allergens',
+                          labels: 'List labels',
+                          packaging: 'List packaging entries'
+                        };
+
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>{listDescriptions[selectedType] || 'List entries'}. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /open-food-facts?type={selectedType}
+                            </span>
                           </div>
                         );
                       }
