@@ -2330,6 +2330,141 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 20. Open Library API
+  {
+    id: 'open-library',
+    category: 'open-library',
+    categoryTitle: 'Open Library',
+    method: 'GET',
+    path: '/open-library',
+    title: 'Open Library API',
+    shortDescription: 'Provides book, edition, author, subject, and ISBN metadata.',
+    description: 'The Open Library API provides book, edition, author, subject, and ISBN metadata. Responses forward data directly from Open Library (https://openlibrary.org). Supports 6 operation types: search, work, edition, author, subject, and isbn.',
+    notes: [
+      'Upstream API: https://openlibrary.org',
+      'Response operation defaults to "search".',
+      'Default request GET /open-library searches open library catalog.',
+      'The endpoint is read-only.',
+      'A 15-second timeout applies to upstream Open Library requests.',
+      'Additional query parameters (such as title, fields, limit, etc.) are forwarded directly to Open Library.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'search',
+        description: 'Open Library operation type; defaults to search.',
+        options: [
+          { label: 'search (Search Catalog - default)', value: 'search', description: 'Search for books, works, and editions by query or title' },
+          { label: 'work (Work by ID)', value: 'work', description: 'Get work metadata by Open Library work ID (e.g. OL45804W)' },
+          { label: 'edition (Edition by ID)', value: 'edition', description: 'Get edition metadata by Open Library edition ID (e.g. OL7353617M)' },
+          { label: 'author (Author by ID)', value: 'author', description: 'Get author profile and details by author ID (e.g. OL23919A)' },
+          { label: 'subject (Subject)', value: 'subject', description: 'Get works and editions under a subject heading (e.g. science_fiction)' },
+          { label: 'isbn (ISBN Lookup)', value: 'isbn', description: 'Get book metadata by ISBN-10 or ISBN-13 (e.g. 9780140328721)' }
+        ]
+      },
+      {
+        name: 'q',
+        label: 'Query (q)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. pride and prejudice',
+        description: 'General search keyword query (used with type=search).'
+      },
+      {
+        name: 'title',
+        label: 'Title',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. pride and prejudice',
+        description: 'Search by book title (used with type=search).'
+      },
+      {
+        name: 'value',
+        label: 'Value / Identifier',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. OL45804W',
+        description: 'Open Library identifier (work ID, edition ID, author ID, subject heading, or ISBN).'
+      }
+    ],
+    presets: [
+      {
+        id: 'open-library-search',
+        label: 'Book Search',
+        description: 'Search books for "pride and prejudice" (GET /open-library?type=search&q=pride+and+prejudice)',
+        queryParams: { type: 'search', q: 'pride and prejudice' }
+      },
+      {
+        id: 'open-library-work',
+        label: 'Work (OL45804W)',
+        description: 'Get work metadata by ID (GET /open-library?type=work&value=OL45804W)',
+        queryParams: { type: 'work', value: 'OL45804W' }
+      },
+      {
+        id: 'open-library-edition',
+        label: 'Edition (OL7353617M)',
+        description: 'Get edition metadata by ID (GET /open-library?type=edition&value=OL7353617M)',
+        queryParams: { type: 'edition', value: 'OL7353617M' }
+      },
+      {
+        id: 'open-library-author',
+        label: 'Author (OL23919A)',
+        description: 'Get author metadata by ID (GET /open-library?type=author&value=OL23919A)',
+        queryParams: { type: 'author', value: 'OL23919A' }
+      },
+      {
+        id: 'open-library-subject',
+        label: 'Subject (science_fiction)',
+        description: 'Get subject metadata (GET /open-library?type=subject&value=science_fiction)',
+        queryParams: { type: 'subject', value: 'science_fiction' }
+      },
+      {
+        id: 'open-library-isbn',
+        label: 'ISBN (9780140328721)',
+        description: 'Get book metadata by ISBN (GET /open-library?type=isbn&value=9780140328721)',
+        queryParams: { type: 'isbn', value: '9780140328721' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/open-library?type=search&q=pride+and+prejudice',
+    exampleCurl: 'curl "http://localhost:3000/open-library?type=search&q=pride+and+prejudice"',
+    responseExample: {
+      numFound: 1,
+      start: 0,
+      numFoundExact: true,
+      docs: [
+        {
+          key: '/works/OL45804W',
+          title: 'Pride and Prejudice',
+          author_name: ['Jane Austen'],
+          first_publish_year: 1813,
+          isbn: ['9780140328721'],
+          subject: ['Classic Literature', 'Sisters', 'Romance']
+        }
+      ]
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required identifier 'value' for operation 'work', 'edition', 'author', 'subject', or 'isbn'.",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Missing required 'value' parameter for type=work"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

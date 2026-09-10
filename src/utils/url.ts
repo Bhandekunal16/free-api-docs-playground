@@ -85,6 +85,27 @@ export function buildUrl(
         }
       }
 
+      // Special check: for open-library endpoint, omit default type=search (when empty) and non-applicable fields
+      if (endpoint.id === 'open-library') {
+        const op = queryParams.type || 'search';
+        const isSearchOp = op === 'search';
+        const isIdOp = ['work', 'edition', 'author', 'subject', 'isbn'].includes(op);
+
+        if (key === 'type' && (val === 'search' || val === '')) {
+          const hasSearchParam = (queryParams.q && queryParams.q.trim()) || (queryParams.title && queryParams.title.trim());
+          if (!hasSearchParam) {
+            return; // clean /open-library for default search with no parameters
+          }
+        }
+
+        if ((key === 'q' || key === 'title') && !isSearchOp) {
+          return;
+        }
+        if (key === 'value' && !isIdOp) {
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

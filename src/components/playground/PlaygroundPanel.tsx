@@ -127,6 +127,22 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Open Library endpoint
+    if (endpoint.id === 'open-library') {
+      const op = queryParams.type || 'search';
+      const isIdOp = ['work', 'edition', 'author', 'subject', 'isbn'].includes(op);
+      if (isIdOp && (!queryParams.value || !queryParams.value.trim())) {
+        const idLabel =
+          op === 'work' ? 'work ID (e.g. "OL45804W")' :
+          op === 'edition' ? 'edition ID (e.g. "OL7353617M")' :
+          op === 'author' ? 'author ID (e.g. "OL23919A")' :
+          op === 'subject' ? 'subject (e.g. "science_fiction")' :
+          'ISBN (e.g. "9780140328721")';
+        setValidationError(`The "${op}" operation requires an identifier in the "Value / Identifier" field (${idLabel}).`);
+        return;
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -223,6 +239,12 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const isGithubRepoRequired = isGithubEndpoint && param.name === 'repo' && isGithubRepoOp;
     const isGithubQueryRequired = isGithubEndpoint && param.name === 'q' && isGithubSearchOp;
 
+    // Context-awareness for Open Library API
+    const isOpenLibraryEndpoint = endpoint.id === 'open-library';
+    const selectedOpenLibraryType = queryParams.type || 'search';
+    const isOpenLibraryIdOp = ['work', 'edition', 'author', 'subject', 'isbn'].includes(selectedOpenLibraryType);
+    const isOpenLibraryValueRequired = isOpenLibraryEndpoint && param.name === 'value' && isOpenLibraryIdOp;
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -231,7 +253,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isGithubUsernameRequired ||
       isGithubOwnerRequired ||
       isGithubRepoRequired ||
-      isGithubQueryRequired;
+      isGithubQueryRequired ||
+      isOpenLibraryValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -266,6 +289,17 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. javascript (Required search query)';
     } else if (isGithubEndpoint && param.name === 'state' && selectedGithubType === 'repoIssues') {
       customPlaceholder = 'e.g. open (Optional state: open, closed, all)';
+    } else if (isOpenLibraryValueRequired) {
+      customPlaceholder =
+        selectedOpenLibraryType === 'work' ? 'e.g. OL45804W (Work ID)' :
+        selectedOpenLibraryType === 'edition' ? 'e.g. OL7353617M (Edition ID)' :
+        selectedOpenLibraryType === 'author' ? 'e.g. OL23919A (Author ID)' :
+        selectedOpenLibraryType === 'subject' ? 'e.g. science_fiction (Subject)' :
+        'e.g. 9780140328721 (ISBN-10 or ISBN-13)';
+    } else if (isOpenLibraryEndpoint && param.name === 'q') {
+      customPlaceholder = 'e.g. pride and prejudice (Optional search query)';
+    } else if (isOpenLibraryEndpoint && param.name === 'title') {
+      customPlaceholder = 'e.g. pride and prejudice (Optional title filter)';
     }
 
     return (
@@ -288,7 +322,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -334,6 +368,12 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? `Required: Search keyword query for operation "${selectedGithubType}"`
             : isGithubEndpoint && param.name === 'state'
             ? 'Optional issue state filter (open, closed, all)'
+            : isOpenLibraryValueRequired
+            ? `Required: Identifier for operation "${selectedOpenLibraryType}"`
+            : isOpenLibraryEndpoint && param.name === 'q'
+            ? 'Optional query keyword to search works and editions'
+            : isOpenLibraryEndpoint && param.name === 'title'
+            ? 'Optional title filter for book search'
             : param.description}
         </p>
       </div>
@@ -656,6 +696,72 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                             <div className="grid grid-cols-1 gap-3">
                               {endpoint.queryParams
                                 .filter(p => p.name === 'q')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'open-library' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Open Library Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">6 supported operations</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Operation-Specific Dynamic Inputs */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'search';
+                      const isSearchOp = selectedType === 'search';
+                      const isIdOp = ['work', 'edition', 'author', 'subject', 'isbn'].includes(selectedType);
+
+                      if (isSearchOp) {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Search Parameters
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">optional catalog query</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['q', 'title'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (isIdOp) {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                {selectedType === 'work' ? 'Work Identifier' :
+                                 selectedType === 'edition' ? 'Edition Identifier' :
+                                 selectedType === 'author' ? 'Author Identifier' :
+                                 selectedType === 'subject' ? 'Subject Identifier' :
+                                 'ISBN'}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">for type={selectedType}</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
                                 .map(renderQueryParamInput)}
                             </div>
                           </div>
