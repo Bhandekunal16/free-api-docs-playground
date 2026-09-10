@@ -350,11 +350,15 @@ Default Type: product`
             }
           },
           {
-            title: '2. Product Catalog Search',
-            body: 'Search for products matching a keyword like milk, organic, or chocolate:',
+            title: '2. Product Search & Category Filtering',
+            body: 'Search for products matching a category tag (e.g. beverages) or keyword (e.g. milk, chocolate):',
             codeBlock: {
               language: 'bash',
-              code: `curl "http://localhost:3000/open-food-facts?type=products&search_terms=milk"`
+              code: `# Filter products by category tag
+curl "http://localhost:3000/open-food-facts?type=products&categories_tags_en=beverages"
+
+# Search products by keyword
+curl "http://localhost:3000/open-food-facts?type=products&search_terms=milk"`
             }
           },
           {
@@ -420,6 +424,145 @@ curl "http://localhost:3000/open-food-facts?type=ingredients"`
   "statusCode": 400,
   "status": false,
   "message": "Missing required 'value' parameter for type=product"
+}`
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  'meal-db': {
+    id: 'meal-db',
+    title: 'TheMealDB API Reference',
+    category: 'reference',
+    shortDescription: 'Developer reference for TheMealDB API providing meal recipes, ingredients, categories, and cuisine lookups.',
+    icon: 'Utensils',
+    sections: [
+      {
+        heading: 'Endpoint Overview',
+        content: 'The `/meal-db` endpoint provides meal, recipe, category, area, and ingredient data from TheMealDB database. Requests forward upstream directly to https://www.themealdb.com/api/json/v1/1.'
+      },
+      {
+        heading: 'Supported Operations',
+        content: 'The endpoint supports 8 distinct operations controlled via the `type` query parameter:',
+        subsections: [
+          {
+            title: 'Operation Matrix',
+            body: 'Summary of supported operations, upstream routes, and required parameters:',
+            codeBlock: {
+              language: 'markdown',
+              code: `| Operation       | Upstream Endpoint           | Parameters                            | Description                             |
+|-----------------|-----------------------------|---------------------------------------|-----------------------------------------|
+| random          | /random.php                 | None (Default)                        | Get a single random meal recipe         |
+| randomSelection | /randomselection.php        | None                                  | Get a random selection of meals         |
+| lookup          | /lookup.php?i={value}       | value (Meal ID)                       | Lookup full meal details by ID          |
+| search          | /search.php?s={value}       | value (Meal Name)                     | Search meals by name                    |
+| filter          | /filter.php                 | category, area, and/or ingredient     | Filter meals by category, area, or item |
+| categories      | /categories.php             | None                                  | List all meal categories with images    |
+| areas           | /list.php?a=list            | None                                  | List all meal areas / cuisines          |
+| ingredients     | /list.php?i=list            | None                                  | List all meal ingredients               |`
+            }
+          }
+        ]
+      },
+      {
+        heading: 'Request Examples',
+        content: 'Common cURL commands for fetching random recipes, searching by name, looking up by ID, and filtering by category or area:',
+        subsections: [
+          {
+            title: '1. Random Meal & Random Selection',
+            body: 'Retrieve a single random recipe (default) or a batch of random meal selections:',
+            codeBlock: {
+              language: 'bash',
+              code: `# Single random meal (default)
+curl "http://localhost:3000/meal-db"
+
+# Random meal selection
+curl "http://localhost:3000/meal-db?type=randomSelection"`
+            }
+          },
+          {
+            title: '2. Meal ID Lookup & Search by Name',
+            body: 'Lookup a meal by its unique ID or search meals by title:',
+            codeBlock: {
+              language: 'bash',
+              code: `# Lookup meal by ID (52772)
+curl "http://localhost:3000/meal-db?type=lookup&value=52772"
+
+# Search meals by name (Arrabiata)
+curl "http://localhost:3000/meal-db?type=search&value=Arrabiata"`
+            }
+          },
+          {
+            title: '3. Filter by Category, Area, or Ingredient',
+            body: 'Filter meals by category, geographical area/cuisine, or main ingredient (at least one parameter required):',
+            codeBlock: {
+              language: 'bash',
+              code: `# Filter by category
+curl "http://localhost:3000/meal-db?type=filter&category=Seafood"
+
+# Filter by area / cuisine
+curl "http://localhost:3000/meal-db?type=filter&area=Indian"
+
+# Filter by ingredient
+curl "http://localhost:3000/meal-db?type=filter&ingredient=Chicken"`
+            }
+          },
+          {
+            title: '4. List Categories, Areas & Ingredients',
+            body: 'Retrieve taxonomies and listing entries without additional parameters:',
+            codeBlock: {
+              language: 'bash',
+              code: `# List meal categories
+curl "http://localhost:3000/meal-db?type=categories"
+
+# List meal areas / cuisines
+curl "http://localhost:3000/meal-db?type=areas"
+
+# List meal ingredients
+curl "http://localhost:3000/meal-db?type=ingredients"`
+            }
+          }
+        ]
+      },
+      {
+        heading: 'Response Payload & Status Codes',
+        content: 'Responses return standard TheMealDB JSON schema structures with HTTP status codes matching the request status:',
+        subsections: [
+          {
+            title: '200 OK — Successful Meal Query',
+            body: 'Contains the meals array with complete instructions, ingredients, measures, category, and tags:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "meals": [
+    {
+      "idMeal": "52772",
+      "strMeal": "Teriyaki Chicken Casserole",
+      "strCategory": "Chicken",
+      "strArea": "Japanese",
+      "strInstructions": "Preheat oven to 350° F. Spray a 9x13-inch baking dish with cooking spray...",
+      "strMealThumb": "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+      "strTags": "Meat,Casserole",
+      "strYoutube": "https://www.youtube.com/watch?v=4aZr5hZXP_s",
+      "strIngredient1": "soy sauce",
+      "strMeasure1": "3/4 cup"
+    }
+  ]
+}`
+            }
+          },
+          {
+            title: '400 Bad Request — Missing Required Parameter',
+            body: 'Returned when lookup/search is missing value, or filter is called without category, area, or ingredient:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "success": false,
+  "statusCode": 400,
+  "status": false,
+  "message": "Missing required 'value' parameter for type=lookup"
 }`
             }
           }

@@ -22,6 +22,7 @@ import {
   ShieldAlert,
   AlertTriangle,
   UtensilsCrossed,
+  Utensils,
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
@@ -57,6 +58,7 @@ export const Sidebar: React.FC = () => {
     github: false,
     openLibrary: false,
     gutendex: false,
+    mealDb: false,
     openFoodFacts: false
   });
 
@@ -87,6 +89,7 @@ export const Sidebar: React.FC = () => {
   const githubEndpoints = API_ENDPOINTS.filter(e => e.category === 'github');
   const openLibraryEndpoints = API_ENDPOINTS.filter(e => e.category === 'open-library');
   const gutendexEndpoints = API_ENDPOINTS.filter(e => e.category === 'gutendex');
+  const mealDbEndpoints = API_ENDPOINTS.filter(e => e.category === 'meal-db');
   const openFoodFactsEndpoints = API_ENDPOINTS.filter(e => e.category === 'open-food-facts');
 
   return (
@@ -232,7 +235,7 @@ export const Sidebar: React.FC = () => {
                 <span>Fake API</span>
               </span>
               <div className="flex items-center space-x-1">
-                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">5 routes</span>
+                <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">5 routes</span>
                 {collapsedSections.fake ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
               </div>
             </button>
@@ -924,7 +927,7 @@ export const Sidebar: React.FC = () => {
               <div className="flex items-center space-x-1.5">
                 <span className="flex items-center space-x-1 px-1.5 py-0.5 text-[9px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded">
                   <Lock size={9} />
-                  <span>Working on</span>
+                  <span>WORKING ON</span>
                 </span>
                 {collapsedSections.gutendex ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
               </div>
@@ -964,7 +967,55 @@ export const Sidebar: React.FC = () => {
             )}
           </div>
 
-          {/* 20. SECTION: OPEN FOOD FACTS */}
+          {/* 20. SECTION: THEMEALDB */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('mealDb')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Utensils size={12} className="text-amber-500" />
+                <span>TheMealDB</span>
+              </span>
+              <div className="flex items-center space-x-1.5">
+                <span className="px-1.5 py-0.2 text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 rounded font-mono">
+                  {mealDbEndpoints.length}
+                </span>
+                {collapsedSections.mealDb ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.mealDb && (
+              <div className="space-y-0.5 pt-0.5">
+                {mealDbEndpoints.map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 21. SECTION: OPEN FOOD FACTS */}
           <div className="space-y-1">
             <button
               onClick={() => toggleSection('openFoodFacts')}

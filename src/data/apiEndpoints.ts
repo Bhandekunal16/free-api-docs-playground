@@ -2667,15 +2667,29 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
         description: 'Target identifier or barcode required for specific item lookup operations.'
       },
       {
+        name: 'categories_tags_en',
+        label: 'Category Tag (categories_tags_en)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. beverages, plant-based-foods-and-beverages, snacks',
+        description: 'Category tag filter for products search (used with type=products).'
+      },
+      {
         name: 'search_terms',
         label: 'Search Terms',
         type: 'string',
         required: false,
-        placeholder: 'e.g. milk',
+        placeholder: 'e.g. milk, chocolate',
         description: 'Search keyword to filter products (used with type=products).'
       }
     ],
     presets: [
+      {
+        id: 'off-product-categories-search',
+        label: 'Products by Category (beverages)',
+        description: 'Search products by category tag (GET /open-food-facts?type=products&categories_tags_en=beverages)',
+        queryParams: { type: 'products', categories_tags_en: 'beverages' }
+      },
       {
         id: 'off-product-lookup',
         label: 'Product Lookup (737628064502)',
@@ -2701,8 +2715,8 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
         queryParams: { type: 'brand', value: 'nestle' }
       }
     ],
-    exampleRequestUrl: 'https://free-api-server.vercel.app/open-food-facts?type=product&value=737628064502',
-    exampleCurl: 'curl "http://localhost:3000/open-food-facts?type=product&value=737628064502"',
+    exampleRequestUrl: 'https://free-api-server.vercel.app/open-food-facts?type=products&categories_tags_en=beverages',
+    exampleCurl: 'curl "http://localhost:3000/open-food-facts?type=products&categories_tags_en=beverages"',
     responseExample: {
       code: '737628064502',
       product: {
@@ -2738,6 +2752,194 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
           statusCode: 400,
           status: false,
           message: "Missing required 'value' parameter for type=product"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
+  },
+
+  // 23. TheMealDB API
+  {
+    id: 'meal-db',
+    category: 'meal-db',
+    categoryTitle: 'TheMealDB',
+    method: 'GET',
+    path: '/meal-db',
+    title: 'TheMealDB API',
+    shortDescription: 'Provides meal, recipe, category, area, and ingredient data from TheMealDB.',
+    description: 'The TheMealDB API provides meal, recipe, category, area, and ingredient data from TheMealDB database. Responses forward data directly from TheMealDB API v1 (https://www.themealdb.com/api/json/v1/1).',
+    notes: [
+      'Upstream API: https://www.themealdb.com/api/json/v1/1',
+      'Response operation defaults to "random" (GET /meal-db).',
+      'Operation "lookup" requires the "value" parameter (Meal ID).',
+      'Operation "search" requires the "value" parameter (Meal Name).',
+      'Operation "filter" requires at least one of "category", "area", or "ingredient".',
+      'Operations "randomSelection", "categories", "areas", and "ingredients" require no additional parameters.',
+      'The endpoint is read-only.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'TheMealDB operation type; defaults to random.',
+        options: [
+          { label: 'random (Get a random meal - default)', value: 'random', description: 'Get a random meal' },
+          { label: 'randomSelection (Get a random selection of meals)', value: 'randomSelection', description: 'Get a random selection of meals' },
+          { label: 'lookup (Get a meal by ID)', value: 'lookup', description: 'Get a meal by ID (requires value=id)' },
+          { label: 'search (Search meals by name)', value: 'search', description: 'Search meals by name (requires value=name)' },
+          { label: 'filter (Filter meals by category, area, or ingredient)', value: 'filter', description: 'Filter meals by category, area, or ingredient' },
+          { label: 'categories (List meal categories)', value: 'categories', description: 'List meal categories' },
+          { label: 'areas (List meal areas / cuisines)', value: 'areas', description: 'List meal areas/cuisines' },
+          { label: 'ingredients (List meal ingredients)', value: 'ingredients', description: 'List meal ingredients' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Identifier / Query (value)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 52772 (ID for lookup) or Arrabiata (Name for search)',
+        description: 'Meal ID for lookup operation, or Meal Name for search operation.'
+      },
+      {
+        name: 'category',
+        label: 'Category',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Seafood, Beef, Vegetarian',
+        description: 'Category filter for filter operation (used with type=filter).'
+      },
+      {
+        name: 'area',
+        label: 'Area / Cuisine',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Indian, Italian, Mexican',
+        description: 'Area / Cuisine filter for filter operation (used with type=filter).'
+      },
+      {
+        name: 'ingredient',
+        label: 'Ingredient',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Chicken, Salmon, Garlic',
+        description: 'Ingredient filter for filter operation (used with type=filter).'
+      }
+    ],
+    presets: [
+      {
+        id: 'meal-preset-1-random',
+        label: 'Preset 1 — Random Meal',
+        description: 'Get a random meal (GET /meal-db)',
+        queryParams: { type: 'random' }
+      },
+      {
+        id: 'meal-preset-2-random-selection',
+        label: 'Preset 2 — Random Selection',
+        description: 'Get a random selection of meals (GET /meal-db?type=randomSelection)',
+        queryParams: { type: 'randomSelection' }
+      },
+      {
+        id: 'meal-preset-3-lookup',
+        label: 'Preset 3 — Meal by ID (52772)',
+        description: 'Lookup meal by ID (GET /meal-db?type=lookup&value=52772)',
+        queryParams: { type: 'lookup', value: '52772' }
+      },
+      {
+        id: 'meal-preset-4-search',
+        label: 'Preset 4 — Search Meal (Arrabiata)',
+        description: 'Search meals by name (GET /meal-db?type=search&value=Arrabiata)',
+        queryParams: { type: 'search', value: 'Arrabiata' }
+      },
+      {
+        id: 'meal-preset-5-filter-category',
+        label: 'Preset 5 — Seafood Category',
+        description: 'Filter meals by category (GET /meal-db?type=filter&category=Seafood)',
+        queryParams: { type: 'filter', category: 'Seafood' }
+      },
+      {
+        id: 'meal-preset-6-filter-area',
+        label: 'Preset 6 — Indian Cuisine',
+        description: 'Filter meals by area / cuisine (GET /meal-db?type=filter&area=Indian)',
+        queryParams: { type: 'filter', area: 'Indian' }
+      },
+      {
+        id: 'meal-preset-7-filter-ingredient',
+        label: 'Preset 7 — Chicken Ingredient',
+        description: 'Filter meals by main ingredient (GET /meal-db?type=filter&ingredient=Chicken)',
+        queryParams: { type: 'filter', ingredient: 'Chicken' }
+      },
+      {
+        id: 'meal-preset-8-categories',
+        label: 'Preset 8 — Categories',
+        description: 'List meal categories (GET /meal-db?type=categories)',
+        queryParams: { type: 'categories' }
+      },
+      {
+        id: 'meal-preset-9-areas',
+        label: 'Preset 9 — Areas',
+        description: 'List meal areas / cuisines (GET /meal-db?type=areas)',
+        queryParams: { type: 'areas' }
+      },
+      {
+        id: 'meal-preset-10-ingredients',
+        label: 'Preset 10 — Ingredients',
+        description: 'List meal ingredients (GET /meal-db?type=ingredients)',
+        queryParams: { type: 'ingredients' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/meal-db',
+    exampleCurl: 'curl http://localhost:3000/meal-db',
+    responseExample: {
+      meals: [
+        {
+          idMeal: '52772',
+          strMeal: 'Teriyaki Chicken Casserole',
+          strDrinkAlternate: null,
+          strCategory: 'Chicken',
+          strArea: 'Japanese',
+          strInstructions: 'Preheat oven to 350° F. Spray a 9x13-inch baking dish with cooking spray. Combine soy sauce, mirin, brown sugar, garlic, and ginger in a small saucepan. Heat over medium heat until sugar is dissolved. In a large bowl, combine chicken, cooked rice, and broccoli florets. Pour sauce over chicken mixture and toss to coat evenly. Transfer to prepared baking dish and bake for 30 minutes until bubbling.',
+          strMealThumb: 'https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg',
+          strTags: 'Meat,Casserole',
+          strYoutube: 'https://www.youtube.com/watch?v=4aZr5hZXP_s',
+          strIngredient1: 'soy sauce',
+          strIngredient2: 'water',
+          strIngredient3: 'brown sugar',
+          strIngredient4: 'garlic',
+          strIngredient5: 'ginger',
+          strIngredient6: 'chicken breasts',
+          strIngredient7: 'rice',
+          strIngredient8: 'broccoli',
+          strMeasure1: '3/4 cup',
+          strMeasure2: '1/2 cup',
+          strMeasure3: '1/4 cup',
+          strMeasure4: '2 cloves',
+          strMeasure5: '1 tbsp',
+          strMeasure6: '2 pieces',
+          strMeasure7: '2 cups',
+          strMeasure8: '1 cup',
+          strSource: 'https://findingtimeforcooking.com/main-dishes/casseroles/teriyaki-chicken-casserole/'
+        }
+      ]
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required 'value' for lookup/search, missing filter parameters, or invalid operation type.",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Missing required 'value' parameter for type=lookup"
         }
       },
       COMMON_STATUS_CODES[2],

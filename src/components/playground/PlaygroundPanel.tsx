@@ -176,6 +176,28 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate TheMealDB endpoint
+    if (endpoint.id === 'meal-db') {
+      const op = queryParams.type || 'random';
+      if (op === 'lookup' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Meal ID is required for lookup operation (e.g. "52772").');
+        return;
+      }
+      if (op === 'search' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Meal Name is required for search operation (e.g. "Arrabiata").');
+        return;
+      }
+      if (op === 'filter') {
+        const hasCategory = Boolean(queryParams.category && queryParams.category.trim());
+        const hasArea = Boolean(queryParams.area && queryParams.area.trim());
+        const hasIngredient = Boolean(queryParams.ingredient && queryParams.ingredient.trim());
+        if (!hasCategory && !hasArea && !hasIngredient) {
+          setValidationError('The "filter" operation requires at least one filter: Category, Area / Cuisine, or Ingredient.');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -292,6 +314,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     ].includes(selectedOpenFoodFactsType);
     const isOpenFoodFactsValueRequired = isOpenFoodFactsEndpoint && param.name === 'value' && isOpenFoodFactsIdOp;
 
+    // Context-awareness for TheMealDB API
+    const isMealDbEndpoint = endpoint.id === 'meal-db';
+    const selectedMealDbType = queryParams.type || 'random';
+    const isMealDbValueRequired = isMealDbEndpoint && param.name === 'value' && ['lookup', 'search'].includes(selectedMealDbType);
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -303,7 +330,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isGithubQueryRequired ||
       isOpenLibraryValueRequired ||
       isGutendexValueRequired ||
-      isOpenFoodFactsValueRequired;
+      isOpenFoodFactsValueRequired ||
+      isMealDbValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -363,8 +391,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
         selectedOpenFoodFactsType === 'allergen' ? 'e.g. en:peanuts (Allergen Identifier)' :
         selectedOpenFoodFactsType === 'label' ? 'e.g. en:organic (Label Identifier)' :
         'e.g. en:plastic (Packaging Material Identifier)';
+    } else if (isOpenFoodFactsEndpoint && param.name === 'categories_tags_en') {
+      customPlaceholder = 'e.g. beverages (Category filter for products)';
     } else if (isOpenFoodFactsEndpoint && param.name === 'search_terms') {
       customPlaceholder = 'e.g. milk (Optional product search query)';
+    } else if (isMealDbEndpoint && param.name === 'value') {
+      customPlaceholder = selectedMealDbType === 'lookup' ? 'e.g. 52772 (Required Meal ID)' : 'e.g. Arrabiata (Required Meal Name)';
+    } else if (isMealDbEndpoint && param.name === 'category') {
+      customPlaceholder = 'e.g. Seafood, Beef, Vegetarian';
+    } else if (isMealDbEndpoint && param.name === 'area') {
+      customPlaceholder = 'e.g. Indian, Italian, Mexican';
+    } else if (isMealDbEndpoint && param.name === 'ingredient') {
+      customPlaceholder = 'e.g. Chicken, Salmon, Garlic';
     }
 
     return (
@@ -387,7 +425,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -445,8 +483,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? 'Optional search term to filter Project Gutenberg catalog'
             : isOpenFoodFactsValueRequired
             ? `Required: Identifier for operation "${selectedOpenFoodFactsType}"`
+            : isOpenFoodFactsEndpoint && param.name === 'categories_tags_en'
+            ? 'Optional category tag to filter products (e.g. beverages, snacks)'
             : isOpenFoodFactsEndpoint && param.name === 'search_terms'
             ? 'Optional search keyword to filter products catalog'
+            : isMealDbValueRequired
+            ? `Required: ${selectedMealDbType === 'lookup' ? 'Meal ID' : 'Meal Name'} for operation "${selectedMealDbType}"`
+            : isMealDbEndpoint && param.name === 'category'
+            ? 'Filter meals by category (e.g. Seafood, Beef)'
+            : isMealDbEndpoint && param.name === 'area'
+            ? 'Filter meals by area / cuisine (e.g. Indian, Italian)'
+            : isMealDbEndpoint && param.name === 'ingredient'
+            ? 'Filter meals by main ingredient (e.g. Chicken, Salmon)'
             : param.description}
         </p>
       </div>
@@ -960,13 +1008,13 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                           <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                             <div className="flex items-center justify-between">
                               <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                                Product Search Parameters
+                                Product Search & Filter Parameters
                               </span>
-                              <span className="text-[10px] text-slate-400 font-mono">optional search query</span>
+                              <span className="text-[10px] text-slate-400 font-mono">optional category and search filters</span>
                             </div>
-                            <div className="grid grid-cols-1 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {endpoint.queryParams
-                                .filter(p => p.name === 'search_terms')
+                                .filter(p => p.name === 'categories_tags_en' || p.name === 'search_terms')
                                 .map(renderQueryParamInput)}
                             </div>
                           </div>
@@ -1018,6 +1066,123 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                             <span>{listDescriptions[selectedType] || 'List entries'}. No additional parameters required.</span>
                             <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
                               GET /open-food-facts?type={selectedType}
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'meal-db' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          1. Select Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">defaults to random (GET /meal-db)</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Contextual Parameters based on Operation */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'random';
+
+                      if (selectedType === 'random') {
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>Get a random meal. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /meal-db
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'randomSelection') {
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>Get a random selection of meals. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /meal-db?type=randomSelection
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'lookup') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Meal Identifier
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">required for type=lookup</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'search') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Meal Search Query
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">required for type=search</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'filter') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Filter Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Provide at least one filter</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'category' || p.name === 'area' || p.name === 'ingredient')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (['categories', 'areas', 'ingredients'].includes(selectedType)) {
+                        const labels: Record<string, string> = {
+                          categories: 'List meal categories',
+                          areas: 'List meal areas / cuisines',
+                          ingredients: 'List meal ingredients'
+                        };
+
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>{labels[selectedType]}. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /meal-db?type={selectedType}
                             </span>
                           </div>
                         );

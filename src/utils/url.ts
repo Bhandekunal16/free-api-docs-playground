@@ -136,10 +136,31 @@ export function buildUrl(
           'allergen', 'label', 'packagingMaterial'
         ].includes(op);
 
-        if (key === 'search_terms' && !isProductsOp) {
+        if ((key === 'search_terms' || key === 'categories_tags_en') && !isProductsOp) {
           return;
         }
         if (key === 'value' && !isIdentifierOp) {
+          return;
+        }
+      }
+
+      // Special check: for meal-db endpoint, omit default type=random and non-applicable fields
+      if (endpoint.id === 'meal-db') {
+        const op = queryParams.type || 'random';
+        if (key === 'type' && (val === 'random' || val === '')) {
+          return; // 'random' is default operation, produces clean /meal-db
+        }
+        const isNoParamOp = ['random', 'randomSelection', 'categories', 'areas', 'ingredients'].includes(op);
+        const isValueOp = ['lookup', 'search'].includes(op);
+        const isFilterOp = op === 'filter';
+
+        if (isNoParamOp && (key === 'value' || key === 'category' || key === 'area' || key === 'ingredient')) {
+          return;
+        }
+        if (isValueOp && (key === 'category' || key === 'area' || key === 'ingredient')) {
+          return;
+        }
+        if (isFilterOp && key === 'value') {
           return;
         }
       }
