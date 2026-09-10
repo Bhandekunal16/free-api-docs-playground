@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ShieldAlert, AlertTriangle, Copy, Check, ArrowRight, Play, ExternalLink } from 'lucide-react';
+import { BookOpen, ShieldAlert, AlertTriangle, UtensilsCrossed, Copy, Check, ArrowRight, Play, ExternalLink } from 'lucide-react';
 import { DOC_ARTICLES } from '../../data/docSections';
 import { useApi } from '../../context/ApiContext';
 
@@ -24,6 +24,8 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         return <ShieldAlert size={24} className="text-amber-500" />;
       case 'AlertTriangle':
         return <AlertTriangle size={24} className="text-rose-500" />;
+      case 'UtensilsCrossed':
+        return <UtensilsCrossed size={24} className="text-emerald-500" />;
       default:
         return <BookOpen size={24} className="text-slate-700 dark:text-slate-300" />;
     }
@@ -112,14 +114,21 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         <div className="space-y-1">
           <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Ready to test endpoints?</h4>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            Open the interactive playground to test fake collections, weather models, and country lookups.
+            {docId === 'open-food-facts'
+              ? 'Open the interactive playground to test Open Food Facts barcode lookups and searches.'
+              : 'Open the interactive playground to test fake collections, weather models, and country lookups.'}
           </p>
         </div>
         <button
-          onClick={() => setActiveSelection({ type: 'endpoint', id: 'fake-collection' })}
+          onClick={() =>
+            setActiveSelection({
+              type: 'endpoint',
+              id: docId === 'open-food-facts' ? 'open-food-facts' : 'fake-collection'
+            })
+          }
           className="inline-flex items-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-lg text-xs font-semibold transition-colors shadow-sm shrink-0"
         >
-          <span>Try Fake API</span>
+          <span>{docId === 'open-food-facts' ? 'Try Open Food Facts' : 'Try Fake API'}</span>
           <ArrowRight size={14} />
         </button>
       </div>

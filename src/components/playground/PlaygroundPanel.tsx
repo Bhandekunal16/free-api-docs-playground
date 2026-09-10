@@ -951,7 +951,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                         'allergen', 'label', 'packagingMaterial'
                       ].includes(selectedType);
                       const isListOp = [
-                        'categories', 'brands', 'ingredients', 'additives',
+                        'categories', 'brands', 'countries', 'ingredients', 'additives',
                         'allergens', 'labels', 'packaging'
                       ].includes(selectedType);
 
@@ -1005,6 +1005,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                         const listDescriptions: Record<string, string> = {
                           categories: 'List known product categories',
                           brands: 'List brands',
+                          countries: 'List countries',
                           ingredients: 'List ingredients',
                           additives: 'List additives',
                           allergens: 'List allergens',

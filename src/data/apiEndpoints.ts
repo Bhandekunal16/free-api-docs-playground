@@ -2645,6 +2645,7 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
           { label: 'category (Category Details)', value: 'category', description: 'Category identifier lookup (requires value)' },
           { label: 'brands (List Brands)', value: 'brands', description: 'List brands' },
           { label: 'brand (Brand Details)', value: 'brand', description: 'Brand identifier lookup (requires value)' },
+          { label: 'countries (List Countries)', value: 'countries', description: 'List countries' },
           { label: 'ingredients (List Ingredients)', value: 'ingredients', description: 'List ingredients' },
           { label: 'ingredient (Ingredient Details)', value: 'ingredient', description: 'Ingredient identifier lookup (requires value)' },
           { label: 'additives (List Additives)', value: 'additives', description: 'List additives' },

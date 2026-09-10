@@ -165,6 +165,18 @@ export const Sidebar: React.FC = () => {
                   <AlertTriangle size={14} className="shrink-0 text-rose-600 dark:text-rose-400" />
                   <span className="truncate">Error Handling</span>
                 </button>
+
+                <button
+                  onClick={() => handleSelect('doc', 'open-food-facts')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'open-food-facts'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <UtensilsCrossed size={14} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span className="truncate">Open Food Facts Guide</span>
+                </button>
               </div>
             )}
           </div>

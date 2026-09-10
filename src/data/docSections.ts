@@ -270,5 +270,161 @@ https://free-api-server.vercel.app`
         ]
       }
     ]
+  },
+
+  'open-food-facts': {
+    id: 'open-food-facts',
+    title: 'Open Food Facts API Guide',
+    category: 'reference',
+    shortDescription: 'Complete developer documentation for Open Food Facts API: product barcode lookup, search, categories, brands, countries, ingredients, additives, allergens, labels, and packaging metadata.',
+    icon: 'UtensilsCrossed',
+    sections: [
+      {
+        heading: 'Overview & Upstream Configuration',
+        content: 'The Open Food Facts API exposes comprehensive product metadata, product catalog search, and nutritional taxonomies sourced from the global Open Food Facts database. All operations are read-only GET requests with zero authentication required.',
+        subsections: [
+          {
+            title: 'Endpoint Specification',
+            body: 'Direct GET requests to /open-food-facts with operation types configured via query parameters:',
+            codeBlock: {
+              language: 'text',
+              code: `Endpoint:     GET /open-food-facts
+Base URL:     http://localhost:3000
+Upstream API: https://world.openfoodfacts.org/api/v2
+Timeout:      15000ms (15 seconds)
+Default Type: product`
+            }
+          },
+          {
+            title: 'Authentication & Headers',
+            body: 'No API keys, bearer tokens, or client credentials are required. Requests automatically forward headers to the upstream Open Food Facts API v2.'
+          }
+        ]
+      },
+      {
+        heading: 'Supported Operations & Parameter Contract',
+        content: 'The endpoint accepts a type parameter selecting the target operation. Operations requiring an identifier validate that the value parameter is present and return 400 Bad Request when missing.',
+        subsections: [
+          {
+            title: 'Operations Reference Table',
+            body: 'Supported operation types and their corresponding upstream routes and parameter requirements:',
+            codeBlock: {
+              language: 'text',
+              code: `| Type              | Upstream Path          | Required Params | Description                              |
+| ----------------- | ---------------------- | --------------- | ---------------------------------------- |
+| product (default) | /product/{barcode}     | value           | Product details by barcode (e.g. 737628064502) |
+| products          | /search                | None            | Search products (optional search_terms)  |
+| categories        | /categories            | None            | List product categories                  |
+| category          | /categories/{id}       | value           | Category details by identifier           |
+| brands            | /brands                | None            | List brands                              |
+| brand             | /brands/{id}           | value           | Brand details by identifier              |
+| countries         | /countries             | None            | List countries                           |
+| ingredients       | /ingredients           | None            | List ingredients                         |
+| ingredient        | /ingredients/{id}      | value           | Ingredient details by identifier         |
+| additives         | /additives             | None            | List additives                           |
+| additive          | /additives/{id}        | value           | Additive details by identifier           |
+| allergens         | /allergens             | None            | List allergens                           |
+| allergen          | /allergens/{id}        | value           | Allergen details by identifier           |
+| labels            | /labels                | None            | List labels                              |
+| label             | /labels/{id}           | value           | Label details by identifier              |
+| packaging         | /packaging             | None            | List packaging entries                   |
+| packagingMaterial | /packaging/{id}        | value           | Packaging material details by identifier |`
+            }
+          },
+          {
+            title: 'Barcode Lookup vs. Taxonomy Search',
+            body: 'For type=product, the value parameter is mapped to the upstream {barcode} path parameter. For type=products, search_terms (and any additional query filters) are forwarded as query parameters.'
+          }
+        ]
+      },
+      {
+        heading: 'Request Examples',
+        content: 'Common cURL commands for fetching product data, searching catalog items, and exploring taxonomies:',
+        subsections: [
+          {
+            title: '1. Product Barcode Lookup',
+            body: 'Fetch complete nutritional facts, nutriscore, ingredients, and allergen data for a barcode:',
+            codeBlock: {
+              language: 'bash',
+              code: `curl "http://localhost:3000/open-food-facts?type=product&value=737628064502"`
+            }
+          },
+          {
+            title: '2. Product Catalog Search',
+            body: 'Search for products matching a keyword like milk, organic, or chocolate:',
+            codeBlock: {
+              language: 'bash',
+              code: `curl "http://localhost:3000/open-food-facts?type=products&search_terms=milk"`
+            }
+          },
+          {
+            title: '3. Taxonomies & Listings',
+            body: 'Query categories, brands, countries, ingredients, additives, allergens, labels, or packaging:',
+            codeBlock: {
+              language: 'bash',
+              code: `# List categories
+curl "http://localhost:3000/open-food-facts?type=categories"
+
+# Category detail
+curl "http://localhost:3000/open-food-facts?type=category&value=beverages"
+
+# List brands
+curl "http://localhost:3000/open-food-facts?type=brands"
+
+# List countries
+curl "http://localhost:3000/open-food-facts?type=countries"
+
+# List ingredients
+curl "http://localhost:3000/open-food-facts?type=ingredients"`
+            }
+          }
+        ]
+      },
+      {
+        heading: 'Response Payload & Status Codes',
+        content: 'Responses include standard Open Food Facts API v2 schema structures with HTTP status codes matching the request status:',
+        subsections: [
+          {
+            title: '200 OK — Successful Product Lookup',
+            body: 'Contains the product object with nutriments, nutriscore_grade, nova_group, and ingredients_text:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "code": "737628064502",
+  "product": {
+    "_id": "737628064502",
+    "product_name": "Thai Peanut Noodle Kit",
+    "brands": "Simply Asia",
+    "categories": "Plant-based foods, Meals, Noodle dishes",
+    "nutriments": {
+      "energy-kcal_100g": 380,
+      "fat_100g": 12,
+      "carbohydrates_100g": 56,
+      "proteins_100g": 10
+    },
+    "nutriscore_grade": "d",
+    "nova_group": 4
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}`
+            }
+          },
+          {
+            title: '400 Bad Request — Missing Required Value',
+            body: 'Returned when an identifier-based operation (like product, category, brand, etc.) is called without a value parameter:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "success": false,
+  "statusCode": 400,
+  "status": false,
+  "message": "Missing required 'value' parameter for type=product"
+}`
+            }
+          }
+        ]
+      }
+    ]
   }
 };
