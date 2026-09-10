@@ -198,6 +198,29 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate TheCocktailDB endpoint
+    if (endpoint.id === 'cocktail-db') {
+      const op = queryParams.type || 'random';
+      if (op === 'lookup' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Cocktail ID is required for lookup operation (e.g. "11007").');
+        return;
+      }
+      if (op === 'search' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Cocktail Name is required for search operation (e.g. "margarita").');
+        return;
+      }
+      if (op === 'filter') {
+        const hasIngredient = Boolean(queryParams.ingredient && queryParams.ingredient.trim());
+        const hasCategory = Boolean(queryParams.category && queryParams.category.trim());
+        const hasAlcoholic = Boolean(queryParams.alcoholic && queryParams.alcoholic.trim());
+        const hasGlass = Boolean(queryParams.glass && queryParams.glass.trim());
+        if (!hasIngredient && !hasCategory && !hasAlcoholic && !hasGlass) {
+          setValidationError('The "filter" operation requires at least one filter: Ingredient, Category, Alcoholic, or Glass.');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -319,6 +342,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const selectedMealDbType = queryParams.type || 'random';
     const isMealDbValueRequired = isMealDbEndpoint && param.name === 'value' && ['lookup', 'search'].includes(selectedMealDbType);
 
+    // Context-awareness for TheCocktailDB API
+    const isCocktailDbEndpoint = endpoint.id === 'cocktail-db';
+    const selectedCocktailDbType = queryParams.type || 'random';
+    const isCocktailDbValueRequired = isCocktailDbEndpoint && param.name === 'value' && ['lookup', 'search'].includes(selectedCocktailDbType);
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -331,7 +359,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isOpenLibraryValueRequired ||
       isGutendexValueRequired ||
       isOpenFoodFactsValueRequired ||
-      isMealDbValueRequired;
+      isMealDbValueRequired ||
+      isCocktailDbValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -403,6 +432,16 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. Indian, Italian, Mexican';
     } else if (isMealDbEndpoint && param.name === 'ingredient') {
       customPlaceholder = 'e.g. Chicken, Salmon, Garlic';
+    } else if (isCocktailDbEndpoint && param.name === 'value') {
+      customPlaceholder = selectedCocktailDbType === 'lookup' ? '11007' : 'margarita';
+    } else if (isCocktailDbEndpoint && param.name === 'ingredient') {
+      customPlaceholder = 'e.g. Gin, Vodka, Tequila';
+    } else if (isCocktailDbEndpoint && param.name === 'category') {
+      customPlaceholder = 'e.g. Cocktail, Ordinary Drink, Shot';
+    } else if (isCocktailDbEndpoint && param.name === 'alcoholic') {
+      customPlaceholder = 'e.g. Alcoholic, Non_Alcoholic';
+    } else if (isCocktailDbEndpoint && param.name === 'glass') {
+      customPlaceholder = 'e.g. Cocktail_glass, Highball_glass';
     }
 
     return (
@@ -425,7 +464,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -495,6 +534,16 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? 'Filter meals by area / cuisine (e.g. Indian, Italian)'
             : isMealDbEndpoint && param.name === 'ingredient'
             ? 'Filter meals by main ingredient (e.g. Chicken, Salmon)'
+            : isCocktailDbValueRequired
+            ? `Required: ${selectedCocktailDbType === 'lookup' ? 'Cocktail ID' : 'Cocktail Name'} for operation "${selectedCocktailDbType}"`
+            : isCocktailDbEndpoint && param.name === 'ingredient'
+            ? 'Filter cocktails by ingredient (e.g. Gin, Vodka)'
+            : isCocktailDbEndpoint && param.name === 'category'
+            ? 'Filter cocktails by category (e.g. Cocktail, Shot)'
+            : isCocktailDbEndpoint && param.name === 'alcoholic'
+            ? 'Filter cocktails by alcoholic classification (e.g. Alcoholic, Non_Alcoholic)'
+            : isCocktailDbEndpoint && param.name === 'glass'
+            ? 'Filter cocktails by glass type (e.g. Cocktail_glass, Highball_glass)'
             : param.description}
         </p>
       </div>
@@ -1183,6 +1232,124 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                             <span>{labels[selectedType]}. No additional parameters required.</span>
                             <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
                               GET /meal-db?type={selectedType}
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'cocktail-db' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          1. Select Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">defaults to random (GET /cocktail-db)</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Contextual Parameters based on Operation */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'random';
+
+                      if (selectedType === 'random') {
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>Get a random cocktail. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /cocktail-db
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'randomMultiple') {
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>Get a random selection of cocktails. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /cocktail-db?type=randomMultiple
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'lookup') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Cocktail ID
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">required for type=lookup</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'search') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Cocktail Name
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">required for type=search</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'filter') {
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Filter Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Provide at least one filter</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'ingredient' || p.name === 'category' || p.name === 'alcoholic' || p.name === 'glass')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (['categories', 'glass', 'ingredients', 'alcoholic'].includes(selectedType)) {
+                        const labels: Record<string, string> = {
+                          categories: 'List cocktail categories',
+                          glass: 'List glass types',
+                          ingredients: 'List cocktail ingredients',
+                          alcoholic: 'List alcoholic classifications'
+                        };
+
+                        return (
+                          <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>{labels[selectedType]}. No additional parameters required.</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                              GET /cocktail-db?type={selectedType}
                             </span>
                           </div>
                         );

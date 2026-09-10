@@ -165,6 +165,27 @@ export function buildUrl(
         }
       }
 
+      // Special check: for cocktail-db endpoint, omit default type=random and non-applicable fields
+      if (endpoint.id === 'cocktail-db') {
+        const op = queryParams.type || 'random';
+        if (key === 'type' && (val === 'random' || val === '')) {
+          return; // 'random' is default operation, produces clean /cocktail-db
+        }
+        const isNoParamOp = ['random', 'randomMultiple', 'categories', 'glass', 'ingredients', 'alcoholic'].includes(op);
+        const isValueOp = ['lookup', 'search'].includes(op);
+        const isFilterOp = op === 'filter';
+
+        if (isNoParamOp && (key === 'value' || key === 'ingredient' || key === 'category' || key === 'alcoholic' || key === 'glass')) {
+          return;
+        }
+        if (isValueOp && (key === 'ingredient' || key === 'category' || key === 'alcoholic' || key === 'glass')) {
+          return;
+        }
+        if (isFilterOp && key === 'value') {
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

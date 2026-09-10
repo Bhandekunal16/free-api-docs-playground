@@ -2947,6 +2947,208 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 24. TheCocktailDB API
+  {
+    id: 'cocktail-db',
+    category: 'cocktail-db',
+    categoryTitle: 'TheCocktailDB',
+    method: 'GET',
+    path: '/cocktail-db',
+    title: 'TheCocktailDB API',
+    shortDescription: 'Provides cocktail recipes, search, filters, categories, glass types, ingredients, and alcoholic classifications.',
+    description: 'The TheCocktailDB API provides cocktail recipes, search, filters, categories, glass types, ingredients, and alcoholic classifications from TheCocktailDB database. Responses forward data directly from TheCocktailDB API v1 (https://www.thecocktaildb.com/api/json/v1/1).',
+    notes: [
+      'Upstream API: https://www.thecocktaildb.com/api/json/v1/1',
+      'Response operation defaults to "random" (GET /cocktail-db).',
+      'Operation "lookup" requires the "value" parameter (Cocktail ID, e.g. 11007).',
+      'Operation "search" requires the "value" parameter (Cocktail Name, e.g. margarita).',
+      'Operation "filter" requires at least one of "ingredient", "category", "alcoholic", or "glass".',
+      'Operations "randomMultiple", "categories", "glass", "ingredients", and "alcoholic" require no additional parameters.',
+      'The endpoint is read-only.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'TheCocktailDB operation type; defaults to random.',
+        options: [
+          { label: 'random (Random Cocktail - default)', value: 'random', description: 'Get a random cocktail' },
+          { label: 'randomMultiple (Random Multiple Cocktails)', value: 'randomMultiple', description: 'Get a random selection of cocktails' },
+          { label: 'lookup (Lookup Cocktail)', value: 'lookup', description: 'Get a cocktail by ID (requires value=id)' },
+          { label: 'search (Search Cocktails)', value: 'search', description: 'Search cocktails by name (requires value=name)' },
+          { label: 'filter (Filter Cocktails)', value: 'filter', description: 'Filter cocktails by ingredient, category, alcoholic type, or glass' },
+          { label: 'categories (Categories)', value: 'categories', description: 'List cocktail categories' },
+          { label: 'glass (Glass Types)', value: 'glass', description: 'List glass types' },
+          { label: 'ingredients (Ingredients)', value: 'ingredients', description: 'List cocktail ingredients' },
+          { label: 'alcoholic (Alcoholic Classifications)', value: 'alcoholic', description: 'List alcoholic classifications' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Identifier / Query (value)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 11007 (Cocktail ID) or margarita (Cocktail Name)',
+        description: 'Cocktail ID for lookup operation, or Cocktail Name for search operation.'
+      },
+      {
+        name: 'ingredient',
+        label: 'Ingredient',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Gin, Vodka, Tequila',
+        description: 'Ingredient filter for filter operation (used with type=filter).'
+      },
+      {
+        name: 'category',
+        label: 'Category',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Cocktail, Ordinary Drink, Shot',
+        description: 'Category filter for filter operation (used with type=filter).'
+      },
+      {
+        name: 'alcoholic',
+        label: 'Alcoholic Classification',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Alcoholic, Non_Alcoholic, Optional alcohol',
+        description: 'Alcoholic classification filter for filter operation (used with type=filter).'
+      },
+      {
+        name: 'glass',
+        label: 'Glass Type',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Cocktail_glass, Highball_glass, Champagne_flute',
+        description: 'Glass type filter for filter operation (used with type=filter).'
+      }
+    ],
+    presets: [
+      {
+        id: 'cocktail-preset-1-random',
+        label: 'Preset 1 — Random Cocktail',
+        description: 'Get a random cocktail (GET /cocktail-db)',
+        queryParams: { type: 'random' }
+      },
+      {
+        id: 'cocktail-preset-2-random-multiple',
+        label: 'Preset 2 — Random Multiple Cocktails',
+        description: 'Get a random selection of cocktails (GET /cocktail-db?type=randomMultiple)',
+        queryParams: { type: 'randomMultiple' }
+      },
+      {
+        id: 'cocktail-preset-3-lookup',
+        label: 'Preset 3 — Lookup Cocktail (11007)',
+        description: 'Lookup cocktail by ID (GET /cocktail-db?type=lookup&value=11007)',
+        queryParams: { type: 'lookup', value: '11007' }
+      },
+      {
+        id: 'cocktail-preset-4-search',
+        label: 'Preset 4 — Search Cocktails (margarita)',
+        description: 'Search cocktails by name (GET /cocktail-db?type=search&value=margarita)',
+        queryParams: { type: 'search', value: 'margarita' }
+      },
+      {
+        id: 'cocktail-preset-5-filter-ingredient',
+        label: 'Preset 5 — Filter by Ingredient (Gin)',
+        description: 'Filter cocktails by ingredient (GET /cocktail-db?type=filter&ingredient=Gin)',
+        queryParams: { type: 'filter', ingredient: 'Gin' }
+      },
+      {
+        id: 'cocktail-preset-6-filter-category',
+        label: 'Preset 6 — Filter by Category (Cocktail)',
+        description: 'Filter cocktails by category (GET /cocktail-db?type=filter&category=Cocktail)',
+        queryParams: { type: 'filter', category: 'Cocktail' }
+      },
+      {
+        id: 'cocktail-preset-7-filter-alcoholic',
+        label: 'Preset 7 — Filter by Alcoholic (Alcoholic)',
+        description: 'Filter cocktails by classification (GET /cocktail-db?type=filter&alcoholic=Alcoholic)',
+        queryParams: { type: 'filter', alcoholic: 'Alcoholic' }
+      },
+      {
+        id: 'cocktail-preset-8-filter-glass',
+        label: 'Preset 8 — Filter by Glass (Cocktail_glass)',
+        description: 'Filter cocktails by glass type (GET /cocktail-db?type=filter&glass=Cocktail_glass)',
+        queryParams: { type: 'filter', glass: 'Cocktail_glass' }
+      },
+      {
+        id: 'cocktail-preset-9-categories',
+        label: 'Preset 9 — Categories',
+        description: 'List cocktail categories (GET /cocktail-db?type=categories)',
+        queryParams: { type: 'categories' }
+      },
+      {
+        id: 'cocktail-preset-10-glass',
+        label: 'Preset 10 — Glass Types',
+        description: 'List glass types (GET /cocktail-db?type=glass)',
+        queryParams: { type: 'glass' }
+      },
+      {
+        id: 'cocktail-preset-11-ingredients',
+        label: 'Preset 11 — Ingredients',
+        description: 'List cocktail ingredients (GET /cocktail-db?type=ingredients)',
+        queryParams: { type: 'ingredients' }
+      },
+      {
+        id: 'cocktail-preset-12-alcoholic',
+        label: 'Preset 12 — Alcoholic Classifications',
+        description: 'List alcoholic classifications (GET /cocktail-db?type=alcoholic)',
+        queryParams: { type: 'alcoholic' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/cocktail-db',
+    exampleCurl: 'curl http://localhost:3000/cocktail-db',
+    responseExample: {
+      drinks: [
+        {
+          idDrink: '11007',
+          strDrink: 'Margarita',
+          strDrinkAlternate: null,
+          strTags: 'IBA,ContemporaryClassic',
+          strVideo: null,
+          strCategory: 'Ordinary Drink',
+          strIBA: 'Contemporary Classics',
+          strAlcoholic: 'Alcoholic',
+          strGlass: 'Cocktail glass',
+          strInstructions: 'Rub the rim of the glass with the lime slice to make the salt stick to it. Take care to moisten only the outer rim and sprinkle the salt on it. The salt should present to the lips of the imbiber and never mix into the cocktail. Shake the other ingredients with ice, then carefully pour into the glass.',
+          strDrinkThumb: 'https://www.thecocktaildb.com/images/media/drink/5noda61589575158.jpg',
+          strIngredient1: 'Tequila',
+          strIngredient2: 'Triple sec',
+          strIngredient3: 'Lime juice',
+          strIngredient4: 'Salt',
+          strMeasure1: '1 1/2 oz',
+          strMeasure2: '1/2 oz',
+          strMeasure3: '1 oz',
+          strMeasure4: null
+        }
+      ]
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required 'value' for lookup/search, missing filter parameters, or invalid operation type.",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Missing required 'value' parameter for type=lookup"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

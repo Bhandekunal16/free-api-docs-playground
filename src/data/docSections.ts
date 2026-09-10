@@ -569,5 +569,154 @@ curl "http://localhost:3000/meal-db?type=ingredients"`
         ]
       }
     ]
+  },
+
+  'cocktail-db': {
+    id: 'cocktail-db',
+    title: 'TheCocktailDB API Reference',
+    category: 'reference',
+    shortDescription: 'Developer reference for TheCocktailDB API providing cocktail recipes, search, filters, categories, glass types, ingredients, and alcoholic classifications.',
+    icon: 'Wine',
+    sections: [
+      {
+        heading: 'Endpoint Overview',
+        content: 'The `/cocktail-db` endpoint provides cocktail recipes, search, filters, categories, glass types, ingredients, and alcoholic classifications from TheCocktailDB database. Requests forward upstream directly to https://www.thecocktaildb.com/api/json/v1/1.'
+      },
+      {
+        heading: 'Supported Operations',
+        content: 'The endpoint supports 9 distinct operations controlled via the `type` query parameter:',
+        subsections: [
+          {
+            title: 'Operation Matrix',
+            body: 'Summary of supported operations, upstream routes, and required parameters:',
+            codeBlock: {
+              language: 'markdown',
+              code: `| Operation       | Upstream Endpoint           | Parameters                            | Description                             |
+|-----------------|-----------------------------|---------------------------------------|-----------------------------------------|
+| random          | /random.php                 | None (Default)                        | Get a random cocktail                   |
+| randomMultiple  | /randomselection.php        | None                                  | Get a random selection of cocktails     |
+| lookup          | /lookup.php?i={value}       | value (Cocktail ID)                   | Lookup full cocktail details by ID      |
+| search          | /search.php?s={value}       | value (Cocktail Name)                 | Search cocktails by name                |
+| filter          | /filter.php                 | ingredient, category, alcoholic, glass| Filter cocktails by attribute           |
+| categories      | /list.php?c=list            | None                                  | List all cocktail categories            |
+| glass           | /list.php?g=list            | None                                  | List all glass types                    |
+| ingredients     | /list.php?i=list            | None                                  | List all cocktail ingredients           |
+| alcoholic       | /list.php?a=list            | None                                  | List alcoholic classifications          |`
+            }
+          }
+        ]
+      },
+      {
+        heading: 'Request Examples',
+        content: 'Common cURL commands for fetching random cocktails, searching by name, looking up by ID, and filtering by ingredient, category, alcoholic type, or glass:',
+        subsections: [
+          {
+            title: '1. Random Cocktail & Random Multiple',
+            body: 'Retrieve a single random recipe (default) or a selection of multiple random cocktails:',
+            codeBlock: {
+              language: 'bash',
+              code: `# Single random cocktail (default)
+curl "http://localhost:3000/cocktail-db"
+
+# Random multiple cocktails
+curl "http://localhost:3000/cocktail-db?type=randomMultiple"`
+            }
+          },
+          {
+            title: '2. Cocktail ID Lookup & Search by Name',
+            body: 'Lookup a cocktail by ID or search cocktails by name:',
+            codeBlock: {
+              language: 'bash',
+              code: `# Lookup cocktail by ID (11007)
+curl "http://localhost:3000/cocktail-db?type=lookup&value=11007"
+
+# Search cocktails by name (margarita)
+curl "http://localhost:3000/cocktail-db?type=search&value=margarita"`
+            }
+          },
+          {
+            title: '3. Filter by Ingredient, Category, Alcoholic, or Glass',
+            body: 'Filter cocktails by ingredient, category, alcoholic classification, or glass type (at least one parameter required):',
+            codeBlock: {
+              language: 'bash',
+              code: `# Filter by ingredient
+curl "http://localhost:3000/cocktail-db?type=filter&ingredient=Gin"
+
+# Filter by category
+curl "http://localhost:3000/cocktail-db?type=filter&category=Cocktail"
+
+# Filter by alcoholic classification
+curl "http://localhost:3000/cocktail-db?type=filter&alcoholic=Alcoholic"
+
+# Filter by glass type
+curl "http://localhost:3000/cocktail-db?type=filter&glass=Cocktail_glass"`
+            }
+          },
+          {
+            title: '4. List Categories, Glass Types, Ingredients & Alcoholic Classifications',
+            body: 'Retrieve taxonomies and listing entries without additional parameters:',
+            codeBlock: {
+              language: 'bash',
+              code: `# List cocktail categories
+curl "http://localhost:3000/cocktail-db?type=categories"
+
+# List glass types
+curl "http://localhost:3000/cocktail-db?type=glass"
+
+# List cocktail ingredients
+curl "http://localhost:3000/cocktail-db?type=ingredients"
+
+# List alcoholic classifications
+curl "http://localhost:3000/cocktail-db?type=alcoholic"`
+            }
+          }
+        ]
+      },
+      {
+        heading: 'Response Payload & Status Codes',
+        content: 'Responses return standard TheCocktailDB JSON schema structures with HTTP status codes matching the request status:',
+        subsections: [
+          {
+            title: '200 OK — Successful Cocktail Query',
+            body: 'Contains the drinks array with complete instructions, ingredients, measures, category, and tags:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "drinks": [
+    {
+      "idDrink": "11007",
+      "strDrink": "Margarita",
+      "strCategory": "Ordinary Drink",
+      "strAlcoholic": "Alcoholic",
+      "strGlass": "Cocktail glass",
+      "strInstructions": "Rub the rim of the glass with the lime slice to make the salt stick to it...",
+      "strDrinkThumb": "https://www.thecocktaildb.com/images/media/drink/5noda61589575158.jpg",
+      "strIngredient1": "Tequila",
+      "strIngredient2": "Triple sec",
+      "strIngredient3": "Lime juice",
+      "strMeasure1": "1 1/2 oz",
+      "strMeasure2": "1/2 oz",
+      "strMeasure3": "1 oz"
+    }
+  ]
+}`
+            }
+          },
+          {
+            title: '400 Bad Request — Missing Required Parameter',
+            body: 'Returned when lookup/search is missing value, or filter is called without ingredient, category, alcoholic, or glass:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "success": false,
+  "statusCode": 400,
+  "status": false,
+  "message": "Missing required 'value' parameter for type=lookup"
+}`
+            }
+          }
+        ]
+      }
+    ]
   }
 };
