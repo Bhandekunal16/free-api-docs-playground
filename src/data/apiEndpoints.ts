@@ -3149,6 +3149,186 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 25. JokeAPI
+  {
+    id: 'joke-api',
+    category: 'joke-api',
+    categoryTitle: 'JokeAPI',
+    method: 'GET',
+    path: '/joke-api',
+    title: 'JokeAPI',
+    shortDescription: 'Provides access to random jokes, category-specific jokes, joke IDs, and filtered joke results.',
+    description: 'The JokeAPI provides access to random jokes, category-specific jokes, and filtered joke results from the JokeAPI v2 service (https://v2.jokeapi.dev).',
+    notes: [
+      'Upstream API: https://v2.jokeapi.dev',
+      'Response operation defaults to "random" (GET /joke-api).',
+      'Operation "joke" requires the "value" parameter (Joke ID, e.g. 123).',
+      'Operations "category", "categories", and "filter" require the "value" parameter (Category or comma-separated categories).',
+      'The "filter" operation supports optional blacklistFlags (comma-separated, e.g. nsfw,religious,political) and safe (true/false).',
+      'Amount controls the number of jokes returned (e.g. amount=5).',
+      'Joke format (single / twopart) can be specified via format (mapped to JokeAPI format type parameter).',
+      'The endpoint is read-only.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'JokeAPI local operation selector; defaults to random.',
+        options: [
+          { label: 'random (Random Joke - default)', value: 'random', description: 'Get a random joke' },
+          { label: 'joke (Joke by ID)', value: 'joke', description: 'Get a joke by ID (requires value=id)' },
+          { label: 'category (Joke by Category)', value: 'category', description: 'Get jokes from a specific category (requires value=category)' },
+          { label: 'categories (Multiple Categories)', value: 'categories', description: 'Get jokes from one or more categories (requires value=cat1,cat2)' },
+          { label: 'filter (Filter Jokes)', value: 'filter', description: 'Get jokes from a category with additional filters (requires value=category)' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Category or Joke ID (value)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Programming, or 123 (for joke by ID)',
+        description: 'Category for random, category, or filter; Joke ID for joke operation; comma-separated categories for categories operation.'
+      },
+      {
+        name: 'amount',
+        label: 'Amount',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 5',
+        description: 'Number of jokes to return (e.g. 5).'
+      },
+      {
+        name: 'format',
+        label: 'Joke Format',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'JokeAPI joke format: single (one-liner) or twopart (setup + delivery).',
+        options: [
+          { label: '(Any / Both)', value: '', description: 'Default format (both single and twopart jokes)' },
+          { label: 'single (Single)', value: 'single', description: 'Single one-liner joke' },
+          { label: 'twopart (Two Part)', value: 'twopart', description: 'Two-part joke with setup and delivery' }
+        ]
+      },
+      {
+        name: 'blacklistFlags',
+        label: 'Blacklist Flags',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. nsfw,religious,political,racist,sexist,explicit',
+        description: 'Comma-separated flags to exclude from results.'
+      },
+      {
+        name: 'safe',
+        label: 'Safe for Work (safe)',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'Request safe-for-work jokes (safe=true).',
+        options: [
+          { label: '(Default / Unspecified)', value: '', description: 'Default safety filter' },
+          { label: 'true (Safe for Work)', value: 'true', description: 'Filter out unsafe jokes' },
+          { label: 'false (Allow All)', value: 'false', description: 'Do not enforce safe mode' }
+        ]
+      },
+      {
+        name: 'lang',
+        label: 'Language (lang)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. en, de, es, fr, cs, pt',
+        description: 'Language code for jokes (defaults to en).'
+      }
+    ],
+    presets: [
+      {
+        id: 'joke-preset-1-random',
+        label: 'Preset 1 — Random Joke',
+        description: 'Get a random joke (GET /joke-api)',
+        queryParams: { type: 'random' }
+      },
+      {
+        id: 'joke-preset-2-programming',
+        label: 'Preset 2 — Programming Joke',
+        description: 'Get a random Programming joke (GET /joke-api?type=random&value=Programming)',
+        queryParams: { type: 'random', value: 'Programming' }
+      },
+      {
+        id: 'joke-preset-3-category',
+        label: 'Preset 3 — Joke by Category (Programming)',
+        description: 'Get jokes from category Programming (GET /joke-api?type=category&value=Programming)',
+        queryParams: { type: 'category', value: 'Programming' }
+      },
+      {
+        id: 'joke-preset-4-categories',
+        label: 'Preset 4 — Multiple Categories (Programming,Misc)',
+        description: 'Get jokes from multiple categories (GET /joke-api?type=categories&value=Programming,Misc)',
+        queryParams: { type: 'categories', value: 'Programming,Misc' }
+      },
+      {
+        id: 'joke-preset-5-filter',
+        label: 'Preset 5 — Filtered Joke (Safe & Blacklist)',
+        description: 'Get filtered joke (GET /joke-api?type=filter&value=Programming&blacklistFlags=nsfw,religious,political&safe=true)',
+        queryParams: { type: 'filter', value: 'Programming', blacklistFlags: 'nsfw,religious,political', safe: 'true' }
+      },
+      {
+        id: 'joke-preset-6-multiple',
+        label: 'Preset 6 — Multiple Jokes (Amount 5, Single)',
+        description: 'Get 5 single-format jokes (GET /joke-api?type=random&value=Programming&amount=5&format=single)',
+        queryParams: { type: 'random', value: 'Programming', amount: '5', format: 'single' }
+      },
+      {
+        id: 'joke-preset-7-by-id',
+        label: 'Preset 7 — Joke by ID (123)',
+        description: 'Get joke by specific ID (GET /joke-api?type=joke&value=123)',
+        queryParams: { type: 'joke', value: '123' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/joke-api',
+    exampleCurl: 'curl http://localhost:3000/joke-api',
+    responseExample: {
+      error: false,
+      category: 'Programming',
+      type: 'twopart',
+      setup: 'Why did the programmer quit his job?',
+      delivery: "Because he didn't get arrays.",
+      flags: {
+        nsfw: false,
+        religious: false,
+        political: false,
+        racist: false,
+        sexist: false,
+        explicit: false
+      },
+      id: 123,
+      safe: true,
+      lang: 'en'
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required 'value' for joke ID, category, or filter operation, or invalid operation type.",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Missing required 'value' parameter for type=joke"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

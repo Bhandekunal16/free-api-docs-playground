@@ -718,5 +718,102 @@ curl "http://localhost:3000/cocktail-db?type=alcoholic"`
         ]
       }
     ]
+  },
+  jokeApi: {
+    id: 'jokeApi',
+    title: 'JokeAPI Guide & Specification',
+    category: 'reference',
+    shortDescription: 'Comprehensive documentation for fetching random, category-based, multiple, and filtered programming and general jokes via JokeAPI v2.',
+    icon: 'Smile',
+    sections: [
+      {
+        heading: 'Endpoint Overview',
+        content: 'The `/joke-api` endpoint proxies requests to JokeAPI v2 (https://v2.jokeapi.dev), delivering curated jokes with rich classification flags, single or twopart formats, category filtering, and safe mode enforcement.',
+        subsections: [
+          {
+            title: 'Endpoint URL',
+            body: 'GET /joke-api (local proxy) -> https://v2.jokeapi.dev/joke'
+          },
+          {
+            title: 'Supported Operation Types',
+            body: 'random (default), joke (by ID), category (by specific category), categories (comma-separated categories), and filter (category with blacklistFlags and safe mode).'
+          }
+        ]
+      },
+      {
+        heading: 'Operations & Examples',
+        content: 'Configure the type parameter and optional filters to retrieve single or multiple jokes in twopart or single format.',
+        subsections: [
+          {
+            title: '1. Random Joke',
+            body: 'Returns a random joke across any category (GET /joke-api):',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/joke-api'
+            }
+          },
+          {
+            title: '2. Joke by ID',
+            body: 'Returns a specific joke by ID (GET /joke-api?type=joke&value=123):',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/joke-api?type=joke&value=123"'
+            }
+          },
+          {
+            title: '3. Category & Filtered Safe Jokes',
+            body: 'Returns safe programming jokes excluding NSFW, religious, and political jokes:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/joke-api?type=filter&value=Programming&blacklistFlags=nsfw,religious,political&safe=true"'
+            }
+          }
+        ]
+      },
+      {
+        heading: 'Response Schemas & Status Codes',
+        content: 'JokeAPI returns structured JSON objects for single jokes or arrays when amount > 1.',
+        subsections: [
+          {
+            title: '200 OK — Successful Joke Response',
+            body: 'Returns joke metadata including category, twopart setup/delivery or single joke line, safety flags, and ID:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "error": false,
+  "category": "Programming",
+  "type": "twopart",
+  "setup": "Why did the programmer quit his job?",
+  "delivery": "Because he didn't get arrays.",
+  "flags": {
+    "nsfw": false,
+    "religious": false,
+    "political": false,
+    "racist": false,
+    "sexist": false,
+    "explicit": false
+  },
+  "id": 123,
+  "safe": true,
+  "lang": "en"
+}`
+            }
+          },
+          {
+            title: '400 Bad Request — Missing Required Parameter',
+            body: 'Returned when joke ID, category, or filter value is missing:',
+            codeBlock: {
+              language: 'json',
+              code: `{
+  "success": false,
+  "statusCode": 400,
+  "status": false,
+  "message": "Missing required 'value' parameter for type=joke"
+}`
+            }
+          }
+        ]
+      }
+    ]
   }
 };

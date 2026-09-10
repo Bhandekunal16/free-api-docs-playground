@@ -186,6 +186,38 @@ export function buildUrl(
         }
       }
 
+      // Special check: for joke-api endpoint, omit default type=random (when empty) and filter non-applicable fields
+      if (endpoint.id === 'joke-api') {
+        const op = queryParams.type || 'random';
+        if (key === 'type' && (val === 'random' || val === '')) {
+          const hasExtraParams = Boolean(
+            (queryParams.value && queryParams.value.trim()) ||
+            (queryParams.amount && queryParams.amount.trim()) ||
+            (queryParams.format && queryParams.format.trim()) ||
+            (queryParams.blacklistFlags && queryParams.blacklistFlags.trim()) ||
+            (queryParams.safe && queryParams.safe.trim()) ||
+            (queryParams.lang && queryParams.lang.trim())
+          );
+          if (!hasExtraParams) {
+            return; // clean /joke-api for default random joke
+          }
+        }
+
+        // For joke operation (joke by ID), omit filter-specific params unless provided
+        if (op === 'joke') {
+          if (key === 'blacklistFlags' || key === 'safe') {
+            return;
+          }
+        }
+
+        // Map format field to query string 'format' or 'jokeType'
+        if (key === 'format') {
+          if (!val.trim()) return;
+          searchParams.append('format', val.trim());
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

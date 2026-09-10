@@ -221,6 +221,27 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate JokeAPI endpoint
+    if (endpoint.id === 'joke-api') {
+      const op = queryParams.type || 'random';
+      if (op === 'joke' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Joke ID is required.');
+        return;
+      }
+      if (op === 'category' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Category is required.');
+        return;
+      }
+      if (op === 'categories' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('At least one category is required (e.g. "Programming,Misc").');
+        return;
+      }
+      if (op === 'filter' && (!queryParams.value || !queryParams.value.trim())) {
+        setValidationError('Category is required for filter operation (e.g. "Programming").');
+        return;
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -347,6 +368,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const selectedCocktailDbType = queryParams.type || 'random';
     const isCocktailDbValueRequired = isCocktailDbEndpoint && param.name === 'value' && ['lookup', 'search'].includes(selectedCocktailDbType);
 
+    // Context-awareness for JokeAPI
+    const isJokeApiEndpoint = endpoint.id === 'joke-api';
+    const selectedJokeApiType = queryParams.type || 'random';
+    const isJokeApiValueRequired = isJokeApiEndpoint && param.name === 'value' && ['joke', 'category', 'categories', 'filter'].includes(selectedJokeApiType);
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -360,7 +386,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isGutendexValueRequired ||
       isOpenFoodFactsValueRequired ||
       isMealDbValueRequired ||
-      isCocktailDbValueRequired;
+      isCocktailDbValueRequired ||
+      isJokeApiValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -442,6 +469,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. Alcoholic, Non_Alcoholic';
     } else if (isCocktailDbEndpoint && param.name === 'glass') {
       customPlaceholder = 'e.g. Cocktail_glass, Highball_glass';
+    } else if (isJokeApiEndpoint && param.name === 'value') {
+      customPlaceholder = selectedJokeApiType === 'joke'
+        ? '123'
+        : selectedJokeApiType === 'categories'
+        ? 'Programming,Misc'
+        : 'Programming';
+    } else if (isJokeApiEndpoint && param.name === 'blacklistFlags') {
+      customPlaceholder = 'nsfw,religious,political';
+    } else if (isJokeApiEndpoint && param.name === 'amount') {
+      customPlaceholder = '5';
+    } else if (isJokeApiEndpoint && param.name === 'lang') {
+      customPlaceholder = 'en';
     }
 
     return (
@@ -464,7 +503,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -544,6 +583,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? 'Filter cocktails by alcoholic classification (e.g. Alcoholic, Non_Alcoholic)'
             : isCocktailDbEndpoint && param.name === 'glass'
             ? 'Filter cocktails by glass type (e.g. Cocktail_glass, Highball_glass)'
+            : isJokeApiValueRequired
+            ? `Required: ${selectedJokeApiType === 'joke' ? 'Joke ID' : selectedJokeApiType === 'categories' ? 'Categories' : 'Category'} for operation "${selectedJokeApiType}"`
+            : isJokeApiEndpoint && param.name === 'blacklistFlags'
+            ? 'Comma-separated flags to exclude (e.g. nsfw,religious,political)'
+            : isJokeApiEndpoint && param.name === 'safe'
+            ? 'Safe for Work filter (safe=true excludes sensitive jokes)'
+            : isJokeApiEndpoint && param.name === 'format'
+            ? 'Joke format: single (one-liner) or twopart (setup & delivery)'
+            : isJokeApiEndpoint && param.name === 'amount'
+            ? 'Number of jokes to return (e.g. 5)'
+            : isJokeApiEndpoint && param.name === 'lang'
+            ? 'Language code (e.g. en, de, es, fr)'
             : param.description}
         </p>
       </div>
@@ -1356,6 +1407,126 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                       }
 
                       return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'joke-api' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          1. Select Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">defaults to random (GET /joke-api)</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Contextual Parameters based on Operation */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'random';
+
+                      return (
+                        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                          {selectedType === 'random' && (
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'value' || p.name === 'amount')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'format' || p.name === 'safe' || p.name === 'lang')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedType === 'joke' && (
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                  Joke ID
+                                </span>
+                                <span className="text-[10px] text-rose-500 font-mono">required (e.g. 123)</span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'value' || p.name === 'lang')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedType === 'category' && (
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                  Category Name
+                                </span>
+                                <span className="text-[10px] text-rose-500 font-mono">required (e.g. Programming)</span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'value' || p.name === 'amount')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'format' || p.name === 'safe' || p.name === 'lang')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedType === 'categories' && (
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                  Multiple Categories
+                                </span>
+                                <span className="text-[10px] text-rose-500 font-mono">required (e.g. Programming,Misc)</span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'value' || p.name === 'amount')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'format' || p.name === 'safe' || p.name === 'lang')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedType === 'filter' && (
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                  Filter Criteria
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-mono">value (category) required</span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'value' || p.name === 'blacklistFlags')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'amount' || p.name === 'format' || p.name === 'safe' || p.name === 'lang')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
                     })()}
                   </div>
                 ) : (
