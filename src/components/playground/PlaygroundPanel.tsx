@@ -297,6 +297,30 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Bored API endpoint
+    if (endpoint.id === 'bored') {
+      const op = queryParams.operation || 'random';
+      if (!['random', 'filter', 'activity'].includes(op)) {
+        setValidationError('Invalid operation. Supported operations: random, filter, activity.');
+        return;
+      }
+      if (op === 'activity') {
+        if (!queryParams.value || !queryParams.value.trim()) {
+          setValidationError('Activity Key is required for the activity operation (e.g. "3943506").');
+          return;
+        }
+      }
+      if (op === 'filter') {
+        if (queryParams.participants && queryParams.participants.trim()) {
+          const num = Number(queryParams.participants.trim());
+          if (isNaN(num) || !Number.isInteger(num) || num <= 0) {
+            setValidationError('Participants must be a positive integer (e.g. 2).');
+            return;
+          }
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -436,6 +460,11 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       param.name === 'value' &&
       ['randomMultiple', 'byType', 'joke'].includes(selectedOfficialJokeType);
 
+    // Context-awareness for Bored API
+    const isBoredEndpoint = endpoint.id === 'bored';
+    const selectedBoredOperation = queryParams.operation || 'random';
+    const isBoredValueRequired = isBoredEndpoint && param.name === 'value' && selectedBoredOperation === 'activity';
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -451,7 +480,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isMealDbValueRequired ||
       isCocktailDbValueRequired ||
       isJokeApiValueRequired ||
-      isOfficialJokeValueRequired;
+      isOfficialJokeValueRequired ||
+      isBoredValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -553,13 +583,21 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
         : selectedOfficialJokeType === 'joke'
         ? 'e.g. 1'
         : 'Value';
+    } else if (isBoredEndpoint && param.name === 'value') {
+      customPlaceholder = 'e.g. 3943506 (Activity Key)';
+    } else if (isBoredEndpoint && param.name === 'type') {
+      customPlaceholder = 'e.g. education, social, recreational';
+    } else if (isBoredEndpoint && param.name === 'participants') {
+      customPlaceholder = 'e.g. 2';
     }
+
+    const paramDisplayName = param.name === 'value' && isBoredEndpoint ? 'value (Activity Key)' : param.name;
 
     return (
       <div key={param.name} className="space-y-1">
         <div className="flex items-center justify-between text-xs">
           <label className="font-mono text-slate-900 dark:text-slate-100 font-semibold flex items-center space-x-1">
-            <span>{param.name}</span>
+            <span>{paramDisplayName}</span>
             {isRequired && (
               <span className="text-rose-600 dark:text-rose-400 text-[10px]">*</span>
             )}
@@ -587,7 +625,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && endpoint.id !== 'random-user' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && endpoint.id !== 'random-user' && endpoint.id !== 'bored' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -1746,6 +1784,79 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                           .map(renderQueryParamInput)}
                       </div>
                     </div>
+                  </div>
+                ) : endpoint.id === 'bored' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selector */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {queryParams.operation === 'filter'
+                            ? 'GET /bored?operation=filter'
+                            : queryParams.operation === 'activity'
+                            ? 'GET /bored?operation=activity'
+                            : 'GET /bored (default random)'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'operation')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Dynamic Controls Based on Operation */}
+                    {(() => {
+                      const op = queryParams.operation || 'random';
+                      if (op === 'filter') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Filter Parameters
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                optional type & participants filters
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['type', 'participants'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'activity') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Activity Lookup
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                activity key required (maps to /activity/{'{key}'})
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-dashed border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
+                          Ready to fetch a random activity from Bored API. No extra parameters required.
+                        </div>
+                      );
+                    })()}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

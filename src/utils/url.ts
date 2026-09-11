@@ -266,6 +266,30 @@ export function buildUrl(
         }
       }
 
+      // Special check: for bored endpoint
+      if (endpoint.id === 'bored') {
+        const op = queryParams.operation || 'random';
+        if (op === 'random') {
+          return; // clean /bored without operation=random or stale filter/activity params
+        }
+
+        if (op === 'filter') {
+          if (key === 'value') return;
+          if (key === 'operation') {
+            searchParams.append('operation', 'filter');
+            return;
+          }
+        }
+
+        if (op === 'activity') {
+          if (key === 'type' || key === 'participants') return;
+          if (key === 'operation') {
+            searchParams.append('operation', 'activity');
+            return;
+          }
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

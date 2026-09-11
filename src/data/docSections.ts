@@ -902,5 +902,92 @@ curl "http://localhost:3000/cocktail-db?type=alcoholic"`
         ]
       }
     ]
+  },
+  bored: {
+    id: 'bored',
+    title: 'Bored API Reference',
+    category: 'reference',
+    shortDescription: 'Comprehensive guide for the Bored API endpoints, operations, filters, activity keys, and cURL examples.',
+    icon: 'Sparkles',
+    sections: [
+      {
+        heading: 'Overview & Upstream Architecture',
+        content: 'The Bored API provides random activities and supports filtering activities by type and number of participants, as well as retrieving an activity by key from Bored API (https://bored-api.appbrewery.com).',
+        subsections: [
+          {
+            title: 'Upstream & Local Endpoints',
+            body: 'Upstream: https://bored-api.appbrewery.com\nLocal Endpoint: GET /bored\n\nAll operations route through the local /bored endpoint.'
+          },
+          {
+            title: 'Parameter Naming Distinction (operation vs type)',
+            body: 'The local operation parameter is named "operation" so that it does not conflict with the upstream "type" filter parameter. The default operation is "random" and maps to GET /bored.'
+          }
+        ]
+      },
+      {
+        heading: 'Supported Operations & Mappings',
+        content: 'Three operations are supported: random, filter, and activity.',
+        subsections: [
+          {
+            title: 'operation=random — Random Activity',
+            body: 'Upstream: /random\nReturns a random activity suggestion. Defaults to GET /bored without requiring extra parameters.'
+          },
+          {
+            title: 'operation=filter — Filter Activities',
+            body: 'Upstream: /filter\nSupports optional query parameters "type" (e.g. education, recreational, social, diy, charity, cooking, relaxation, music, busywork) and "participants" (e.g. 2).'
+          },
+          {
+            title: 'operation=activity — Activity by Key',
+            body: 'Upstream: /activity/{key}\nRequires the "value" parameter representing the activity key (e.g. value=3943506).'
+          }
+        ]
+      },
+      {
+        heading: 'Example Requests & Responses',
+        content: 'Common cURL and HTTP request patterns for the Bored API.',
+        subsections: [
+          {
+            title: 'GET /bored — Random Activity',
+            body: 'Fetches a single random activity.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/bored'
+            }
+          },
+          {
+            title: 'GET /bored?operation=filter&type=education — Educational Activity',
+            body: 'Filters activities by category type "education".',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/bored?operation=filter&type=education"'
+            }
+          },
+          {
+            title: 'GET /bored?operation=filter&participants=2 — Two Participants',
+            body: 'Filters activities for 2 participants.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/bored?operation=filter&participants=2"'
+            }
+          },
+          {
+            title: 'GET /bored?operation=filter&type=social&participants=2 — Social Activity for Two',
+            body: 'Combines type and participants filters.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/bored?operation=filter&type=social&participants=2"'
+            }
+          },
+          {
+            title: 'GET /bored?operation=activity&value=3943506 — Activity by Key',
+            body: 'Retrieves the specific activity by key 3943506.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/bored?operation=activity&value=3943506"'
+            }
+          }
+        ]
+      }
+    ]
   }
 };

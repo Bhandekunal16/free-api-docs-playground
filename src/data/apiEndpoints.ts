@@ -3702,6 +3702,122 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+  {
+    id: 'bored',
+    category: 'bored',
+    categoryTitle: 'Bored API',
+    method: 'GET',
+    path: '/bored',
+    title: 'Bored Activities',
+    shortDescription: 'Discover random activities or filter by type, participants, and activity key.',
+    description: 'Provides access to random activities and supports filtering activities by type and number of participants, as well as retrieving an activity by key from Bored API (https://bored-api.appbrewery.com).',
+    notes: [
+      'Local selector: operation (random, filter, activity). Defaults to random (/random).',
+      'Parameter distinction: "operation" selects the local operation mode, while "type" is the upstream activity type filter (e.g. education, social, recreational).',
+      'The "activity" operation requires an Activity Key passed via the "value" parameter (upstream: /activity/{key}).',
+      'Upstream API base: https://bored-api.appbrewery.com'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'operation',
+        type: 'string',
+        required: false,
+        defaultValue: 'random',
+        description: 'Operation type: random, filter, or activity. Defaults to random.',
+        options: [
+          { label: 'random — Random Activity', value: 'random' },
+          { label: 'filter — Filter Activities', value: 'filter' },
+          { label: 'activity — Activity by Key', value: 'activity' }
+        ]
+      },
+      {
+        name: 'type',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. education, social, recreational',
+        description: 'Activity type filter (used with operation=filter). Supported: education, recreational, social, diy, charity, cooking, relaxation, music, busywork.'
+      },
+      {
+        name: 'participants',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 2',
+        description: 'Number of participants filter (used with operation=filter).'
+      },
+      {
+        name: 'value',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 3943506',
+        description: 'Activity Key (required when operation=activity).'
+      }
+    ],
+    presets: [
+      {
+        id: 'random',
+        label: 'Random Activity',
+        description: 'Get a random activity suggestion',
+        queryParams: { operation: 'random' }
+      },
+      {
+        id: 'filter-education',
+        label: 'Educational Activity',
+        description: 'Filter activities by type "education"',
+        queryParams: { operation: 'filter', type: 'education' }
+      },
+      {
+        id: 'filter-participants',
+        label: 'Two Participants',
+        description: 'Filter activities requiring 2 participants',
+        queryParams: { operation: 'filter', participants: '2' }
+      },
+      {
+        id: 'filter-social-two',
+        label: 'Social Activity for Two',
+        description: 'Filter social activities for 2 participants',
+        queryParams: { operation: 'filter', type: 'social', participants: '2' }
+      },
+      {
+        id: 'activity-key',
+        label: 'Activity by Key',
+        description: 'Retrieve a specific activity by its key',
+        queryParams: { operation: 'activity', value: '3943506' }
+      }
+    ],
+    exampleRequestUrl: '/bored',
+    exampleCurl: 'curl http://localhost:3000/bored',
+    responseExample: {
+      activity: 'Learn Express.js',
+      availability: 0.25,
+      type: 'education',
+      participants: 1,
+      price: 0.1,
+      accessibility: 'Few to no challenges',
+      duration: 'hours',
+      kidFriendly: true,
+      link: 'https://expressjs.com/',
+      key: '3943506'
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type, missing activity key, or invalid parameter values.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'value is required for activity operation'
+        }
+      },
+      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 
