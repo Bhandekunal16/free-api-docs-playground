@@ -27,7 +27,9 @@ import {
   Smile,
   Laugh,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  FoldVertical,
+  UnfoldVertical
 } from 'lucide-react';
 import { useApi } from '../../context/ApiContext';
 import { API_ENDPOINTS } from '../../data/apiEndpoints';
@@ -41,42 +43,116 @@ export const Sidebar: React.FC = () => {
     setIsMobileMenuOpen
   } = useApi();
   
-  // Collapsible section states
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
-    docs: false,
-    health: false,
-    fake: false,
-    geography: false,
-    weather: false,
-    pokemon: false,
-    rickAndMorty: false,
-    catFacts: false,
-    dogs: false,
-    jikan: false,
-    coingecko: false,
-    ipify: false,
-    agify: false,
-    genderize: false,
-    nationalize: false,
-    github: false,
-    openLibrary: false,
-    gutendex: false,
-    mealDb: false,
-    cocktailDb: false,
-    jokeApi: false,
-    officialJoke: false,
-    randomUser: false,
-    bored: false,
-    openFoodFacts: false
+  const getCategorySectionKey = (category: string): string => {
+    switch (category) {
+      case 'health': return 'health';
+      case 'fake':
+      case 'mock': return 'fake';
+      case 'geography': return 'geography';
+      case 'weather': return 'weather';
+      case 'pokemon': return 'pokemon';
+      case 'rick-and-morty': return 'rickAndMorty';
+      case 'cat-facts': return 'catFacts';
+      case 'dogs': return 'dogs';
+      case 'jikan': return 'jikan';
+      case 'coingecko': return 'coingecko';
+      case 'ipify': return 'ipify';
+      case 'agify': return 'agify';
+      case 'genderize': return 'genderize';
+      case 'nationalize': return 'nationalize';
+      case 'github': return 'github';
+      case 'open-library': return 'openLibrary';
+      case 'gutendex': return 'gutendex';
+      case 'meal-db': return 'mealDb';
+      case 'cocktail-db': return 'cocktailDb';
+      case 'joke-api': return 'jokeApi';
+      case 'official-joke': return 'officialJoke';
+      case 'random-user': return 'randomUser';
+      case 'bored': return 'bored';
+      case 'open-food-facts': return 'openFoodFacts';
+      default: return '';
+    }
+  };
+
+  const API_SECTION_KEYS = [
+    'health', 'fake', 'geography', 'weather', 'pokemon',
+    'rickAndMorty', 'catFacts', 'dogs', 'jikan', 'coingecko',
+    'ipify', 'agify', 'genderize', 'nationalize', 'github',
+    'openLibrary', 'gutendex', 'mealDb', 'cocktailDb', 'jokeApi',
+    'officialJoke', 'randomUser', 'bored', 'openFoodFacts'
+  ];
+
+  // Collapsible section states (API parts collapsed initially by default)
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>(() => {
+    const initialState: Record<string, boolean> = {
+      docs: false,
+      health: true,
+      fake: true,
+      geography: true,
+      weather: true,
+      pokemon: true,
+      rickAndMorty: true,
+      catFacts: true,
+      dogs: true,
+      jikan: true,
+      coingecko: true,
+      ipify: true,
+      agify: true,
+      genderize: true,
+      nationalize: true,
+      github: true,
+      openLibrary: true,
+      gutendex: true,
+      mealDb: true,
+      cocktailDb: true,
+      jokeApi: true,
+      officialJoke: true,
+      randomUser: true,
+      bored: true,
+      openFoodFacts: true
+    };
+    return initialState;
   });
 
   const toggleSection = (key: string) => {
     setCollapsedSections(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const collapseAllApis = () => {
+    setCollapsedSections(prev => {
+      const next: Record<string, boolean> = { ...prev };
+      API_SECTION_KEYS.forEach(k => {
+        next[k] = true;
+      });
+      return next;
+    });
+  };
+
+  const expandAllApis = () => {
+    setCollapsedSections(prev => {
+      const next: Record<string, boolean> = { ...prev };
+      API_SECTION_KEYS.forEach(k => {
+        next[k] = false;
+      });
+      return next;
+    });
+  };
+
   const handleSelect = (type: 'endpoint' | 'doc', id: string) => {
     setActiveSelection({ type, id });
     setIsMobileMenuOpen(false);
+
+    if (type === 'endpoint') {
+      const ep = API_ENDPOINTS.find(e => e.id === id);
+      if (ep) {
+        const secKey = getCategorySectionKey(ep.category);
+        if (secKey) {
+          setCollapsedSections(prev => ({ ...prev, [secKey]: false }));
+        }
+      }
+    } else if (type === 'doc') {
+      setCollapsedSections(prev => ({ ...prev, docs: false }));
+    }
   };
 
   // Group endpoints
@@ -122,11 +198,27 @@ export const Sidebar: React.FC = () => {
         }`}
       >
         {/* Top Menubar Header with Version & Mode Badge */}
-        <div className="px-3.5 py-3 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/30">
+        <div className="px-3.5 py-2.5 flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/30">
           <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">Explorer</span>
-          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded shadow-2xs">
-            v1.0 Docs & Playground
-          </span>
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={expandAllApis}
+              title="Expand all API sections"
+              className="px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded transition-colors flex items-center space-x-1"
+            >
+              <UnfoldVertical size={11} />
+              <span>Expand</span>
+            </button>
+            <span className="text-slate-300 dark:text-slate-700">|</span>
+            <button
+              onClick={collapseAllApis}
+              title="Collapse all API sections"
+              className="px-1.5 py-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded transition-colors flex items-center space-x-1"
+            >
+              <FoldVertical size={11} />
+              <span>Collapse</span>
+            </button>
+          </div>
         </div>
 
         {/* Navigation list */}
