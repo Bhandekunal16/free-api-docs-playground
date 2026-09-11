@@ -3818,6 +3818,170 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+  {
+    id: 'deck-of-cards',
+    category: 'deck-of-cards',
+    categoryTitle: 'Deck of Cards API',
+    method: 'GET',
+    path: '/deck-of-cards',
+    title: 'Deck of Cards Operations',
+    shortDescription: 'Create decks, shuffle cards, draw cards, and manage named card piles.',
+    description: 'Provides operations for creating new decks, shuffling cards, drawing cards, and managing named piles from upstream Deck of Cards API (https://deckofcardsapi.com/api/deck).',
+    notes: [
+      'Local selector: operation (new, newShuffle, draw, shuffle, return, pileAdd, pileShuffle, pileList, pileDraw, pileReturn). Defaults to newShuffle (/new/shuffle/).',
+      'Operations working with an existing deck (draw, shuffle, return) require "deckId".',
+      'Pile operations (pileAdd, pileShuffle, pileList, pileDraw, pileReturn) require both "deckId" and "pileName".',
+      'Card lists use standard comma-separated card codes: AS, 2S, KH, etc.',
+      'Upstream API base: https://deckofcardsapi.com/api/deck'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'operation',
+        type: 'string',
+        required: false,
+        defaultValue: 'newShuffle',
+        description: 'Deck of Cards operation. Defaults to newShuffle.',
+        options: [
+          { label: 'newShuffle — New Shuffled Deck', value: 'newShuffle' },
+          { label: 'new — New Unshuffled Deck', value: 'new' },
+          { label: 'draw — Draw Cards from Deck', value: 'draw' },
+          { label: 'shuffle — Reshuffle Existing Deck', value: 'shuffle' },
+          { label: 'return — Return Cards to Deck', value: 'return' },
+          { label: 'pileAdd — Add Cards to Pile', value: 'pileAdd' },
+          { label: 'pileShuffle — Shuffle Pile', value: 'pileShuffle' },
+          { label: 'pileList — List Cards in Pile', value: 'pileList' },
+          { label: 'pileDraw — Draw Cards from Pile', value: 'pileDraw' },
+          { label: 'pileReturn — Return Pile to Deck', value: 'pileReturn' }
+        ]
+      },
+      {
+        name: 'deckId',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 3p40paa87x90',
+        description: 'Existing Deck ID (required for draw, shuffle, return, and all pile operations).'
+      },
+      {
+        name: 'pileName',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. discard',
+        description: 'Named pile identifier (required for pileAdd, pileShuffle, pileList, pileDraw, and pileReturn).'
+      },
+      {
+        name: 'count',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 2',
+        description: 'Number of cards to draw (used with draw and pileDraw).'
+      },
+      {
+        name: 'deckCount',
+        type: 'number',
+        required: false,
+        placeholder: 'e.g. 1',
+        description: 'Number of decks to create (used with new and newShuffle).'
+      },
+      {
+        name: 'jokersEnabled',
+        type: 'boolean',
+        required: false,
+        description: 'Whether to include 2 jokers in a new deck (used with new and newShuffle).',
+        options: [
+          { label: 'false (Standard 52 cards)', value: 'false' },
+          { label: 'true (Include 2 Jokers)', value: 'true' }
+        ]
+      },
+      {
+        name: 'cards',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. AS,2S',
+        description: 'Comma-separated card codes (used with return and pileAdd).'
+      },
+      {
+        name: 'remaining',
+        type: 'boolean',
+        required: false,
+        description: 'Shuffle only remaining cards when true (used with shuffle).',
+        options: [
+          { label: 'false (Shuffle all cards)', value: 'false' },
+          { label: 'true (Shuffle only remaining)', value: 'true' }
+        ]
+      }
+    ],
+    presets: [
+      {
+        id: 'new-deck',
+        label: 'New Deck',
+        description: 'Create a new unshuffled deck',
+        queryParams: { operation: 'new' }
+      },
+      {
+        id: 'new-shuffled-deck',
+        label: 'New Shuffled Deck',
+        description: 'Create and shuffle a new deck with deckCount=1',
+        queryParams: { operation: 'newShuffle', deckCount: '1' }
+      },
+      {
+        id: 'draw-cards',
+        label: 'Draw Cards',
+        description: 'Draw 2 cards from an existing deck',
+        queryParams: { operation: 'draw', deckId: '3p40paa87x90', count: '2' }
+      },
+      {
+        id: 'shuffle-existing',
+        label: 'Shuffle Existing Deck',
+        description: 'Reshuffle remaining cards in an existing deck',
+        queryParams: { operation: 'shuffle', deckId: '3p40paa87x90', remaining: 'true' }
+      },
+      {
+        id: 'add-to-pile',
+        label: 'Add Cards to Pile',
+        description: 'Add AS,2S to the "discard" pile',
+        queryParams: { operation: 'pileAdd', deckId: '3p40paa87x90', pileName: 'discard', cards: 'AS,2S' }
+      },
+      {
+        id: 'list-pile',
+        label: 'List Pile',
+        description: 'List cards currently in the "discard" pile',
+        queryParams: { operation: 'pileList', deckId: '3p40paa87x90', pileName: 'discard' }
+      },
+      {
+        id: 'draw-from-pile',
+        label: 'Draw From Pile',
+        description: 'Draw 2 cards from the "discard" pile',
+        queryParams: { operation: 'pileDraw', deckId: '3p40paa87x90', pileName: 'discard', count: '2' }
+      }
+    ],
+    exampleRequestUrl: '/deck-of-cards',
+    exampleCurl: 'curl http://localhost:3000/deck-of-cards',
+    responseExample: {
+      success: true,
+      deck_id: '3p40paa87x90',
+      remaining: 52,
+      shuffled: true
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation, missing deckId / pileName, or malformed parameters.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'deckId is required for operation draw'
+        }
+      },
+      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

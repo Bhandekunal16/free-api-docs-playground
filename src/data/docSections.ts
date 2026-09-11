@@ -989,5 +989,142 @@ curl "http://localhost:3000/cocktail-db?type=alcoholic"`
         ]
       }
     ]
+  },
+  deckOfCards: {
+    id: 'deckOfCards',
+    title: 'Deck of Cards API Reference',
+    category: 'reference',
+    shortDescription: 'Technical guide and reference for creating decks, shuffling, drawing cards, and managing named card piles.',
+    icon: 'Layers',
+    sections: [
+      {
+        heading: 'Overview & Upstream Architecture',
+        content: 'The Deck of Cards API provides comprehensive card deck operations, from creating fresh decks and drawing cards to managing separate named piles. All requests are proxied from the upstream Deck of Cards service (https://deckofcardsapi.com/api/deck).',
+        subsections: [
+          {
+            title: 'Local Endpoint Route',
+            body: 'GET /deck-of-cards (default localhost:3000/deck-of-cards)'
+          },
+          {
+            title: 'Upstream Base API',
+            body: 'https://deckofcardsapi.com/api/deck'
+          },
+          {
+            title: 'Operation Routing',
+            body: 'The local query parameter "operation" dynamically determines the upstream endpoint path. When no operation is provided, it defaults to newShuffle (/new/shuffle/).'
+          }
+        ]
+      },
+      {
+        heading: 'Supported Operations & Upstream Mappings',
+        content: 'The Deck of Cards API supports 10 distinct operations mapped directly to upstream paths:',
+        subsections: [
+          {
+            title: 'operation=new — New Unshuffled Deck',
+            body: 'Upstream: /new/\nCreates a new unshuffled standard 52-card deck. Supports optional deckCount (number of decks) and jokersEnabled (true/false).'
+          },
+          {
+            title: 'operation=newShuffle — New Shuffled Deck (Default)',
+            body: 'Upstream: /new/shuffle/\nCreates a new shuffled deck. Supports optional deckCount and jokersEnabled. When calling GET /deck-of-cards without parameters, this is the default.'
+          },
+          {
+            title: 'operation=draw — Draw Cards from Deck',
+            body: 'Upstream: /{deckId}/draw/\nRequires deckId. Supports optional count parameter specifying the number of cards to draw.'
+          },
+          {
+            title: 'operation=shuffle — Reshuffle Existing Deck',
+            body: 'Upstream: /{deckId}/shuffle/\nRequires deckId. Supports optional remaining=true to shuffle only undrawn cards.'
+          },
+          {
+            title: 'operation=return — Return Cards to Deck',
+            body: 'Upstream: /{deckId}/return/\nRequires deckId. Supports optional comma-separated cards parameter (e.g. cards=AS,2S).'
+          },
+          {
+            title: 'operation=pileAdd — Add Cards to Pile',
+            body: 'Upstream: /{deckId}/pile/{pileName}/add/\nRequires deckId, pileName, and cards parameter (e.g. cards=AS,2S).'
+          },
+          {
+            title: 'operation=pileShuffle — Shuffle Pile',
+            body: 'Upstream: /{deckId}/pile/{pileName}/shuffle/\nRequires deckId and pileName to shuffle cards inside the specified pile.'
+          },
+          {
+            title: 'operation=pileList — List Cards in Pile',
+            body: 'Upstream: /{deckId}/pile/{pileName}/list/\nRequires deckId and pileName to list all cards currently residing in the pile.'
+          },
+          {
+            title: 'operation=pileDraw — Draw Cards from Pile',
+            body: 'Upstream: /{deckId}/pile/{pileName}/draw/\nRequires deckId and pileName. Supports optional count parameter.'
+          },
+          {
+            title: 'operation=pileReturn — Return Pile to Deck',
+            body: 'Upstream: /{deckId}/pile/{pileName}/return/\nRequires deckId and pileName to return all cards in that pile back to the main deck.'
+          }
+        ]
+      },
+      {
+        heading: 'Card Code Standards',
+        content: 'Cards are represented by 2-character string codes combining value and suit:',
+        subsections: [
+          {
+            title: 'Values',
+            body: 'A (Ace), 2, 3, 4, 5, 6, 7, 8, 9, 0 (10), J (Jack), Q (Queen), K (King).'
+          },
+          {
+            title: 'Suits',
+            body: 'S (Spades), D (Diamonds), C (Clubs), H (Hearts).'
+          },
+          {
+            title: 'Examples',
+            body: 'AS (Ace of Spades), 0D (10 of Diamonds), KH (King of Hearts), 2C (2 of Clubs), X1/X2 (Jokers).'
+          }
+        ]
+      },
+      {
+        heading: 'Example Requests & Responses',
+        content: 'Standard cURL request patterns for interacting with the Deck of Cards API:',
+        subsections: [
+          {
+            title: 'GET /deck-of-cards — Create & Shuffle New Deck',
+            body: 'Creates and shuffles a new standard 52-card deck.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/deck-of-cards'
+            }
+          },
+          {
+            title: 'GET /deck-of-cards?operation=draw&deckId=3p40paa87x90&count=2 — Draw 2 Cards',
+            body: 'Draws 2 cards from an existing deck.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/deck-of-cards?operation=draw&deckId=3p40paa87x90&count=2"'
+            }
+          },
+          {
+            title: 'GET /deck-of-cards?operation=pileAdd&deckId=3p40paa87x90&pileName=discard&cards=AS,2S — Add Cards to Pile',
+            body: 'Adds specified cards to the named "discard" pile.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/deck-of-cards?operation=pileAdd&deckId=3p40paa87x90&pileName=discard&cards=AS,2S"'
+            }
+          },
+          {
+            title: 'GET /deck-of-cards?operation=pileList&deckId=3p40paa87x90&pileName=discard — List Cards in Pile',
+            body: 'Lists the cards currently in the "discard" pile.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/deck-of-cards?operation=pileList&deckId=3p40paa87x90&pileName=discard"'
+            }
+          },
+          {
+            title: 'GET /deck-of-cards?operation=pileDraw&deckId=3p40paa87x90&pileName=discard&count=2 — Draw From Pile',
+            body: 'Draws 2 cards from the "discard" pile.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/deck-of-cards?operation=pileDraw&deckId=3p40paa87x90&pileName=discard&count=2"'
+            }
+          }
+        ]
+      }
+    ]
   }
 };

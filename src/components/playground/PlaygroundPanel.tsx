@@ -321,6 +321,60 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Deck of Cards API endpoint
+    if (endpoint.id === 'deck-of-cards') {
+      const op = queryParams.operation || 'newShuffle';
+      const validOps = ['new', 'newShuffle', 'draw', 'shuffle', 'return', 'pileAdd', 'pileShuffle', 'pileList', 'pileDraw', 'pileReturn'];
+      if (!validOps.includes(op)) {
+        setValidationError(`Invalid operation "${op}". Supported operations: ${validOps.join(', ')}.`);
+        return;
+      }
+
+      // Existing deck operations require deckId
+      const deckOps = ['draw', 'shuffle', 'return'];
+      if (deckOps.includes(op)) {
+        if (!queryParams.deckId || !queryParams.deckId.trim()) {
+          setValidationError(`Deck ID is required for operation "${op}" (e.g. "3p40paa87x90").`);
+          return;
+        }
+      }
+
+      // Pile operations require both deckId and pileName
+      const pileOps = ['pileAdd', 'pileShuffle', 'pileList', 'pileDraw', 'pileReturn'];
+      if (pileOps.includes(op)) {
+        if (!queryParams.deckId || !queryParams.deckId.trim()) {
+          setValidationError(`Deck ID is required for pile operation "${op}" (e.g. "3p40paa87x90").`);
+          return;
+        }
+        if (!queryParams.pileName || !queryParams.pileName.trim()) {
+          setValidationError(`Pile Name is required for pile operation "${op}" (e.g. "discard").`);
+          return;
+        }
+      }
+
+      // Count validation for draw and pileDraw
+      if (op === 'draw' || op === 'pileDraw') {
+        if (queryParams.count && queryParams.count.trim()) {
+          const num = Number(queryParams.count.trim());
+          if (isNaN(num) || !Number.isInteger(num) || num <= 0) {
+            setValidationError('Count must be a positive integer (e.g. 2).');
+            return;
+          }
+        }
+      }
+
+      // Deck Count validation for new / newShuffle
+      if (op === 'new' || op === 'newShuffle') {
+        if (queryParams.deckCount && queryParams.deckCount.trim()) {
+          const num = Number(queryParams.deckCount.trim());
+          if (isNaN(num) || !Number.isInteger(num) || num <= 0) {
+            setValidationError('Deck Count must be a positive integer (e.g. 1 or 2).');
+            return;
+          }
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -465,6 +519,18 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const selectedBoredOperation = queryParams.operation || 'random';
     const isBoredValueRequired = isBoredEndpoint && param.name === 'value' && selectedBoredOperation === 'activity';
 
+    // Context-awareness for Deck of Cards API
+    const isDeckOfCardsEndpoint = endpoint.id === 'deck-of-cards';
+    const selectedDeckOfCardsOp = queryParams.operation || 'newShuffle';
+    const isDeckOfCardsDeckIdRequired =
+      isDeckOfCardsEndpoint &&
+      param.name === 'deckId' &&
+      ['draw', 'shuffle', 'return', 'pileAdd', 'pileShuffle', 'pileList', 'pileDraw', 'pileReturn'].includes(selectedDeckOfCardsOp);
+    const isDeckOfCardsPileNameRequired =
+      isDeckOfCardsEndpoint &&
+      param.name === 'pileName' &&
+      ['pileAdd', 'pileShuffle', 'pileList', 'pileDraw', 'pileReturn'].includes(selectedDeckOfCardsOp);
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -481,7 +547,9 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isCocktailDbValueRequired ||
       isJokeApiValueRequired ||
       isOfficialJokeValueRequired ||
-      isBoredValueRequired;
+      isBoredValueRequired ||
+      isDeckOfCardsDeckIdRequired ||
+      isDeckOfCardsPileNameRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -589,9 +657,32 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = 'e.g. education, social, recreational';
     } else if (isBoredEndpoint && param.name === 'participants') {
       customPlaceholder = 'e.g. 2';
+    } else if (isDeckOfCardsEndpoint && param.name === 'deckId') {
+      customPlaceholder = isDeckOfCardsDeckIdRequired ? 'e.g. 3p40paa87x90 (Required Deck ID)' : 'e.g. 3p40paa87x90 (Deck ID)';
+    } else if (isDeckOfCardsEndpoint && param.name === 'pileName') {
+      customPlaceholder = isDeckOfCardsPileNameRequired ? 'e.g. discard (Required Pile Name)' : 'e.g. discard (Pile Name)';
+    } else if (isDeckOfCardsEndpoint && param.name === 'count') {
+      customPlaceholder = selectedDeckOfCardsOp === 'pileDraw' ? 'e.g. 2 (Cards to draw from pile)' : 'e.g. 2 (Cards to draw)';
+    } else if (isDeckOfCardsEndpoint && param.name === 'deckCount') {
+      customPlaceholder = 'e.g. 1 or 2 (Number of decks)';
+    } else if (isDeckOfCardsEndpoint && param.name === 'cards') {
+      customPlaceholder = 'e.g. AS,2S,KH (Comma-separated card codes)';
     }
 
     const paramDisplayName = param.name === 'value' && isBoredEndpoint ? 'value (Activity Key)' : param.name;
+
+    const getBooleanLabel = () => {
+      if (param.name === 'jokersEnabled') {
+        return currentValue === 'true' ? 'Enabled (2 Jokers included)' : 'Disabled (Standard 52 cards)';
+      }
+      if (param.name === 'remaining') {
+        return currentValue === 'true' ? 'Enabled (Shuffle only remaining cards)' : 'Disabled (Shuffle all cards)';
+      }
+      if (param.name === 'noinfo') {
+        return currentValue === 'true' ? 'Enabled (noinfo=true)' : 'Disabled (include info)';
+      }
+      return currentValue === 'true' ? `Enabled (${param.name}=true)` : `Disabled`;
+    };
 
     return (
       <div key={param.name} className="space-y-1">
@@ -616,7 +707,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
               className="rounded bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 focus:ring-slate-500 h-4 w-4"
             />
             <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-              {currentValue === 'true' ? 'Enabled (noinfo=true)' : 'Disabled (include info)'}
+              {getBooleanLabel()}
             </span>
           </label>
         ) : param.options && param.options.length > 0 ? (
@@ -625,7 +716,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && endpoint.id !== 'random-user' && endpoint.id !== 'bored' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && endpoint.id !== 'random-user' && endpoint.id !== 'bored' && endpoint.id !== 'deck-of-cards' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -1856,6 +1947,197 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                           Ready to fetch a random activity from Bored API. No extra parameters required.
                         </div>
                       );
+                    })()}
+                  </div>
+                ) : endpoint.id === 'deck-of-cards' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selector */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {(() => {
+                            const op = queryParams.operation || 'newShuffle';
+                            switch (op) {
+                              case 'new': return 'upstream: /new/';
+                              case 'newShuffle': return 'upstream: /new/shuffle/ (default)';
+                              case 'draw': return 'upstream: /{deckId}/draw/';
+                              case 'shuffle': return 'upstream: /{deckId}/shuffle/';
+                              case 'return': return 'upstream: /{deckId}/return/';
+                              case 'pileAdd': return 'upstream: /{deckId}/pile/{pileName}/add/';
+                              case 'pileShuffle': return 'upstream: /{deckId}/pile/{pileName}/shuffle/';
+                              case 'pileList': return 'upstream: /{deckId}/pile/{pileName}/list/';
+                              case 'pileDraw': return 'upstream: /{deckId}/pile/{pileName}/draw/';
+                              case 'pileReturn': return 'upstream: /{deckId}/pile/{pileName}/return/';
+                              default: return '';
+                            }
+                          })()}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'operation')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Dynamic Controls Based on Operation */}
+                    {(() => {
+                      const op = queryParams.operation || 'newShuffle';
+
+                      if (op === 'new' || op === 'newShuffle') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Deck Options
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                optional deckCount & jokersEnabled
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckCount', 'jokersEnabled'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'draw') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Draw Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                deckId & count
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckId', 'count'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'shuffle') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Shuffle Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                deckId required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckId', 'remaining'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'return') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Return Cards Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                deckId required, cards optional
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckId', 'cards'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'pileAdd') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Add Cards to Pile
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                deckId, pileName & cards required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckId', 'pileName'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'cards')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'pileDraw') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Draw Cards from Pile
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                deckId, pileName & count required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckId', 'pileName'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'count')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'pileShuffle' || op === 'pileList' || op === 'pileReturn') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Pile Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                deckId & pileName required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['deckId', 'pileName'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
                     })()}
                   </div>
                 ) : (

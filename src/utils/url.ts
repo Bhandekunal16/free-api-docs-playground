@@ -290,6 +290,43 @@ export function buildUrl(
         }
       }
 
+      // Special check: for deck-of-cards endpoint
+      if (endpoint.id === 'deck-of-cards') {
+        const op = queryParams.operation || 'newShuffle';
+
+        if (op === 'new') {
+          if (!['operation', 'deckCount', 'jokersEnabled'].includes(key)) return;
+          if (key === 'jokersEnabled' && val !== 'true') return;
+        } else if (op === 'newShuffle') {
+          if (!['operation', 'deckCount', 'jokersEnabled'].includes(key)) return;
+          if (key === 'jokersEnabled' && val !== 'true') return;
+          if (key === 'operation') {
+            const hasDeckCount = !!(queryParams.deckCount && queryParams.deckCount.trim());
+            const hasJokers = queryParams.jokersEnabled === 'true';
+            if (!hasDeckCount && !hasJokers) {
+              return; // clean /deck-of-cards
+            }
+          }
+        } else if (op === 'draw') {
+          if (!['operation', 'deckId', 'count'].includes(key)) return;
+        } else if (op === 'shuffle') {
+          if (!['operation', 'deckId', 'remaining'].includes(key)) return;
+          if (key === 'remaining' && val !== 'true') return;
+        } else if (op === 'return') {
+          if (!['operation', 'deckId', 'cards'].includes(key)) return;
+        } else if (op === 'pileAdd') {
+          if (!['operation', 'deckId', 'pileName', 'cards'].includes(key)) return;
+        } else if (op === 'pileShuffle') {
+          if (!['operation', 'deckId', 'pileName'].includes(key)) return;
+        } else if (op === 'pileList') {
+          if (!['operation', 'deckId', 'pileName'].includes(key)) return;
+        } else if (op === 'pileDraw') {
+          if (!['operation', 'deckId', 'pileName', 'count'].includes(key)) return;
+        } else if (op === 'pileReturn') {
+          if (!['operation', 'deckId', 'pileName'].includes(key)) return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

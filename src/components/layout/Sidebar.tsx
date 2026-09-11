@@ -69,6 +69,7 @@ export const Sidebar: React.FC = () => {
       case 'official-joke': return 'officialJoke';
       case 'random-user': return 'randomUser';
       case 'bored': return 'bored';
+      case 'deck-of-cards': return 'deckOfCards';
       case 'open-food-facts': return 'openFoodFacts';
       default: return '';
     }
@@ -79,7 +80,7 @@ export const Sidebar: React.FC = () => {
     'rickAndMorty', 'catFacts', 'dogs', 'jikan', 'coingecko',
     'ipify', 'agify', 'genderize', 'nationalize', 'github',
     'openLibrary', 'gutendex', 'mealDb', 'cocktailDb', 'jokeApi',
-    'officialJoke', 'randomUser', 'bored', 'openFoodFacts'
+    'officialJoke', 'randomUser', 'bored', 'deckOfCards', 'openFoodFacts'
   ];
 
   // Collapsible section states (API parts collapsed initially by default)
@@ -109,6 +110,7 @@ export const Sidebar: React.FC = () => {
       officialJoke: true,
       randomUser: true,
       bored: true,
+      deckOfCards: true,
       openFoodFacts: true
     };
     return initialState;
@@ -179,6 +181,7 @@ export const Sidebar: React.FC = () => {
   const officialJokeEndpoints = API_ENDPOINTS.filter(e => e.category === 'official-joke');
   const randomUserEndpoints = API_ENDPOINTS.filter(e => e.category === 'random-user');
   const boredEndpoints = API_ENDPOINTS.filter(e => e.category === 'bored');
+  const deckOfCardsEndpoints = API_ENDPOINTS.filter(e => e.category === 'deck-of-cards');
   const openFoodFactsEndpoints = API_ENDPOINTS.filter(e => e.category === 'open-food-facts');
 
   return (
@@ -308,6 +311,18 @@ export const Sidebar: React.FC = () => {
                 >
                   <Sparkles size={14} className="shrink-0 text-amber-500 dark:text-amber-400" />
                   <span className="truncate">Bored API Reference</span>
+                </button>
+
+                <button
+                  onClick={() => handleSelect('doc', 'deckOfCards')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'deckOfCards'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Layers size={14} className="shrink-0 text-indigo-500 dark:text-indigo-400" />
+                  <span className="truncate">Deck of Cards Reference</span>
                 </button>
               </div>
             )}
@@ -1387,7 +1402,55 @@ export const Sidebar: React.FC = () => {
             )}
           </div>
 
-          {/* 26. SECTION: OPEN FOOD FACTS */}
+          {/* 26. SECTION: DECK OF CARDS */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('deckOfCards')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Layers size={12} className="text-indigo-500" />
+                <span>Deck of Cards</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                  {deckOfCardsEndpoints.length} {deckOfCardsEndpoints.length === 1 ? 'route' : 'routes'}
+                </span>
+                {collapsedSections.deckOfCards ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.deckOfCards && (
+              <div className="space-y-0.5 pt-0.5">
+                {deckOfCardsEndpoints.map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 27. SECTION: OPEN FOOD FACTS */}
           <div className="space-y-1">
             <button
               onClick={() => toggleSection('openFoodFacts')}
