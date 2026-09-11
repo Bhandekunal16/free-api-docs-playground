@@ -1126,5 +1126,111 @@ curl "http://localhost:3000/cocktail-db?type=alcoholic"`
         ]
       }
     ]
+  },
+
+  chess: {
+    id: 'chess',
+    title: 'Chess.com Public API Guide',
+    category: 'reference',
+    shortDescription: 'Official read-only endpoints for chess puzzles, titled players, profiles, monthly PGN games, clubs, countries, streamers, and leaderboards.',
+    icon: 'Crown',
+    sections: [
+      {
+        heading: 'Overview & Upstream Base URL',
+        content: 'The Chess.com Public API allows developers to read public data from Chess.com including daily tactical puzzles, random puzzles, player profiles, game archives, rated matches, club memberships, country rosters, and live streaming broadcasters.'
+      },
+      {
+        heading: 'Operations & Query Parameters',
+        content: 'The /chess route supports various operations configured via the "type" parameter:',
+        subsections: [
+          {
+            title: 'type=dailyPuzzle (Default)',
+            body: 'Upstream: /puzzle\nFetches today\'s daily tactical chess puzzle with FEN, PGN, title, and solutions. Default behavior when requesting /chess directly.'
+          },
+          {
+            title: 'type=randomPuzzle',
+            body: 'Upstream: /puzzle/random\nFetches a random puzzle from the daily puzzle archive.'
+          },
+          {
+            title: 'type=puzzle & value={id}',
+            body: 'Upstream: /puzzle/{id}\nFetches a specific puzzle by ID.'
+          },
+          {
+            title: 'type=player & username={username}',
+            body: 'Upstream: /player/{username}\nFetches public profile details, status, avatar URL, title, followers, and joined timestamp.'
+          },
+          {
+            title: 'type=playerStats & username={username}',
+            body: 'Upstream: /player/{username}/stats\nFetches player ratings, record (win/loss/draw), and best ratings across rapid, blitz, bullet, daily, tactics, and puzzle rush.'
+          },
+          {
+            title: 'type=playerArchives & username={username}',
+            body: 'Upstream: /player/{username}/games/archives\nFetches array of available monthly game archive endpoints.'
+          },
+          {
+            title: 'type=playerGames & username={username}&year={year}&month={month}',
+            body: 'Upstream: /player/{username}/games/{year}/{month}/pgn\nFetches standard Portable Game Notation (PGN) for all rated and casual games played during that calendar month.'
+          },
+          {
+            title: 'type=titled & title={title}',
+            body: 'Upstream: /titled/{title}\nFetches list of usernames holding the given FIDE / Chess.com title (GM, WGM, IM, WIM, FM, WFM, CM, WCM, NM, WNM).'
+          },
+          {
+            title: 'type=club & club={club}',
+            body: 'Upstream: /club/{club}\nFetches club metadata, description, member count, and admin usernames.'
+          },
+          {
+            title: 'type=country & country={country}',
+            body: 'Upstream: /country/{country}\nFetches country details by 2-letter ISO code (e.g. US, IN, NO).'
+          },
+          {
+            title: 'type=leaderboards',
+            body: 'Upstream: /leaderboards\nFetches top 50 leaderboards across daily, live, tactics, and lessons.'
+          },
+          {
+            title: 'type=streamers',
+            body: 'Upstream: /streamers\nFetches all active verified Chess.com community streamers.'
+          }
+        ]
+      },
+      {
+        heading: 'Example Requests',
+        content: 'Ready-to-run cURL snippets for interacting with the Chess.com API endpoints:',
+        subsections: [
+          {
+            title: 'Daily Puzzle',
+            body: 'Get the daily puzzle:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/chess'
+            }
+          },
+          {
+            title: 'Grandmaster Player Profile',
+            body: 'Lookup Hikaru Nakamura\'s profile:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/chess?type=player&username=hikaru"'
+            }
+          },
+          {
+            title: 'Player Performance Ratings',
+            body: 'Lookup player statistics:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/chess?type=playerStats&username=hikaru"'
+            }
+          },
+          {
+            title: 'Monthly Game Archive (PGN)',
+            body: 'Get monthly games notation:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/chess?type=playerGames&username=hikaru&year=2026&month=01"'
+            }
+          }
+        ]
+      }
+    ]
   }
 };

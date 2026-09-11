@@ -307,11 +307,11 @@ export const EndpointDocView: React.FC<EndpointDocViewProps> = ({ endpoint }) =>
           <span>Supported Status Codes</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {endpoint.statusCodes.map(sc => {
+          {endpoint.statusCodes.map((sc, idx) => {
             const isSuccess = sc.code >= 200 && sc.code < 300;
             return (
               <div
-                key={sc.code}
+                key={`${sc.code}-${sc.title}-${idx}`}
                 className="p-3 bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1 text-xs shadow-2xs"
               >
                 <div className="flex items-center space-x-2">

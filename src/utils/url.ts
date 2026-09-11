@@ -327,6 +327,45 @@ export function buildUrl(
         }
       }
 
+      // Special check: for chess endpoint
+      if (endpoint.id === 'chess') {
+        const op = queryParams.type || 'dailyPuzzle';
+
+        if (key === 'type' && (val === 'dailyPuzzle' || val === '')) {
+          return; // 'dailyPuzzle' is default operation, produces clean /chess
+        }
+
+        const isNoParamOp = ['dailyPuzzle', 'randomPuzzle', 'leaderboards', 'streamers'].includes(op);
+        const isPuzzleOp = op === 'puzzle';
+        const isPlayerOp = ['player', 'playerStats', 'playerArchives'].includes(op);
+        const isPlayerGamesOp = op === 'playerGames';
+        const isClubOp = ['club', 'clubMembers', 'clubMatches'].includes(op);
+        const isCountryOp = ['country', 'countryPlayers', 'countryClubs'].includes(op);
+        const isTitledOp = op === 'titled';
+
+        if (isNoParamOp && key !== 'type' && key !== 'query') {
+          return;
+        }
+        if (isPuzzleOp && !['type', 'value', 'query'].includes(key)) {
+          return;
+        }
+        if (isPlayerOp && !['type', 'username', 'query'].includes(key)) {
+          return;
+        }
+        if (isPlayerGamesOp && !['type', 'username', 'year', 'month', 'query'].includes(key)) {
+          return;
+        }
+        if (isClubOp && !['type', 'club', 'query'].includes(key)) {
+          return;
+        }
+        if (isCountryOp && !['type', 'country', 'query'].includes(key)) {
+          return;
+        }
+        if (isTitledOp && !['type', 'title', 'query'].includes(key)) {
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

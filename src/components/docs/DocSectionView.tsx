@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ShieldAlert, AlertTriangle, UtensilsCrossed, Copy, Check, ArrowRight, Play, ExternalLink } from 'lucide-react';
+import { BookOpen, ShieldAlert, AlertTriangle, UtensilsCrossed, Users, Sparkles, Layers, Crown, Copy, Check, ArrowRight, Play, ExternalLink } from 'lucide-react';
 import { DOC_ARTICLES } from '../../data/docSections';
 import { useApi } from '../../context/ApiContext';
 
@@ -26,10 +26,37 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         return <AlertTriangle size={24} className="text-rose-500" />;
       case 'UtensilsCrossed':
         return <UtensilsCrossed size={24} className="text-emerald-500" />;
+      case 'Users':
+        return <Users size={24} className="text-teal-500" />;
+      case 'Sparkles':
+        return <Sparkles size={24} className="text-amber-500" />;
+      case 'Layers':
+        return <Layers size={24} className="text-indigo-500" />;
+      case 'Crown':
+        return <Crown size={24} className="text-amber-500" />;
       default:
         return <BookOpen size={24} className="text-slate-700 dark:text-slate-300" />;
     }
   };
+
+  const getTargetEndpoint = () => {
+    switch (docId) {
+      case 'open-food-facts':
+        return { id: 'open-food-facts', label: 'Try Open Food Facts' };
+      case 'deckOfCards':
+        return { id: 'deck-of-cards', label: 'Try Deck of Cards API' };
+      case 'chess':
+        return { id: 'chess', label: 'Try Chess.com API' };
+      case 'bored':
+        return { id: 'bored', label: 'Try Bored API' };
+      case 'randomUser':
+        return { id: 'random-user', label: 'Try Random User API' };
+      default:
+        return { id: 'fake-collection', label: 'Try Fake API' };
+    }
+  };
+
+  const target = getTargetEndpoint();
 
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-200">
@@ -123,12 +150,12 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
           onClick={() =>
             setActiveSelection({
               type: 'endpoint',
-              id: docId === 'open-food-facts' ? 'open-food-facts' : 'fake-collection'
+              id: target.id
             })
           }
           className="inline-flex items-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-lg text-xs font-semibold transition-colors shadow-sm shrink-0"
         >
-          <span>{docId === 'open-food-facts' ? 'Try Open Food Facts' : 'Try Fake API'}</span>
+          <span>{target.label}</span>
           <ArrowRight size={14} />
         </button>
       </div>

@@ -3813,7 +3813,7 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
           message: 'value is required for activity operation'
         }
       },
-      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[2],
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
@@ -3977,7 +3977,230 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
           message: 'deckId is required for operation draw'
         }
       },
-      COMMON_STATUS_CODES[1],
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
+  },
+  {
+    id: 'chess',
+    category: 'chess',
+    categoryTitle: 'Chess.com Public API',
+    method: 'GET',
+    path: '/chess',
+    title: 'Chess.com Public API',
+    shortDescription: 'Access Chess.com public data including daily puzzles, player profiles, player stats, monthly PGN game records, clubs, country data, titled players, leaderboards, and streamers.',
+    description: 'Provides read-only access to Chess.com data. The local type parameter dynamically routes requests to corresponding Chess.com REST API upstream endpoints at https://api.chess.com/pub. The playerGames operation returns raw plain-text PGN game notations, while all other endpoints return standardized structured JSON.',
+    notes: [
+      'The default operation is dailyPuzzle (GET /chess or GET /chess?type=dailyPuzzle).',
+      'The playerGames operation returns raw PGN (Portable Game Notation) text with preserved formatting.',
+      'Upstream API base: https://api.chess.com/pub.',
+      'All 16 operations validated according to the official Chess.com API specification.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation / Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'dailyPuzzle',
+        description: 'Operation selector determining which Chess.com upstream endpoint to query.',
+        options: [
+          { value: 'dailyPuzzle', label: 'Daily Puzzle — /puzzle', description: 'Get the daily chess puzzle' },
+          { value: 'randomPuzzle', label: 'Random Puzzle — /puzzle/random', description: 'Get a random chess puzzle' },
+          { value: 'puzzle', label: 'Puzzle by ID — /puzzle/{id}', description: 'Get puzzle by specific puzzle ID' },
+          { value: 'player', label: 'Player Profile — /player/{username}', description: 'Get player profile details' },
+          { value: 'playerStats', label: 'Player Statistics — /player/{username}/stats', description: 'Get player ratings and game statistics' },
+          { value: 'playerArchives', label: 'Player Archives — /player/{username}/games/archives', description: 'List URLs for monthly player game archives' },
+          { value: 'playerGames', label: 'Player Games (PGN) — /player/{username}/games/{year}/{month}/pgn', description: 'Get monthly games for a player as raw PGN text' },
+          { value: 'club', label: 'Club Information — /club/{club}', description: 'Get public club profile details' },
+          { value: 'clubMembers', label: 'Club Members — /club/{club}/members', description: 'List active, weekly, and all-time members of a club' },
+          { value: 'clubMatches', label: 'Club Matches — /club/{club}/matches', description: 'List registered, in-progress, and finished matches for a club' },
+          { value: 'country', label: 'Country Information — /country/{country}', description: 'Get country details by 2-letter ISO code' },
+          { value: 'countryPlayers', label: 'Country Players — /country/{country}/players', description: 'List usernames of players from a country' },
+          { value: 'countryClubs', label: 'Country Clubs — /country/{country}/clubs', description: 'List URLs of clubs located in a country' },
+          { value: 'titled', label: 'Titled Players — /titled', description: 'List players holding a specific chess title (GM, IM, etc.)' },
+          { value: 'leaderboards', label: 'Leaderboards — /leaderboards', description: 'Get top 50 player leaderboards for each game format' },
+          { value: 'streamers', label: 'Streamers — /streamers', description: 'List active Chess.com live streamers' }
+        ]
+      },
+      {
+        name: 'username',
+        label: 'Chess.com Username',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. hikaru, magnuscarlsen, garykasparov',
+        description: 'Chess.com username (case-insensitive) for player, stats, archives, and games operations.'
+      },
+      {
+        name: 'club',
+        label: 'Club URL / Slug',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. chess-com, official-speed-chess-championship',
+        description: 'Club URL name or slug for club, club members, and club matches operations.'
+      },
+      {
+        name: 'country',
+        label: 'Country Code (ISO 3166-1 alpha-2)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. IN, US, NO, RU, FR, DE',
+        description: 'Two-letter ISO country code for country, country players, and country clubs operations.'
+      },
+      {
+        name: 'year',
+        label: 'Year (YYYY)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 2026',
+        description: 'Four-digit year for monthly player games PGN download.'
+      },
+      {
+        name: 'month',
+        label: 'Month (MM)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 08',
+        description: 'Two-digit month (01-12) for monthly player games PGN download.'
+      },
+      {
+        name: 'title',
+        label: 'Chess Title',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. GM, WGM, IM, WIM, FM, WFM, CM, WCM, NM, WNM',
+        description: 'Official chess title code for titled player lookups.'
+      },
+      {
+        name: 'value',
+        label: 'Puzzle / Resource ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 74839',
+        description: 'Resource identifier for puzzle by ID lookup.'
+      },
+      {
+        name: 'query',
+        label: 'Upstream Query Parameter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. live=true',
+        description: 'Optional additional query parameters forwarded to the upstream Chess.com API.'
+      }
+    ],
+    presets: [
+      {
+        id: 'daily-puzzle',
+        label: 'Daily Puzzle',
+        description: 'Get today’s official Chess.com daily puzzle',
+        queryParams: { type: 'dailyPuzzle' }
+      },
+      {
+        id: 'random-puzzle',
+        label: 'Random Puzzle',
+        description: 'Get a random daily puzzle from the archive',
+        queryParams: { type: 'randomPuzzle' }
+      },
+      {
+        id: 'hikaru-profile',
+        label: 'Hikaru Player Profile',
+        description: 'Retrieve player profile for GM Hikaru Nakamura',
+        queryParams: { type: 'player', username: 'hikaru' }
+      },
+      {
+        id: 'hikaru-stats',
+        label: 'Hikaru Statistics',
+        description: 'Retrieve blitz, rapid, bullet, and puzzle ratings for Hikaru',
+        queryParams: { type: 'playerStats', username: 'hikaru' }
+      },
+      {
+        id: 'hikaru-archives',
+        label: 'Hikaru Game Archives',
+        description: 'List all available monthly game archive endpoints for Hikaru',
+        queryParams: { type: 'playerArchives', username: 'hikaru' }
+      },
+      {
+        id: 'hikaru-august-2026-pgn',
+        label: 'Hikaru August 2026 Games (PGN)',
+        description: 'Download raw PGN game notations for August 2026',
+        queryParams: { type: 'playerGames', username: 'hikaru', year: '2026', month: '08' }
+      },
+      {
+        id: 'india-players',
+        label: 'India Country Players',
+        description: 'List all Chess.com players registered from India (IN)',
+        queryParams: { type: 'countryPlayers', country: 'IN' }
+      },
+      {
+        id: 'india-clubs',
+        label: 'India Country Clubs',
+        description: 'List all clubs located in India (IN)',
+        queryParams: { type: 'countryClubs', country: 'IN' }
+      },
+      {
+        id: 'grandmasters',
+        label: 'Grandmasters (GM)',
+        description: 'List all titled Grandmasters on Chess.com',
+        queryParams: { type: 'titled', title: 'GM' }
+      },
+      {
+        id: 'leaderboards',
+        label: 'Chess.com Leaderboards',
+        description: 'Get top 50 leaderboards across daily, live, tactics, and lessons',
+        queryParams: { type: 'leaderboards' }
+      },
+      {
+        id: 'streamers',
+        label: 'Active Streamers',
+        description: 'List Chess.com verified live streamers and status',
+        queryParams: { type: 'streamers' }
+      },
+      {
+        id: 'chess-com-club',
+        label: 'Chess.com Official Club',
+        description: 'Retrieve profile for the official Chess.com club',
+        queryParams: { type: 'club', club: 'chess-com' }
+      },
+      {
+        id: 'chess-com-members',
+        label: 'Chess.com Club Members',
+        description: 'List members and admins of the official Chess.com club',
+        queryParams: { type: 'clubMembers', club: 'chess-com' }
+      },
+      {
+        id: 'chess-com-matches',
+        label: 'Chess.com Club Matches',
+        description: 'List daily and live club match records',
+        queryParams: { type: 'clubMatches', club: 'chess-com' }
+      }
+    ],
+    exampleRequestUrl: '/chess',
+    exampleCurl: 'curl http://localhost:3000/chess',
+    responseExample: {
+      title: 'Daily Puzzle',
+      url: 'https://www.chess.com/forum/view/daily-puzzles/9-11-2026-puzzle',
+      publish_time: 1789110000,
+      fen: 'r1bqk2r/pppp1ppp/2n5/4p3/2B1n3/2P2N2/PPP2PPP/R1BQ1RK1 w kq - 0 7',
+      pgn: '[Event "Daily Puzzle"]\n[FEN "r1bqk2r/pppp1ppp/2n5/4p3/2B1n3/2P2N2/PPP2PPP/R1BQ1RK1 w kq - 0 7"]\n1. Bxf7+ Kxf7 2. Qd5+ Ke8 3. Qxe4 *',
+      image: 'https://www.chess.com/dynboard?fen=r1bqk2r/pppp1ppp/2n5/4p3/2B1n3/2P2N2/PPP2PPP/R1BQ1RK1%20w%20kq%20-%200%207'
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type, missing required parameters (username, club, country, year/month, puzzle ID), or malformed inputs.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'username is required for operation player'
+        }
+      },
+      COMMON_STATUS_CODES[2],
       COMMON_STATUS_CODES[3],
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]

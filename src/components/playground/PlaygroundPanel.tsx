@@ -375,6 +375,80 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Chess.com Public API endpoint
+    if (endpoint.id === 'chess') {
+      const op = queryParams.type || 'dailyPuzzle';
+      const validOps = [
+        'dailyPuzzle', 'randomPuzzle', 'puzzle', 'player', 'playerStats',
+        'playerArchives', 'playerGames', 'club', 'clubMembers', 'clubMatches',
+        'country', 'countryPlayers', 'countryClubs', 'titled', 'leaderboards', 'streamers'
+      ];
+      if (!validOps.includes(op)) {
+        setValidationError(`Invalid operation "${op}". Supported operations: ${validOps.join(', ')}.`);
+        return;
+      }
+
+      if (op === 'puzzle') {
+        if (!queryParams.value || !queryParams.value.trim()) {
+          setValidationError('Puzzle ID is required for the puzzle operation in "Puzzle / Resource ID" (e.g. "74839").');
+          return;
+        }
+      }
+
+      if (['player', 'playerStats', 'playerArchives'].includes(op)) {
+        if (!queryParams.username || !queryParams.username.trim()) {
+          setValidationError(`Username is required for operation "${op}" (e.g. "hikaru").`);
+          return;
+        }
+      }
+
+      if (op === 'playerGames') {
+        if (!queryParams.username || !queryParams.username.trim()) {
+          setValidationError('Username is required for playerGames operation (e.g. "hikaru").');
+          return;
+        }
+        if (!queryParams.year || !queryParams.year.trim()) {
+          setValidationError('Year is required for playerGames operation (e.g. "2026").');
+          return;
+        }
+        if (!/^\d{4}$/.test(queryParams.year.trim())) {
+          setValidationError('Year must be a four-digit year (e.g. "2026").');
+          return;
+        }
+        if (!queryParams.month || !queryParams.month.trim()) {
+          setValidationError('Month is required for playerGames operation (e.g. "08").');
+          return;
+        }
+        const m = queryParams.month.trim();
+        const mNum = Number(m);
+        if (isNaN(mNum) || mNum < 1 || mNum > 12) {
+          setValidationError('Month must be a two-digit month between 01 and 12 (e.g. "08").');
+          return;
+        }
+      }
+
+      if (['club', 'clubMembers', 'clubMatches'].includes(op)) {
+        if (!queryParams.club || !queryParams.club.trim()) {
+          setValidationError(`Club URL / slug is required for operation "${op}" (e.g. "chess-com").`);
+          return;
+        }
+      }
+
+      if (['country', 'countryPlayers', 'countryClubs'].includes(op)) {
+        if (!queryParams.country || !queryParams.country.trim()) {
+          setValidationError(`Two-letter country code is required for operation "${op}" (e.g. "IN" or "US").`);
+          return;
+        }
+      }
+
+      if (op === 'titled') {
+        if (!queryParams.title || !queryParams.title.trim()) {
+          setValidationError('Chess title is required for titled players lookup (e.g. "GM", "IM", "FM").');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -2131,6 +2205,218 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {endpoint.queryParams
                                 .filter(p => ['deckId', 'pileName'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'chess' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selector */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Chess Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {(() => {
+                            const op = queryParams.type || 'dailyPuzzle';
+                            switch (op) {
+                              case 'dailyPuzzle': return 'upstream: /puzzle (default)';
+                              case 'randomPuzzle': return 'upstream: /puzzle/random';
+                              case 'puzzle': return 'upstream: /puzzle/{id}';
+                              case 'player': return 'upstream: /player/{username}';
+                              case 'playerStats': return 'upstream: /player/{username}/stats';
+                              case 'playerArchives': return 'upstream: /player/{username}/games/archives';
+                              case 'playerGames': return 'upstream: /player/{username}/games/{year}/{month}/pgn (PGN text)';
+                              case 'club': return 'upstream: /club/{club}';
+                              case 'clubMembers': return 'upstream: /club/{club}/members';
+                              case 'clubMatches': return 'upstream: /club/{club}/matches';
+                              case 'country': return 'upstream: /country/{country}';
+                              case 'countryPlayers': return 'upstream: /country/{country}/players';
+                              case 'countryClubs': return 'upstream: /country/{country}/clubs';
+                              case 'titled': return 'upstream: /titled';
+                              case 'leaderboards': return 'upstream: /leaderboards';
+                              case 'streamers': return 'upstream: /streamers';
+                              default: return '';
+                            }
+                          })()}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Dynamic Controls Based on Operation */}
+                    {(() => {
+                      const op = queryParams.type || 'dailyPuzzle';
+
+                      if (op === 'dailyPuzzle') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-dashed border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                              <span>Ready to fetch today&apos;s daily chess puzzle from Chess.com. Clean URL <code className="font-mono text-emerald-600 dark:text-emerald-400">/chess</code> will be requested.</span>
+                              <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 shrink-0 ml-2">GET /puzzle</span>
+                            </div>
+                            {endpoint.queryParams.filter(p => p.name === 'query').map(renderQueryParamInput)}
+                          </div>
+                        );
+                      }
+
+                      if (op === 'randomPuzzle') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-dashed border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                              <span>Fetches a random puzzle from the daily puzzle archive. No required parameters.</span>
+                              <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">GET /puzzle/random</span>
+                            </div>
+                            {endpoint.queryParams.filter(p => p.name === 'query').map(renderQueryParamInput)}
+                          </div>
+                        );
+                      }
+
+                      if (op === 'leaderboards' || op === 'streamers') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-dashed border-slate-200 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                              <span>
+                                {op === 'leaderboards'
+                                  ? 'Fetches top 50 leaderboards across daily, live, tactics, and lessons.'
+                                  : 'Fetches active verified Chess.com streamers.'}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">
+                                {op === 'leaderboards' ? 'GET /leaderboards' : 'GET /streamers'}
+                              </span>
+                            </div>
+                            {endpoint.queryParams.filter(p => p.name === 'query').map(renderQueryParamInput)}
+                          </div>
+                        );
+                      }
+
+                      if (op === 'puzzle') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Puzzle Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                puzzle ID required (maps to /puzzle/{'{id}'})
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['value', 'query'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (['player', 'playerStats', 'playerArchives'].includes(op)) {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Player Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                username required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['username', 'query'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'playerGames') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Monthly Player Games (PGN)
+                              </span>
+                              <span className="text-[10px] text-indigo-500 font-mono">
+                                raw PGN text response
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['username', 'year', 'month'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                            <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 rounded-lg text-xs text-indigo-800 dark:text-indigo-300">
+                              This endpoint maps to <code className="font-mono font-semibold">/player/{'{username}'}/games/{'{year}'}/{'{month}'}/pgn</code> and returns complete game notations in standard PGN format.
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (['club', 'clubMembers', 'clubMatches'].includes(op)) {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Club Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                club slug/name required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['club', 'query'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (['country', 'countryPlayers', 'countryClubs'].includes(op)) {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Country Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                2-letter ISO country code required
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['country', 'query'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'titled') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Titled Players Parameters
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                chess title required (e.g. GM, IM, FM, WGM)
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['title', 'query'].includes(p.name))
                                 .map(renderQueryParamInput)}
                             </div>
                           </div>
