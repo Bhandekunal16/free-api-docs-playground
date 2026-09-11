@@ -3329,6 +3329,145 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 26. Official Joke API
+  {
+    id: 'official-joke',
+    category: 'official-joke',
+    categoryTitle: 'Official Joke API',
+    method: 'GET',
+    path: '/official-joke',
+    title: 'Official Joke API',
+    shortDescription: 'Provides random jokes, joke collections, joke types, type-specific jokes, and jokes by ID.',
+    description: 'The Official Joke API provides random jokes, joke collections, joke types, type-specific jokes, and jokes by ID from the Official Joke API service (https://official-joke-api.appspot.com).',
+    notes: [
+      'Upstream API: https://official-joke-api.appspot.com',
+      'Response operation defaults to "random" (GET /official-joke -> /random_joke).',
+      'Operation "randomTen" fetches 10 random jokes (GET /official-joke?type=randomTen -> /random_ten).',
+      'Operation "ten" fetches 10 jokes (GET /official-joke?type=ten -> /jokes/ten).',
+      'Operation "randomMultiple" requires a positive integer count in the "value" parameter (GET /official-joke?type=randomMultiple&value=5 -> /jokes/random/5).',
+      'Operation "types" fetches all available joke types (GET /official-joke?type=types -> /types).',
+      'Operation "byType" requires "value" (joke type, e.g. programming) and supports optional "mode" (random / ten) (GET /official-joke?type=byType&value=programming -> /jokes/programming/random).',
+      'Operation "joke" requires "value" (joke ID, e.g. 1) (GET /official-joke?type=joke&value=1 -> /jokes/1).',
+      'The endpoint is read-only.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'Official Joke API operation selector; defaults to random.',
+        options: [
+          { label: 'Random Joke (default)', value: 'random', description: 'Get a single random joke (/random_joke)' },
+          { label: 'Random Ten', value: 'randomTen', description: 'Get ten random jokes (/random_ten)' },
+          { label: 'Ten Jokes', value: 'ten', description: 'Get ten jokes (/jokes/ten)' },
+          { label: 'Random Multiple', value: 'randomMultiple', description: 'Get multiple random jokes by count (/jokes/random/{count})' },
+          { label: 'Joke Types', value: 'types', description: 'Get all available joke categories/types (/types)' },
+          { label: 'Joke by Type', value: 'byType', description: 'Get jokes by type with mode random/ten (/jokes/{type}/random or /jokes/{type}/ten)' },
+          { label: 'Joke by ID', value: 'joke', description: 'Get a specific joke by ID (/jokes/{id})' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Value (ID, Type, or Count)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 5, programming, or 1',
+        description: 'Joke ID for joke, Joke Type for byType, or Count (positive integer) for randomMultiple.'
+      },
+      {
+        name: 'mode',
+        label: 'Mode (for byType)',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'Mode for byType operation: random (single joke) or ten (10 jokes).',
+        options: [
+          { label: 'random (Random Joke of Type)', value: 'random', description: 'Get a single random joke of this type' },
+          { label: 'ten (Ten Jokes of Type)', value: 'ten', description: 'Get 10 jokes of this type' }
+        ]
+      }
+    ],
+    presets: [
+      {
+        id: 'official-joke-preset-1-random',
+        label: 'Preset 1 — Random Joke',
+        description: 'Get a single random joke (GET /official-joke)',
+        queryParams: { type: 'random' }
+      },
+      {
+        id: 'official-joke-preset-2-random-ten',
+        label: 'Preset 2 — Ten Random Jokes',
+        description: 'Get ten random jokes (GET /official-joke?type=randomTen)',
+        queryParams: { type: 'randomTen' }
+      },
+      {
+        id: 'official-joke-preset-3-ten',
+        label: 'Preset 3 — Ten Jokes',
+        description: 'Get ten jokes (GET /official-joke?type=ten)',
+        queryParams: { type: 'ten' }
+      },
+      {
+        id: 'official-joke-preset-4-multiple',
+        label: 'Preset 4 — Five Random Jokes',
+        description: 'Get 5 random jokes (GET /official-joke?type=randomMultiple&value=5)',
+        queryParams: { type: 'randomMultiple', value: '5' }
+      },
+      {
+        id: 'official-joke-preset-5-types',
+        label: 'Preset 5 — Joke Types',
+        description: 'Get all available joke types (GET /official-joke?type=types)',
+        queryParams: { type: 'types' }
+      },
+      {
+        id: 'official-joke-preset-6-by-type',
+        label: 'Preset 6 — Programming Joke',
+        description: 'Get a random programming joke (GET /official-joke?type=byType&value=programming)',
+        queryParams: { type: 'byType', value: 'programming', mode: 'random' }
+      },
+      {
+        id: 'official-joke-preset-7-by-type-ten',
+        label: 'Preset 7 — Ten Programming Jokes',
+        description: 'Get ten programming jokes (GET /official-joke?type=byType&value=programming&mode=ten)',
+        queryParams: { type: 'byType', value: 'programming', mode: 'ten' }
+      },
+      {
+        id: 'official-joke-preset-8-by-id',
+        label: 'Preset 8 — Joke by ID (1)',
+        description: 'Get joke by ID 1 (GET /official-joke?type=joke&value=1)',
+        queryParams: { type: 'joke', value: '1' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/official-joke',
+    exampleCurl: 'curl http://localhost:3000/official-joke',
+    responseExample: {
+      type: 'general',
+      setup: 'What do you call a factory that makes okay products?',
+      punchline: 'A satisfactory.',
+      id: 1
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: "Missing required 'value' for joke ID, type, or randomMultiple count, or count is not a positive integer.",
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: "Count must be a positive integer for type=randomMultiple"
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

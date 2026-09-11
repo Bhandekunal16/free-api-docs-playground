@@ -242,6 +242,39 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Official Joke API endpoint
+    if (endpoint.id === 'official-joke') {
+      const op = queryParams.type || 'random';
+      if (op === 'randomMultiple') {
+        const val = queryParams.value?.trim();
+        if (!val) {
+          setValidationError('Count is required for randomMultiple operation.');
+          return;
+        }
+        const num = Number(val);
+        if (isNaN(num) || !Number.isInteger(num) || num <= 0) {
+          setValidationError('Count must be a positive integer (e.g. 5).');
+          return;
+        }
+      }
+      if (op === 'byType') {
+        if (!queryParams.value || !queryParams.value.trim()) {
+          setValidationError('Joke type is required (e.g. "programming").');
+          return;
+        }
+        if (queryParams.mode && !['', 'random', 'ten'].includes(queryParams.mode)) {
+          setValidationError('Mode must be "random" or "ten".');
+          return;
+        }
+      }
+      if (op === 'joke') {
+        if (!queryParams.value || !queryParams.value.trim()) {
+          setValidationError('Joke ID is required (e.g. "1").');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -373,6 +406,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
     const selectedJokeApiType = queryParams.type || 'random';
     const isJokeApiValueRequired = isJokeApiEndpoint && param.name === 'value' && ['joke', 'category', 'categories', 'filter'].includes(selectedJokeApiType);
 
+    // Context-awareness for Official Joke API
+    const isOfficialJokeEndpoint = endpoint.id === 'official-joke';
+    const selectedOfficialJokeType = queryParams.type || 'random';
+    const isOfficialJokeValueRequired =
+      isOfficialJokeEndpoint &&
+      param.name === 'value' &&
+      ['randomMultiple', 'byType', 'joke'].includes(selectedOfficialJokeType);
+
     const isRequired =
       (param.required && !isAllSelectedInCountries) ||
       isBreedRequiredForDogs ||
@@ -387,7 +428,8 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       isOpenFoodFactsValueRequired ||
       isMealDbValueRequired ||
       isCocktailDbValueRequired ||
-      isJokeApiValueRequired;
+      isJokeApiValueRequired ||
+      isOfficialJokeValueRequired;
 
     let customPlaceholder = param.placeholder || `Enter ${param.name}`;
     if (isValueFieldInCountries && isAllSelectedInCountries) {
@@ -481,6 +523,14 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       customPlaceholder = '5';
     } else if (isJokeApiEndpoint && param.name === 'lang') {
       customPlaceholder = 'en';
+    } else if (isOfficialJokeEndpoint && param.name === 'value') {
+      customPlaceholder = selectedOfficialJokeType === 'randomMultiple'
+        ? 'e.g. 5 (Count)'
+        : selectedOfficialJokeType === 'byType'
+        ? 'e.g. programming'
+        : selectedOfficialJokeType === 'joke'
+        ? 'e.g. 1'
+        : 'Value';
     }
 
     return (
@@ -503,7 +553,7 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -595,6 +645,10 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
             ? 'Number of jokes to return (e.g. 5)'
             : isJokeApiEndpoint && param.name === 'lang'
             ? 'Language code (e.g. en, de, es, fr)'
+            : isOfficialJokeValueRequired
+            ? `Required: ${selectedOfficialJokeType === 'randomMultiple' ? 'Positive integer count' : selectedOfficialJokeType === 'byType' ? 'Joke type (e.g. programming)' : 'Joke ID (e.g. 1)'} for operation "${selectedOfficialJokeType}"`
+            : isOfficialJokeEndpoint && param.name === 'mode'
+            ? 'Mode for byType: random (single joke) or ten (10 jokes)'
             : param.description}
         </p>
       </div>
@@ -1527,6 +1581,104 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                           )}
                         </div>
                       );
+                    })()}
+                  </div>
+                ) : endpoint.id === 'official-joke' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selection (Type) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          1. Select Operation
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">defaults to random (GET /official-joke)</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Contextual Parameters based on Operation */}
+                    {(() => {
+                      const selectedType = queryParams.type || 'random';
+
+                      if (['random', 'randomTen', 'ten', 'types'].includes(selectedType)) {
+                        const labels: Record<string, string> = {
+                          random: 'Random Joke (default)',
+                          randomTen: 'Ten Random Jokes',
+                          ten: 'Ten Jokes',
+                          types: 'Joke Types'
+                        };
+                        const urlSuffix = selectedType === 'random' ? '' : `?type=${selectedType}`;
+                        return (
+                          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                              <span>{labels[selectedType]}. No additional parameters required.</span>
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-500/20">
+                                GET /official-joke{urlSuffix}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'randomMultiple') {
+                        return (
+                          <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Count (Positive Integer)
+                              </span>
+                              <span className="text-[10px] text-rose-500 font-mono">required (e.g. 5)</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'byType') {
+                        return (
+                          <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Joke Type & Mode
+                              </span>
+                              <span className="text-[10px] text-rose-500 font-mono">type required (e.g. programming)</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value' || p.name === 'mode')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (selectedType === 'joke') {
+                        return (
+                          <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Joke ID
+                              </span>
+                              <span className="text-[10px] text-rose-500 font-mono">required (e.g. 1)</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
                     })()}
                   </div>
                 ) : (

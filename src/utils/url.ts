@@ -218,6 +218,36 @@ export function buildUrl(
         }
       }
 
+      // Special check: for official-joke endpoint
+      if (endpoint.id === 'official-joke') {
+        const op = queryParams.type || 'random';
+        if (key === 'type' && (val === 'random' || val === '')) {
+          const hasValue = Boolean(queryParams.value && queryParams.value.trim());
+          if (!hasValue) {
+            return; // clean /official-joke for default random joke
+          }
+        }
+
+        const isNoParamOp = ['random', 'randomTen', 'ten', 'types'].includes(op);
+        if (isNoParamOp && (key === 'value' || key === 'mode')) {
+          return;
+        }
+
+        if (op === 'randomMultiple' && key === 'mode') {
+          return;
+        }
+
+        if (op === 'joke' && key === 'mode') {
+          return;
+        }
+
+        if (op === 'byType' && key === 'mode') {
+          if (!val.trim() || val === 'random') {
+            return; // mode=random is default, omit unless ten
+          }
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });
