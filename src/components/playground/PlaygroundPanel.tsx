@@ -449,6 +449,65 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Dragon Ball API endpoint
+    if (endpoint.id === 'dragon-ball') {
+      const op = queryParams.type || 'characters';
+      const validOps = ['characters', 'character', 'planets', 'planet', 'transformations', 'transformation'];
+      if (!validOps.includes(op)) {
+        setValidationError(`Invalid operation "${op}". Supported operations: ${validOps.join(', ')}.`);
+        return;
+      }
+
+      if (['character', 'planet', 'transformation'].includes(op)) {
+        if (!queryParams.value || !queryParams.value.trim()) {
+          setValidationError(`Resource ID (value) is required for operation "${op}" (e.g. "1").`);
+          return;
+        }
+      }
+
+      if (queryParams.page && queryParams.page.trim()) {
+        const p = Number(queryParams.page.trim());
+        if (isNaN(p) || p < 1) {
+          setValidationError('Page number must be a positive integer (e.g. 1, 2).');
+          return;
+        }
+      }
+
+      if (queryParams.limit && queryParams.limit.trim()) {
+        const l = Number(queryParams.limit.trim());
+        if (isNaN(l) || l < 1) {
+          setValidationError('Limit must be a positive integer (e.g. 10, 20).');
+          return;
+        }
+      }
+    }
+
+    // Validate Digimon API endpoint
+    if (endpoint.id === 'digimon') {
+      const op = queryParams.type || 'digimon';
+      const validOps = ['digimon', 'attribute', 'field', 'level', 'type', 'skill'];
+      if (!validOps.includes(op)) {
+        setValidationError(`Invalid operation type "${op}". Supported operations: ${validOps.join(', ')}.`);
+        return;
+      }
+
+      if (queryParams.page && queryParams.page.trim()) {
+        const p = Number(queryParams.page.trim());
+        if (isNaN(p) || p < 0) {
+          setValidationError('Page index must be a non-negative integer (e.g. 0, 1).');
+          return;
+        }
+      }
+
+      if (queryParams.pageSize && queryParams.pageSize.trim()) {
+        const s = Number(queryParams.pageSize.trim());
+        if (isNaN(s) || s < 1) {
+          setValidationError('Page size must be a positive integer (e.g. 20, 50).');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -2424,6 +2483,297 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
                       }
 
                       return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'dragon-ball' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selector */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Dragon Ball Resource Type
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {(() => {
+                            const op = queryParams.type || 'characters';
+                            switch (op) {
+                              case 'characters': return 'upstream: /characters (default)';
+                              case 'character': return 'upstream: /characters/{id}';
+                              case 'planets': return 'upstream: /planets';
+                              case 'planet': return 'upstream: /planets/{id}';
+                              case 'transformations': return 'upstream: /transformations';
+                              case 'transformation': return 'upstream: /transformations/{id}';
+                              default: return '';
+                            }
+                          })()}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Dynamic Controls Based on Selected Operation */}
+                    {(() => {
+                      const op = queryParams.type || 'characters';
+
+                      if (op === 'characters') {
+                        return (
+                          <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                Character Filters
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => ['name', 'gender', 'race', 'affiliation'].includes(p.name))
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                Pagination
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => ['page', 'limit'].includes(p.name))
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'character') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Character ID
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                required (maps to /characters/{'{id}'})
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                            <div className="p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-lg text-xs text-amber-800 dark:text-amber-300">
+                              Returns character profile including name, ki, maxKi, race, gender, description, image, affiliation, origin planet, and transformations.
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'planets') {
+                        return (
+                          <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                Planet Filters
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => ['name', 'isDestroyed'].includes(p.name))
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                Pagination
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => ['page', 'limit'].includes(p.name))
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'planet') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Planet ID
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                required (maps to /planets/{'{id}'})
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-lg text-xs text-slate-600 dark:text-slate-300">
+                              Returns planet details, destruction status, description, image, and native characters list.
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'transformations') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                              Pagination
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => ['page', 'limit'].includes(p.name))
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (op === 'transformation') {
+                        return (
+                          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Transformation ID
+                              </span>
+                              <span className="text-[10px] text-amber-500 font-mono">
+                                required (maps to /transformations/{'{id}'})
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                            <div className="p-2.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-lg text-xs text-slate-600 dark:text-slate-300">
+                              Returns transformation form details, ki multiplier, and associated character information.
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
+                  </div>
+                ) : endpoint.id === 'digimon' ? (
+                  <div className="space-y-4">
+                    {/* 1. Operation Selector */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Digimon Resource Type
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {(() => {
+                            const op = queryParams.type || 'digimon';
+                            switch (op) {
+                              case 'digimon': return 'upstream: /digimon (default)';
+                              case 'attribute': return 'upstream: /attribute';
+                              case 'field': return 'upstream: /field';
+                              case 'level': return 'upstream: /level';
+                              case 'type': return 'upstream: /type';
+                              case 'skill': return 'upstream: /skill';
+                              default: return '';
+                            }
+                          })()}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => p.name === 'type')
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Dynamic Controls Based on Selected Operation */}
+                    {(() => {
+                      const op = queryParams.type || 'digimon';
+
+                      if (op === 'digimon') {
+                        return (
+                          <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                  Lookup by ID or Name
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-mono">
+                                  optional (e.g. "Agumon" or "1")
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'value')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                Digimon Filters
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => ['name', 'attribute', 'level'].includes(p.name))
+                                  .map(renderQueryParamInput)}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                                {endpoint.queryParams
+                                  .filter(p => p.name === 'xAntibody')
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                                Pagination
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {endpoint.queryParams
+                                  .filter(p => ['page', 'pageSize'].includes(p.name))
+                                  .map(renderQueryParamInput)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // attribute, field, level, type, skill
+                      return (
+                        <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                Resource ID Lookup (Optional)
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                e.g. "1" for /{op}/1
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'value')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                              Pagination
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {endpoint.queryParams
+                                .filter(p => p.name === 'page')
+                                .map(renderQueryParamInput)}
+                            </div>
+                          </div>
+                        </div>
+                      );
                     })()}
                   </div>
                 ) : (

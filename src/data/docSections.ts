@@ -1232,5 +1232,217 @@ curl "http://localhost:3000/cocktail-db?type=alcoholic"`
         ]
       }
     ]
+  },
+
+  dragonBall: {
+    id: 'dragonBall',
+    title: 'Dragon Ball API Guide',
+    category: 'reference',
+    shortDescription: 'Access Dragon Ball universe characters, planets, and transformations data with filter and pagination support.',
+    icon: 'Flame',
+    sections: [
+      {
+        heading: 'Overview & Upstream Base URL',
+        content: 'The Dragon Ball API provides access to data from the Dragon Ball universe, including character profiles, power levels (Ki / Max Ki), transformations, affiliations, and planets. Upstream base URL: https://dragonball-api.com/api'
+      },
+      {
+        heading: 'Operations & Query Parameters',
+        content: 'The /dragon-ball route dynamically routes requests based on the "type" parameter:',
+        subsections: [
+          {
+            title: 'type=characters (Default)',
+            body: 'Upstream: /characters\nList characters with support for pagination (page, limit) and filters (name, gender, race, affiliation). Default behavior for GET /dragon-ball.'
+          },
+          {
+            title: 'type=character & value={id}',
+            body: 'Upstream: /characters/{id}\nGet detailed character profile, Ki levels, origin planet, and all transformations by character ID.'
+          },
+          {
+            title: 'type=planets',
+            body: 'Upstream: /planets\nList planets with pagination (page, limit) and filters (name, isDestroyed).'
+          },
+          {
+            title: 'type=planet & value={id}',
+            body: 'Upstream: /planets/{id}\nGet planet details, destruction status, and resident characters by planet ID.'
+          },
+          {
+            title: 'type=transformations',
+            body: 'Upstream: /transformations\nList all character transformations with pagination (page, limit).'
+          },
+          {
+            title: 'type=transformation & value={id}',
+            body: 'Upstream: /transformations/{id}\nGet transformation details, Ki multiplier, and character info by transformation ID.'
+          }
+        ]
+      },
+      {
+        heading: 'Example Requests',
+        content: 'Ready-to-run cURL snippets for interacting with the Dragon Ball API:',
+        subsections: [
+          {
+            title: 'List All Characters',
+            body: 'Get default character page:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/dragon-ball'
+            }
+          },
+          {
+            title: 'Characters with Pagination',
+            body: 'Get page 2 with limit 10:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/dragon-ball?type=characters&page=2&limit=10"'
+            }
+          },
+          {
+            title: 'Search Character by Name',
+            body: 'Filter characters by name Goku:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/dragon-ball?type=characters&name=Goku"'
+            }
+          },
+          {
+            title: 'Filter by Race & Affiliation',
+            body: 'Filter Saiyans and Z Fighters:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/dragon-ball?type=characters&race=Saiyan"\ncurl "http://localhost:3000/dragon-ball?type=characters&affiliation=Z%20fighter"'
+            }
+          },
+          {
+            title: 'Character by ID',
+            body: 'Lookup Goku profile (#1):',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/dragon-ball?type=character&value=1"'
+            }
+          },
+          {
+            title: 'List Planets',
+            body: 'List all planets or search Earth:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/dragon-ball?type=planets\ncurl "http://localhost:3000/dragon-ball?type=planets&name=Earth"'
+            }
+          },
+          {
+            title: 'List Transformations',
+            body: 'List transformations with pagination:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/dragon-ball?type=transformations\ncurl "http://localhost:3000/dragon-ball?type=transformation&value=1"'
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  digimon: {
+    id: 'digimon',
+    title: 'Digimon API Guide',
+    category: 'reference',
+    shortDescription: 'Access Digimon data, attributes, fields, levels, types, and skills with filter and pagination support.',
+    icon: 'Zap',
+    sections: [
+      {
+        heading: 'Overview & Upstream Base URL',
+        content: 'The Digimon API provides comprehensive data on Digimon creatures, evolutionary levels, attributes, fields, and skills. Configured upstream API base URL: https://digi-api.com/api/v1'
+      },
+      {
+        heading: 'Operations & Query Parameters',
+        content: 'The /digimon route routes requests dynamically based on the "type" parameter:',
+        subsections: [
+          {
+            title: 'type=digimon (Default)',
+            body: 'Upstream: /digimon or /digimon/{value}\nList Digimon with filters (name, attribute, level, xAntibody) and pagination (page, pageSize). When value is provided (e.g. value=Agumon or value=1), retrieves a single Digimon profile.'
+          },
+          {
+            title: 'type=attribute',
+            body: 'Upstream: /attribute or /attribute/{value}\nList all Digimon attributes (e.g. Vaccine, Virus, Data) or get attribute details by ID.'
+          },
+          {
+            title: 'type=field',
+            body: 'Upstream: /field or /field/{value}\nList environmental fields (e.g. Nature Spirits, Deep Savers, Nightmare Soldiers) or get field details by ID.'
+          },
+          {
+            title: 'type=level',
+            body: 'Upstream: /level or /level/{value}\nList evolutionary levels (Fresh, In-Training, Rookie, Champion, Ultimate, Mega) or get level details by ID.'
+          },
+          {
+            title: 'type=type',
+            body: 'Upstream: /type or /type/{value}\nList Digimon biological types (Reptile, Beast, Bird, Dragon, Angel) or get type details by ID.'
+          },
+          {
+            title: 'type=skill',
+            body: 'Upstream: /skill or /skill/{value}\nList special attacks and skills or get skill details by ID.'
+          }
+        ]
+      },
+      {
+        heading: 'Example Requests',
+        content: 'Ready-to-use cURL commands for testing the Digimon API:',
+        subsections: [
+          {
+            title: 'List Digimon (Default)',
+            body: 'Get default paginated list of Digimon:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/digimon'
+            }
+          },
+          {
+            title: 'Lookup Digimon by Name or ID',
+            body: 'Get Agumon details by name or ID:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/digimon?type=digimon&value=Agumon"\ncurl "http://localhost:3000/digimon?type=digimon&value=1"'
+            }
+          },
+          {
+            title: 'Filter by Attribute & Level',
+            body: 'Filter Vaccine attribute and Rookie level:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/digimon?type=digimon&attribute=Vaccine"\ncurl "http://localhost:3000/digimon?type=digimon&level=Rookie"'
+            }
+          },
+          {
+            title: 'Filter by X-Antibody',
+            body: 'Query Digimon carrying the X-Antibody factor:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/digimon?type=digimon&xAntibody=true"'
+            }
+          },
+          {
+            title: 'Pagination (page & pageSize)',
+            body: 'Query page 2 with page size 20:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/digimon?type=digimon&page=2&pageSize=20"'
+            }
+          },
+          {
+            title: 'List Attributes & Fields',
+            body: 'Explore attributes and environmental fields:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/digimon?type=attribute\ncurl http://localhost:3000/digimon?type=field'
+            }
+          },
+          {
+            title: 'List Levels, Types & Skills',
+            body: 'Explore levels, types, and skills:',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/digimon?type=level\ncurl http://localhost:3000/digimon?type=type\ncurl http://localhost:3000/digimon?type=skill'
+            }
+          }
+        ]
+      }
+    ]
   }
 };

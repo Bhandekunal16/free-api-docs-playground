@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ShieldAlert, AlertTriangle, UtensilsCrossed, Users, Sparkles, Layers, Crown, Copy, Check, ArrowRight, Play, ExternalLink } from 'lucide-react';
+import { BookOpen, ShieldAlert, AlertTriangle, UtensilsCrossed, Users, Sparkles, Layers, Crown, Flame, Zap, Copy, Check, ArrowRight, Play, ExternalLink } from 'lucide-react';
 import { DOC_ARTICLES } from '../../data/docSections';
 import { useApi } from '../../context/ApiContext';
 
@@ -34,6 +34,10 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         return <Layers size={24} className="text-indigo-500" />;
       case 'Crown':
         return <Crown size={24} className="text-amber-500" />;
+      case 'Flame':
+        return <Flame size={24} className="text-orange-500" />;
+      case 'Zap':
+        return <Zap size={24} className="text-yellow-500" />;
       default:
         return <BookOpen size={24} className="text-slate-700 dark:text-slate-300" />;
     }
@@ -47,6 +51,10 @@ export const DocSectionView: React.FC<DocSectionViewProps> = ({ docId }) => {
         return { id: 'deck-of-cards', label: 'Try Deck of Cards API' };
       case 'chess':
         return { id: 'chess', label: 'Try Chess.com API' };
+      case 'dragonBall':
+        return { id: 'dragon-ball', label: 'Try Dragon Ball API' };
+      case 'digimon':
+        return { id: 'digimon', label: 'Try Digimon API' };
       case 'bored':
         return { id: 'bored', label: 'Try Bored API' };
       case 'randomUser':

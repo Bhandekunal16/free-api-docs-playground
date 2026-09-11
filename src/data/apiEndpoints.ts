@@ -4205,6 +4205,491 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+  {
+    id: 'dragon-ball',
+    category: 'dragon-ball',
+    categoryTitle: 'Dragon Ball API',
+    method: 'GET',
+    path: '/dragon-ball',
+    title: 'Dragon Ball API',
+    shortDescription: 'Access Dragon Ball universe characters, planets, and transformations data.',
+    description: 'Provides read-only access to Dragon Ball API data. The local type parameter dynamically routes requests to corresponding upstream endpoints at https://dragonball-api.com/api. Query character profiles, power levels, races, affiliations, transformations, and planet statuses with support for filtering and pagination.',
+    notes: [
+      'The default operation is characters (GET /dragon-ball or GET /dragon-ball?type=characters).',
+      'Operations character, planet, and transformation require the value parameter containing the resource ID.',
+      'Upstream API base: https://dragonball-api.com/api.',
+      'Supports filtering characters by name, gender, race, and affiliation, and planets by name and isDestroyed.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation / Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'characters',
+        description: 'Operation selector determining which Dragon Ball upstream endpoint to query.',
+        options: [
+          { value: 'characters', label: 'List Characters — /characters', description: 'List Dragon Ball characters with optional pagination and filters' },
+          { value: 'character', label: 'Get Character by ID — /characters/{id}', description: 'Get a specific character by ID with full details and transformations' },
+          { value: 'planets', label: 'List Planets — /planets', description: 'List planets with optional pagination, name filter, and destruction status' },
+          { value: 'planet', label: 'Get Planet by ID — /planets/{id}', description: 'Get a specific planet by ID with list of native characters' },
+          { value: 'transformations', label: 'List Transformations — /transformations', description: 'List all character transformations with pagination' },
+          { value: 'transformation', label: 'Get Transformation by ID — /transformations/{id}', description: 'Get a specific transformation by ID with ki multipliers' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Resource ID',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 1, 2, 3',
+        description: 'Numeric identifier for character, planet, or transformation ID lookups.'
+      },
+      {
+        name: 'page',
+        label: 'Page Number',
+        type: 'number',
+        required: false,
+        defaultValue: '1',
+        placeholder: 'e.g. 1, 2',
+        description: 'Page number for paginated list results.'
+      },
+      {
+        name: 'limit',
+        label: 'Results per Page',
+        type: 'number',
+        required: false,
+        defaultValue: '10',
+        placeholder: 'e.g. 10, 20',
+        description: 'Number of results to return per page.'
+      },
+      {
+        name: 'name',
+        label: 'Name Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Goku, Vegeta, Earth, Namek',
+        description: 'Filter characters or planets by name.'
+      },
+      {
+        name: 'gender',
+        label: 'Gender Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Male, Female, Unknown',
+        description: 'Filter characters by gender.'
+      },
+      {
+        name: 'race',
+        label: 'Race Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Saiyan, Namekian, Human, Frieza Race, Android, Majin, God, Angel',
+        description: 'Filter characters by race / species.'
+      },
+      {
+        name: 'affiliation',
+        label: 'Affiliation Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Z Fighter, Red Ribbon Army, Frieza Army, Pride Troopers',
+        description: 'Filter characters by group or organization affiliation.'
+      },
+      {
+        name: 'isDestroyed',
+        label: 'Is Destroyed',
+        type: 'enum',
+        required: false,
+        description: 'Filter planets by destruction status.',
+        options: [
+          { value: '', label: 'All Planets (No Filter)' },
+          { value: 'true', label: 'Destroyed (true)' },
+          { value: 'false', label: 'Intact (false)' }
+        ]
+      }
+    ],
+    presets: [
+      {
+        id: 'all-characters',
+        label: 'All Characters',
+        description: 'List characters with default pagination',
+        queryParams: { type: 'characters' }
+      },
+      {
+        id: 'characters-page-2',
+        label: 'Characters Page 2',
+        description: 'Retrieve page 2 of characters with limit=10',
+        queryParams: { type: 'characters', page: '2', limit: '10' }
+      },
+      {
+        id: 'goku-search',
+        label: 'Search Goku',
+        description: 'Filter characters by name=Goku',
+        queryParams: { type: 'characters', name: 'Goku' }
+      },
+      {
+        id: 'saiyan-race',
+        label: 'Saiyan Characters',
+        description: 'Filter characters by race=Saiyan',
+        queryParams: { type: 'characters', race: 'Saiyan' }
+      },
+      {
+        id: 'z-fighter-affiliation',
+        label: 'Z Fighter Affiliation',
+        description: 'Filter characters by affiliation=Z fighter',
+        queryParams: { type: 'characters', affiliation: 'Z fighter' }
+      },
+      {
+        id: 'character-by-id-1',
+        label: 'Character by ID (Goku #1)',
+        description: 'Get full character profile and transformations for ID=1',
+        queryParams: { type: 'character', value: '1' }
+      },
+      {
+        id: 'all-planets',
+        label: 'All Planets',
+        description: 'List Dragon Ball universe planets',
+        queryParams: { type: 'planets' }
+      },
+      {
+        id: 'earth-planet',
+        label: 'Earth Planet',
+        description: 'Filter planets by name=Earth',
+        queryParams: { type: 'planets', name: 'Earth' }
+      },
+      {
+        id: 'destroyed-planets',
+        label: 'Destroyed Planets',
+        description: 'Filter planets with isDestroyed=true',
+        queryParams: { type: 'planets', isDestroyed: 'true' }
+      },
+      {
+        id: 'planet-by-id-1',
+        label: 'Planet by ID (Planet #1)',
+        description: 'Get full planet details and inhabitant characters for ID=1',
+        queryParams: { type: 'planet', value: '1' }
+      },
+      {
+        id: 'all-transformations',
+        label: 'All Transformations',
+        description: 'List all character transformations',
+        queryParams: { type: 'transformations' }
+      },
+      {
+        id: 'transformations-page-2',
+        label: 'Transformations Page 2',
+        description: 'Retrieve page 2 of transformations with limit=10',
+        queryParams: { type: 'transformations', page: '2', limit: '10' }
+      },
+      {
+        id: 'transformation-by-id-1',
+        label: 'Transformation by ID (ID=1)',
+        description: 'Get transformation details for ID=1',
+        queryParams: { type: 'transformation', value: '1' }
+      },
+      {
+        id: 'transformation-by-id-2',
+        label: 'Transformation by ID (ID=2)',
+        description: 'Get transformation details for ID=2',
+        queryParams: { type: 'transformation', value: '2' }
+      }
+    ],
+    exampleRequestUrl: '/dragon-ball',
+    exampleCurl: 'curl http://localhost:3000/dragon-ball',
+    responseExample: {
+      items: [
+        {
+          id: 1,
+          name: 'Goku',
+          ki: '60.000.000',
+          maxKi: '90 Septillion',
+          race: 'Saiyan',
+          gender: 'Male',
+          description: 'El protagonista de la serie, conocido por su gran poder y espíritu de lucha.',
+          image: 'https://dragonball-api.com/characters/goku_normal.webp',
+          affiliation: 'Z Fighter',
+          deletedAt: null
+        }
+      ],
+      meta: {
+        totalItems: 58,
+        itemCount: 10,
+        itemsPerPage: 10,
+        totalPages: 6,
+        currentPage: 1
+      },
+      links: {
+        first: 'https://dragonball-api.com/api/characters?page=1',
+        previous: '',
+        next: 'https://dragonball-api.com/api/characters?page=2',
+        last: 'https://dragonball-api.com/api/characters?page=6'
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type, missing required resource ID (value), or invalid filter/pagination parameters.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'value is required for operation character'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
+  },
+  {
+    id: 'digimon',
+    category: 'digimon',
+    categoryTitle: 'Digimon API',
+    method: 'GET',
+    path: '/digimon',
+    title: 'Digimon API',
+    shortDescription: 'Access Digimon data, attributes, fields, levels, types, and skills.',
+    description: 'Provides read-only access to Digimon API resources. The local type parameter dynamically routes requests to corresponding upstream endpoints at https://digi-api.com/api/v1. Query Digimon by name or ID, filter by attribute (Vaccine, Virus, Data), level (Rookie, Champion, Ultimate, Mega), and X-Antibody status, or explore game attributes, fields, levels, types, and skills.',
+    notes: [
+      'The default operation is digimon (GET /digimon or GET /digimon?type=digimon).',
+      'Operations using value append the value to the corresponding upstream resource path (e.g. /digimon/Agumon or /attribute/1).',
+      'Upstream API base: https://digi-api.com/api/v1.',
+      'Supports filtering Digimon by name, attribute, level, and xAntibody, along with pagination using page and pageSize.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Resource / Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'digimon',
+        description: 'Resource selector determining which Digimon upstream endpoint to query.',
+        options: [
+          { value: 'digimon', label: 'Digimon — /digimon', description: 'List Digimon with filters/pagination, or get by ID/name' },
+          { value: 'attribute', label: 'Attribute — /attribute', description: 'List attributes or get attribute by ID' },
+          { value: 'field', label: 'Field — /field', description: 'List fields or get field by ID' },
+          { value: 'level', label: 'Level — /level', description: 'List levels or get level by ID' },
+          { value: 'type', label: 'Type — /type', description: 'List Digimon types or get type by ID' },
+          { value: 'skill', label: 'Skill — /skill', description: 'List skills or get skill by ID' }
+        ]
+      },
+      {
+        name: 'value',
+        label: 'Resource ID or Name',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Agumon, 1, Greymon',
+        description: 'Resource ID or name appended to the upstream path for single resource lookups.'
+      },
+      {
+        name: 'name',
+        label: 'Name Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Agumon, Gabumon, Omegamon',
+        description: 'Filter Digimon or resources matching this name.'
+      },
+      {
+        name: 'attribute',
+        label: 'Attribute Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Vaccine, Virus, Data, Free, Variable',
+        description: 'Filter Digimon by attribute.'
+      },
+      {
+        name: 'level',
+        label: 'Level Filter',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. Rookie, Champion, Ultimate, Mega, Fresh, In-Training, Armor',
+        description: 'Filter Digimon by evolutionary level.'
+      },
+      {
+        name: 'xAntibody',
+        label: 'X-Antibody',
+        type: 'enum',
+        required: false,
+        description: 'Filter Digimon carrying the X-Antibody factor.',
+        options: [
+          { value: '', label: 'All Digimon (No Filter)' },
+          { value: 'true', label: 'Has X-Antibody (true)' },
+          { value: 'false', label: 'Standard / No X-Antibody (false)' }
+        ]
+      },
+      {
+        name: 'page',
+        label: 'Page Number',
+        type: 'number',
+        required: false,
+        defaultValue: '0',
+        placeholder: 'e.g. 0, 1, 2',
+        description: 'Page index for paginated list results (0-indexed).'
+      },
+      {
+        name: 'pageSize',
+        label: 'Page Size',
+        type: 'number',
+        required: false,
+        defaultValue: '20',
+        placeholder: 'e.g. 20, 50',
+        description: 'Number of results to return per page.'
+      }
+    ],
+    presets: [
+      {
+        id: 'all-digimon',
+        label: 'All Digimon',
+        description: 'List Digimon with default pagination',
+        queryParams: { type: 'digimon' }
+      },
+      {
+        id: 'digimon-by-name-agumon',
+        label: 'Digimon: Agumon (by Value)',
+        description: 'Lookup Agumon profile by name value',
+        queryParams: { type: 'digimon', value: 'Agumon' }
+      },
+      {
+        id: 'digimon-by-id-1',
+        label: 'Digimon: ID #1',
+        description: 'Lookup Digimon #1 (Agumon) by numeric ID',
+        queryParams: { type: 'digimon', value: '1' }
+      },
+      {
+        id: 'digimon-name-search',
+        label: 'Search Name: Agumon',
+        description: 'Filter Digimon list matching name=Agumon',
+        queryParams: { type: 'digimon', name: 'Agumon' }
+      },
+      {
+        id: 'digimon-attribute-vaccine',
+        label: 'Attribute: Vaccine',
+        description: 'Filter Digimon with Vaccine attribute',
+        queryParams: { type: 'digimon', attribute: 'Vaccine' }
+      },
+      {
+        id: 'digimon-level-rookie',
+        label: 'Level: Rookie',
+        description: 'Filter Digimon with Rookie level',
+        queryParams: { type: 'digimon', level: 'Rookie' }
+      },
+      {
+        id: 'digimon-x-antibody',
+        label: 'X-Antibody Digimon',
+        description: 'Filter Digimon possessing X-Antibody',
+        queryParams: { type: 'digimon', xAntibody: 'true' }
+      },
+      {
+        id: 'digimon-pagination',
+        label: 'Pagination (Page 2, Size 20)',
+        description: 'Retrieve page 2 with pageSize 20',
+        queryParams: { type: 'digimon', page: '2', pageSize: '20' }
+      },
+      {
+        id: 'digimon-attributes-list',
+        label: 'List Attributes',
+        description: 'List all Digimon attributes (Vaccine, Virus, Data...)',
+        queryParams: { type: 'attribute' }
+      },
+      {
+        id: 'digimon-attribute-by-id',
+        label: 'Attribute by ID (#1)',
+        description: 'Get attribute details for ID=1',
+        queryParams: { type: 'attribute', value: '1' }
+      },
+      {
+        id: 'digimon-fields-list',
+        label: 'List Fields',
+        description: 'List all Digimon environmental fields (Dragon\'s Roar, etc.)',
+        queryParams: { type: 'field' }
+      },
+      {
+        id: 'digimon-field-by-id',
+        label: 'Field by ID (#1)',
+        description: 'Get field details for ID=1',
+        queryParams: { type: 'field', value: '1' }
+      },
+      {
+        id: 'digimon-levels-list',
+        label: 'List Levels',
+        description: 'List all Digimon evolutionary levels',
+        queryParams: { type: 'level' }
+      },
+      {
+        id: 'digimon-level-by-id',
+        label: 'Level by ID (#1)',
+        description: 'Get level details for ID=1',
+        queryParams: { type: 'level', value: '1' }
+      },
+      {
+        id: 'digimon-types-list',
+        label: 'List Types',
+        description: 'List Digimon biological types (Reptile, Beast, Angel...)',
+        queryParams: { type: 'type' }
+      },
+      {
+        id: 'digimon-type-by-id',
+        label: 'Type by ID (#1)',
+        description: 'Get type details for ID=1',
+        queryParams: { type: 'type', value: '1' }
+      },
+      {
+        id: 'digimon-skills-list',
+        label: 'List Skills',
+        description: 'List Digimon special techniques and skills',
+        queryParams: { type: 'skill' }
+      },
+      {
+        id: 'digimon-skill-by-id',
+        label: 'Skill by ID (#1)',
+        description: 'Get skill details for ID=1',
+        queryParams: { type: 'skill', value: '1' }
+      }
+    ],
+    exampleRequestUrl: '/digimon',
+    exampleCurl: 'curl http://localhost:3000/digimon',
+    responseExample: {
+      content: [
+        {
+          id: 1,
+          name: 'Agumon',
+          href: 'https://digi-api.com/api/v1/digimon/1',
+          image: 'https://digi-api.com/images/digimon/w/Agumon.png'
+        }
+      ],
+      pageable: {
+        currentPage: 0,
+        elementsOnPage: 1,
+        totalElements: 1422,
+        totalPages: 72,
+        previousPage: '',
+        nextPage: 'https://digi-api.com/api/v1/digimon?page=1'
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type or invalid parameter format.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'Invalid operation type'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

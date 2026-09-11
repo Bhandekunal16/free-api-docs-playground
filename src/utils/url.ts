@@ -366,6 +366,70 @@ export function buildUrl(
         }
       }
 
+      // Special check: for dragon-ball endpoint
+      if (endpoint.id === 'dragon-ball') {
+        const op = queryParams.type || 'characters';
+
+        if (op === 'characters') {
+          if (!['type', 'page', 'limit', 'name', 'gender', 'race', 'affiliation'].includes(key)) {
+            return;
+          }
+          if (key === 'type') {
+            const hasOtherParams = !!(
+              (queryParams.page && queryParams.page.trim()) ||
+              (queryParams.limit && queryParams.limit.trim()) ||
+              (queryParams.name && queryParams.name.trim()) ||
+              (queryParams.gender && queryParams.gender.trim()) ||
+              (queryParams.race && queryParams.race.trim()) ||
+              (queryParams.affiliation && queryParams.affiliation.trim())
+            );
+            if (!hasOtherParams) {
+              return; // clean /dragon-ball
+            }
+          }
+        } else if (op === 'character') {
+          if (!['type', 'value'].includes(key)) return;
+        } else if (op === 'planets') {
+          if (!['type', 'page', 'limit', 'name', 'isDestroyed'].includes(key)) return;
+          if (key === 'isDestroyed' && val === '') return;
+        } else if (op === 'planet') {
+          if (!['type', 'value'].includes(key)) return;
+        } else if (op === 'transformations') {
+          if (!['type', 'page', 'limit'].includes(key)) return;
+        } else if (op === 'transformation') {
+          if (!['type', 'value'].includes(key)) return;
+        }
+      }
+
+      // Special check: for digimon endpoint
+      if (endpoint.id === 'digimon') {
+        const op = queryParams.type || 'digimon';
+
+        if (op === 'digimon') {
+          if (!['type', 'value', 'name', 'attribute', 'level', 'xAntibody', 'page', 'pageSize'].includes(key)) {
+            return;
+          }
+          if (key === 'xAntibody' && val === '') return;
+          if (key === 'type') {
+            const hasOtherParams = !!(
+              (queryParams.value && queryParams.value.trim()) ||
+              (queryParams.name && queryParams.name.trim()) ||
+              (queryParams.attribute && queryParams.attribute.trim()) ||
+              (queryParams.level && queryParams.level.trim()) ||
+              (queryParams.xAntibody && queryParams.xAntibody.trim()) ||
+              (queryParams.page && queryParams.page.trim()) ||
+              (queryParams.pageSize && queryParams.pageSize.trim())
+            );
+            if (!hasOtherParams) {
+              return; // clean /digimon
+            }
+          }
+        } else {
+          // attribute, field, level, type, skill
+          if (!['type', 'value', 'page'].includes(key)) return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

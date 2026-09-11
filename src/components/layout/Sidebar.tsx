@@ -27,6 +27,8 @@ import {
   Smile,
   Laugh,
   Crown,
+  Flame,
+  Zap,
   ChevronDown,
   ChevronRight,
   FoldVertical,
@@ -72,6 +74,8 @@ export const Sidebar: React.FC = () => {
       case 'bored': return 'bored';
       case 'deck-of-cards': return 'deckOfCards';
       case 'chess': return 'chess';
+      case 'dragon-ball': return 'dragonBall';
+      case 'digimon': return 'digimon';
       case 'open-food-facts': return 'openFoodFacts';
       default: return '';
     }
@@ -82,7 +86,7 @@ export const Sidebar: React.FC = () => {
     'rickAndMorty', 'catFacts', 'dogs', 'jikan', 'coingecko',
     'ipify', 'agify', 'genderize', 'nationalize', 'github',
     'openLibrary', 'gutendex', 'mealDb', 'cocktailDb', 'jokeApi',
-    'officialJoke', 'randomUser', 'bored', 'deckOfCards', 'chess', 'openFoodFacts'
+    'officialJoke', 'randomUser', 'bored', 'deckOfCards', 'chess', 'dragonBall', 'digimon', 'openFoodFacts'
   ];
 
   // Collapsible section states (API parts collapsed initially by default)
@@ -114,6 +118,8 @@ export const Sidebar: React.FC = () => {
       bored: true,
       deckOfCards: true,
       chess: true,
+      dragonBall: true,
+      digimon: true,
       openFoodFacts: true
     };
     return initialState;
@@ -186,6 +192,8 @@ export const Sidebar: React.FC = () => {
   const boredEndpoints = API_ENDPOINTS.filter(e => e.category === 'bored');
   const deckOfCardsEndpoints = API_ENDPOINTS.filter(e => e.category === 'deck-of-cards');
   const chessEndpoints = API_ENDPOINTS.filter(e => e.category === 'chess');
+  const dragonBallEndpoints = API_ENDPOINTS.filter(e => e.category === 'dragon-ball');
+  const digimonEndpoints = API_ENDPOINTS.filter(e => e.category === 'digimon');
   const openFoodFactsEndpoints = API_ENDPOINTS.filter(e => e.category === 'open-food-facts');
 
   return (
@@ -339,6 +347,30 @@ export const Sidebar: React.FC = () => {
                 >
                   <Crown size={14} className="shrink-0 text-amber-600 dark:text-amber-400" />
                   <span className="truncate">Chess.com API Guide</span>
+                </button>
+
+                <button
+                  onClick={() => handleSelect('doc', 'dragonBall')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'dragonBall'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Flame size={14} className="shrink-0 text-orange-500 dark:text-orange-400" />
+                  <span className="truncate">Dragon Ball API Guide</span>
+                </button>
+
+                <button
+                  onClick={() => handleSelect('doc', 'digimon')}
+                  className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                    activeSelection.type === 'doc' && activeSelection.id === 'digimon'
+                      ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Zap size={14} className="shrink-0 text-yellow-500 dark:text-yellow-400" />
+                  <span className="truncate">Digimon API Guide</span>
                 </button>
               </div>
             )}
@@ -1514,7 +1546,103 @@ export const Sidebar: React.FC = () => {
             )}
           </div>
 
-          {/* 28. SECTION: OPEN FOOD FACTS */}
+          {/* 28. SECTION: DRAGON BALL API */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('dragonBall')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Flame size={12} className="text-orange-500" />
+                <span>Dragon Ball API</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                  {dragonBallEndpoints.length} {dragonBallEndpoints.length === 1 ? 'route' : 'routes'}
+                </span>
+                {collapsedSections.dragonBall ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.dragonBall && (
+              <div className="space-y-0.5 pt-0.5">
+                {dragonBallEndpoints.map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 29. SECTION: DIGIMON API */}
+          <div className="space-y-1">
+            <button
+              onClick={() => toggleSection('digimon')}
+              className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="flex items-center space-x-1.5">
+                <Zap size={12} className="text-yellow-500" />
+                <span>Digimon API</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                  {digimonEndpoints.length} {digimonEndpoints.length === 1 ? 'route' : 'routes'}
+                </span>
+                {collapsedSections.digimon ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </div>
+            </button>
+
+            {!collapsedSections.digimon && (
+              <div className="space-y-0.5 pt-0.5">
+                {digimonEndpoints.map(ep => {
+                  const isActive = activeSelection.type === 'endpoint' && activeSelection.id === ep.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => handleSelect('endpoint', ep.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-slate-200/90 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border border-slate-300 dark:border-slate-700 shadow-2xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 rounded shrink-0">
+                          {ep.method}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="truncate font-mono text-[11px]">{ep.path}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{ep.title}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 30. SECTION: OPEN FOOD FACTS */}
           <div className="space-y-1">
             <button
               onClick={() => toggleSection('openFoodFacts')}
