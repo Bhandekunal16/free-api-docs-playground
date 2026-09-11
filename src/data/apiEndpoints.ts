@@ -3468,6 +3468,240 @@ export const API_ENDPOINTS: EndpointDefinition[] = [
       COMMON_STATUS_CODES[4],
       COMMON_STATUS_CODES[5]
     ]
+  },
+
+  // 27. Random User API
+  {
+    id: 'random-user',
+    category: 'random-user',
+    categoryTitle: 'Random User API',
+    method: 'GET',
+    path: '/random-user',
+    title: 'Random User API',
+    shortDescription: 'Provides randomly generated user profiles with support for filtering, fields, seeds, and pagination.',
+    description: 'The Random User API provides randomly generated user profiles with support for filtering by gender, nationality, selected fields, exclusions, seeds, pagination, and result count from Random User Generator (https://randomuser.me/api).',
+    notes: [
+      'Upstream API: https://randomuser.me/api',
+      'Supported operation: "random" (defaults to "random", upstream path /).',
+      'All query parameters other than the local "type" parameter are forwarded to the Random User API.',
+      'Results parameter accepts a positive integer count of user profiles to generate.',
+      'Gender filter supports "male" or "female". Omit or select "Any" for both.',
+      'Nationality (nat) supports comma-separated nationality codes (e.g. "in", "us", "gb").',
+      'Seed allows generating consistent reproducible user data.',
+      'Page parameter is used for pagination when a seed is provided.',
+      'Include fields (inc) and exclude fields (exc) accept comma-separated field names.',
+      'No Info (noinfo) excludes the "info" metadata object from the response when set to true.',
+      'The endpoint is read-only.'
+    ],
+    pathParams: [],
+    queryParams: [
+      {
+        name: 'type',
+        label: 'Operation Type',
+        type: 'enum',
+        required: false,
+        defaultValue: 'random',
+        description: 'Operation selector; defaults to random.',
+        options: [
+          { label: 'Random Users (default)', value: 'random', description: 'Generate random user profiles (/)' }
+        ]
+      },
+      {
+        name: 'results',
+        label: 'Results (Count)',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 10',
+        description: 'Number of user profiles to return (positive integer).'
+      },
+      {
+        name: 'gender',
+        label: 'Gender',
+        type: 'enum',
+        required: false,
+        defaultValue: '',
+        description: 'Filter generated users by gender.',
+        options: [
+          { label: 'Any (default)', value: '', description: 'Any gender' },
+          { label: 'Male', value: 'male', description: 'Only male profiles' },
+          { label: 'Female', value: 'female', description: 'Only female profiles' }
+        ]
+      },
+      {
+        name: 'nat',
+        label: 'Nationality',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. in or in,us,gb',
+        description: 'Comma-separated nationality codes (e.g. in, us, gb).'
+      },
+      {
+        name: 'seed',
+        label: 'Seed',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. foobar',
+        description: 'Seed string for deterministic/reproducible results.'
+      },
+      {
+        name: 'page',
+        label: 'Page',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. 2',
+        description: 'Page number for paginating seeded results (positive integer).'
+      },
+      {
+        name: 'inc',
+        label: 'Include Fields',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. name,email,picture',
+        description: 'Comma-separated list of fields to include in the output.'
+      },
+      {
+        name: 'exc',
+        label: 'Exclude Fields',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. login',
+        description: 'Comma-separated list of fields to exclude from the output.'
+      },
+      {
+        name: 'format',
+        label: 'Format',
+        type: 'string',
+        required: false,
+        placeholder: 'e.g. json, csv, yaml, xml',
+        description: 'Response format.'
+      },
+      {
+        name: 'noinfo',
+        label: 'No Info',
+        type: 'boolean',
+        required: false,
+        defaultValue: 'false',
+        description: 'Exclude the "info" metadata object from the response (noinfo=true).'
+      }
+    ],
+    presets: [
+      {
+        id: 'random-user-preset-1-default',
+        label: 'Preset 1 — Random User',
+        description: 'Get a single random user profile (GET /random-user)',
+        queryParams: { type: 'random' }
+      },
+      {
+        id: 'random-user-preset-2-multiple',
+        label: 'Preset 2 — Multiple Users (10)',
+        description: 'Get 10 random users (GET /random-user?results=10)',
+        queryParams: { results: '10' }
+      },
+      {
+        id: 'random-user-preset-3-male',
+        label: 'Preset 3 — Male Users',
+        description: 'Get male user profile (GET /random-user?gender=male)',
+        queryParams: { gender: 'male' }
+      },
+      {
+        id: 'random-user-preset-4-female',
+        label: 'Preset 4 — Female Users',
+        description: 'Get female user profile (GET /random-user?gender=female)',
+        queryParams: { gender: 'female' }
+      },
+      {
+        id: 'random-user-preset-5-nat-in',
+        label: 'Preset 5 — Indian Users',
+        description: 'Get user from India (GET /random-user?nat=in)',
+        queryParams: { nat: 'in' }
+      },
+      {
+        id: 'random-user-preset-6-nat-in-10',
+        label: 'Preset 6 — Indian Users — 10 Results',
+        description: 'Get 10 users from India (GET /random-user?results=10&nat=in)',
+        queryParams: { results: '10', nat: 'in' }
+      },
+      {
+        id: 'random-user-preset-7-inc',
+        label: 'Preset 7 — Selected Fields',
+        description: 'Get users with only name, email, picture (GET /random-user?results=10&inc=name,email,picture)',
+        queryParams: { results: '10', inc: 'name,email,picture' }
+      },
+      {
+        id: 'random-user-preset-8-exc',
+        label: 'Preset 8 — Exclude Login',
+        description: 'Get users excluding login info (GET /random-user?results=10&exc=login)',
+        queryParams: { results: '10', exc: 'login' }
+      },
+      {
+        id: 'random-user-preset-9-seed',
+        label: 'Preset 9 — Seeded Results',
+        description: 'Get deterministic users using seed "foobar" (GET /random-user?results=10&seed=foobar)',
+        queryParams: { results: '10', seed: 'foobar' }
+      },
+      {
+        id: 'random-user-preset-10-seed-page',
+        label: 'Preset 10 — Seeded Page',
+        description: 'Get page 2 of seed "foobar" (GET /random-user?results=10&page=2&seed=foobar)',
+        queryParams: { results: '10', page: '2', seed: 'foobar' }
+      }
+    ],
+    exampleRequestUrl: 'https://free-api-server.vercel.app/random-user',
+    exampleCurl: 'curl http://localhost:3000/random-user',
+    responseExample: {
+      results: [
+        {
+          gender: 'female',
+          name: {
+            title: 'Miss',
+            first: 'Jennie',
+            last: 'Nichols'
+          },
+          location: {
+            street: {
+              number: 8929,
+              name: 'Valwood Pkwy'
+            },
+            city: 'Billings',
+            state: 'Michigan',
+            country: 'United States',
+            postcode: 63104
+          },
+          email: 'jennie.nichols@example.com',
+          phone: '(272) 790-0888',
+          picture: {
+            large: 'https://randomuser.me/api/portraits/women/75.jpg',
+            medium: 'https://randomuser.me/api/portraits/med/women/75.jpg',
+            thumbnail: 'https://randomuser.me/api/portraits/thumb/women/75.jpg'
+          },
+          nat: 'US'
+        }
+      ],
+      info: {
+        seed: 'foobar',
+        results: 1,
+        page: 1,
+        version: '1.4'
+      }
+    },
+    statusCodes: [
+      COMMON_STATUS_CODES[0],
+      {
+        code: 400,
+        title: 'Bad Request',
+        description: 'Invalid operation type, or results/page is not a positive integer.',
+        responseExample: {
+          success: false,
+          statusCode: 400,
+          status: false,
+          message: 'results must be a positive integer'
+        }
+      },
+      COMMON_STATUS_CODES[2],
+      COMMON_STATUS_CODES[3],
+      COMMON_STATUS_CODES[4],
+      COMMON_STATUS_CODES[5]
+    ]
   }
 ];
 

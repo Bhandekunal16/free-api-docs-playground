@@ -275,6 +275,28 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
       }
     }
 
+    // Validate Random User API endpoint
+    if (endpoint.id === 'random-user') {
+      if (queryParams.type && queryParams.type.trim() && queryParams.type.trim() !== 'random') {
+        setValidationError('Invalid operation type. Only "random" is supported.');
+        return;
+      }
+      if (queryParams.results && queryParams.results.trim()) {
+        const num = Number(queryParams.results.trim());
+        if (isNaN(num) || !Number.isInteger(num) || num <= 0) {
+          setValidationError('Results must be a positive integer (e.g. 10).');
+          return;
+        }
+      }
+      if (queryParams.page && queryParams.page.trim()) {
+        const num = Number(queryParams.page.trim());
+        if (isNaN(num) || !Number.isInteger(num) || num <= 0) {
+          setValidationError('Page must be a positive integer (e.g. 2).');
+          return;
+        }
+      }
+    }
+
     setValidationError(null);
     executeRequest();
   };
@@ -547,13 +569,25 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
           </span>
         </div>
 
-        {param.options && param.options.length > 0 ? (
+        {param.type === 'boolean' ? (
+          <label className="flex items-center space-x-2.5 px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+            <input
+              type="checkbox"
+              checked={currentValue === 'true'}
+              onChange={e => updateQueryParam(param.name, e.target.checked ? 'true' : '')}
+              className="rounded bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 focus:ring-slate-500 h-4 w-4"
+            />
+            <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+              {currentValue === 'true' ? 'Enabled (noinfo=true)' : 'Disabled (include info)'}
+            </span>
+          </label>
+        ) : param.options && param.options.length > 0 ? (
           <select
             value={currentValue}
             onChange={e => updateQueryParam(param.name, e.target.value)}
             className="w-full px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 font-mono"
           >
-            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && <option value="">(Default)</option>}
+            {!param.required && endpoint.id !== 'github' && endpoint.id !== 'open-library' && endpoint.id !== 'gutendex' && endpoint.id !== 'open-food-facts' && endpoint.id !== 'meal-db' && endpoint.id !== 'cocktail-db' && endpoint.id !== 'joke-api' && endpoint.id !== 'official-joke' && endpoint.id !== 'random-user' && <option value="">(Default)</option>}
             {param.options.map(opt => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -1680,6 +1714,38 @@ export const PlaygroundPanel: React.FC<PlaygroundPanelProps> = ({ endpoint }) =>
 
                       return null;
                     })()}
+                  </div>
+                ) : endpoint.id === 'random-user' ? (
+                  <div className="space-y-4">
+                    {/* 1. Primary Controls (Results, Gender, Nationality) */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Primary Controls
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">defaults to GET /random-user</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['results', 'gender', 'nat'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
+
+                    {/* 2. Advanced / Filtering Options */}
+                    <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                          Advanced & Seeded Pagination Options
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">optional parameters</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        {endpoint.queryParams
+                          .filter(p => ['seed', 'page', 'inc', 'exc', 'format', 'noinfo'].includes(p.name))
+                          .map(renderQueryParamInput)}
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

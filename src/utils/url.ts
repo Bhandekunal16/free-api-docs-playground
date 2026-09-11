@@ -248,6 +248,24 @@ export function buildUrl(
         }
       }
 
+      // Special check: for random-user endpoint
+      if (endpoint.id === 'random-user') {
+        if (key === 'type' && (val === 'random' || val === '')) {
+          return; // clean /random-user without type=random
+        }
+
+        if (key === 'gender' && (!val.trim() || val === 'any')) {
+          return; // omit when Any or empty
+        }
+
+        if (key === 'noinfo') {
+          if (val === 'true') {
+            searchParams.append('noinfo', 'true');
+          }
+          return;
+        }
+      }
+
       searchParams.append(key, val.trim());
     }
   });

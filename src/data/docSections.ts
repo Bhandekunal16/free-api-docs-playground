@@ -815,5 +815,92 @@ curl "http://localhost:3000/cocktail-db?type=alcoholic"`
         ]
       }
     ]
+  },
+  randomUser: {
+    id: 'randomUser',
+    title: 'Random User API Reference',
+    category: 'reference',
+    shortDescription: 'Comprehensive guide for the Random User API endpoints, filters, field selections, seeds, and pagination.',
+    icon: 'Users',
+    sections: [
+      {
+        heading: 'Overview & Upstream Architecture',
+        content: 'The Random User API provides randomly generated user profiles with support for filtering by gender, nationality, selected fields, exclusions, seeds, pagination, and result count from Random User Generator (https://randomuser.me/api).',
+        subsections: [
+          {
+            title: 'Upstream & Local Endpoints',
+            body: 'Upstream: https://randomuser.me/api\nLocal Endpoint: GET /random-user\n\nAll query parameters other than the local "type" parameter are forwarded directly to the upstream Random User API.'
+          },
+          {
+            title: 'Single Operation Architecture',
+            body: 'The only supported operation is "random" (defaulting to random). The local "type" selector defaults to "random" and is omitted from the default request path.'
+          }
+        ]
+      },
+      {
+        heading: 'Supported Query Parameters',
+        content: 'Configure user generation with flexible query parameters.',
+        subsections: [
+          {
+            title: 'results — Result Count',
+            body: 'Positive integer specifying the number of user profiles to generate (e.g. results=10).'
+          },
+          {
+            title: 'gender — Gender Filter',
+            body: 'Filter generated profiles by gender. Supported values: "male" or "female". Omit or select "Any" for mixed results.'
+          },
+          {
+            title: 'nat — Nationality Filter',
+            body: 'Comma-separated nationality codes to restrict users (e.g. nat=in or nat=in,us,gb).'
+          },
+          {
+            title: 'seed — Deterministic Seed',
+            body: 'Alphanumeric seed string (e.g. seed=foobar) allowing consistent, reproducible user generations.'
+          },
+          {
+            title: 'page — Seeded Pagination',
+            body: 'Positive integer page number used in conjunction with a seed (e.g. page=2&seed=foobar).'
+          },
+          {
+            title: 'inc & exc — Field Selection & Exclusion',
+            body: 'Comma-separated field names to include (e.g. inc=name,email,picture) or exclude (e.g. exc=login).'
+          },
+          {
+            title: 'noinfo — Exclude Metadata',
+            body: 'Boolean flag. Setting noinfo=true excludes the "info" metadata object from the response.'
+          }
+        ]
+      },
+      {
+        heading: 'Example Requests & Responses',
+        content: 'Common cURL and HTTP request patterns for Random User API.',
+        subsections: [
+          {
+            title: 'GET /random-user — Default Random User',
+            body: 'Returns a single random user profile with standard info metadata.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl http://localhost:3000/random-user'
+            }
+          },
+          {
+            title: 'GET /random-user?results=10&nat=in — Ten Indian Users',
+            body: 'Generates 10 users with Indian nationality.',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/random-user?results=10&nat=in"'
+            }
+          },
+          {
+            title: 'GET /random-user?results=10&page=2&seed=foobar — Seeded Pagination',
+            body: 'Retrieves page 2 for seed "foobar".',
+            codeBlock: {
+              language: 'bash',
+              code: 'curl "http://localhost:3000/random-user?results=10&page=2&seed=foobar"'
+            }
+          }
+        ]
+      }
+    ]
   }
 };
